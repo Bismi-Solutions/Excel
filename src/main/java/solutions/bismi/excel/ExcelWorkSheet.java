@@ -183,6 +183,111 @@ public class ExcelWorkSheet {
 
     }
 
+    /**
+     * @author - Sulfikar Ali Nazar
+     * @return
+     */
+    public boolean ClearContents() {
 
+        try {
+
+            for (int i = this.sheet.getLastRowNum(); i >= 0; i--) {
+
+                try {
+                    sheet.removeRow(sheet.getRow(i));
+
+                } catch (Exception e) {
+                    log.info("Empty row removal error " + i);
+                }
+
+            }
+
+            SaveWorkBook( inputStream, outputStream, sCompleteFileName);
+            log.info("Cleared sheet contents successfully " );
+            return true;
+
+        } catch (Exception e) {
+            log.info("Error in clearing sheet contents " + e.toString());
+            return false;
+        }
+
+
+
+    }
+
+    public int getColNumber() {
+        return this.sheet.getRow(0).getLastCellNum();
+    }
+
+
+    public int getRowNumber() {
+        return this.sheet.getLastRowNum()+1;
+    }
+
+    public String getSheetName() {
+        return sheetName;
+    }
+
+    /**
+     * @author - Sulfikar Ali Nazar
+     * @param inputStream
+     * @param outputStream
+     * @param sCompleteFileName
+     */
+    private void SaveWorkBook(FileInputStream inputStream,FileOutputStream outputStream, String sCompleteFileName ) {
+        try {
+
+            if (inputStream != null)
+                inputStream.close();
+            OutputStream fileOut = new FileOutputStream(sCompleteFileName);
+            wb.write(fileOut);
+            //wb.close();
+            fileOut.close();
+
+
+        } catch (Exception e) {
+            log.info("Error in saving record " + e.toString());
+        }
+
+
+    }
+
+
+    /**
+     * @author - Sulfikar Ali Nazar
+     * @param row
+     * @param col
+     * @return
+     */
+    public ExcelCell Cells(int row,int col) {
+        ExcelCell cells =null;
+        try {
+            cells=new ExcelCell(this.sheet,this.wb,row,col,this.inputStream,this.outputStream,this.sCompleteFileName);
+
+        } catch (Exception e) {
+            log.info("Error Excel cells operation " + e.toString());
+        }
+
+        return cells;
+
+    }
+
+    /**
+     * @author - Sulfikar Ali Nazar
+     * @param row
+     * @return
+     */
+    public ExcelRow Rows(int row) {
+        ExcelRow rows =null;
+        try {
+            rows=new ExcelRow(this.sheet,this.wb,row,this.inputStream,this.outputStream,this.sCompleteFileName);
+
+        } catch (Exception e) {
+            log.info("Error Excel rows operation " + e.toString());
+        }
+
+        return rows;
+
+    }
 
 }

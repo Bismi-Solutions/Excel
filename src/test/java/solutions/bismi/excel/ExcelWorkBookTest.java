@@ -30,6 +30,8 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -110,6 +112,77 @@ public class ExcelWorkBookTest {
         xlApp.closeAllWorkBooks();
         assertEquals(6,cnt);
     }
+
+
+    /**
+     * @author - Sulfikar Ali Nazar
+     */
+    @Test
+    public void eGetXLSXWorkSheet()
+    {
+        ExcelApplication xlApp =new ExcelApplication();
+        ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/getSheet.xlsx");
+        int cnt=0;
+        cnt=xlbook.getSheetCount();
+        assertEquals(1,cnt);
+
+        ExcelWorkSheet xlsht=xlbook.addSheet("Bismi");
+        String shName=xlsht.getSheetName();
+
+
+        String shName1=xlbook.getExcelSheet(0).getSheetName();
+        xlApp.closeAllWorkBooks();
+        assertEquals("Bismi",shName);
+        assertEquals("Sheet1",shName1);
+    }
+
+    /**
+     * @author - Sulfikar Ali Nazar
+     */
+    @Test
+    public void fGetXLSWorkSheet()
+    {
+        ExcelApplication xlApp =new ExcelApplication();
+        ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/getSheet.xls");
+        int cnt=0;
+        cnt=xlbook.getSheetCount();
+        assertEquals(1,cnt);
+
+        ExcelWorkSheet xlsht=xlbook.addSheet("Bismi");
+        String shName=xlsht.getSheetName();
+        String shName1=xlbook.getExcelSheet(0).getSheetName();
+        xlApp.closeAllWorkBooks();
+        assertEquals("Sheet1",shName1);
+        assertEquals("Bismi",shName);
+    }
+
+    /**
+     * @author - Sulfikar Ali Nazar
+     */
+    @Test
+    public void gGetXLSXWorkSheets()
+    {
+        ExcelApplication xlApp =new ExcelApplication();
+        ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/getSheets.xlsx");
+        int cnt=0;
+        cnt=xlbook.getSheetCount();
+        assertEquals(1,cnt);
+
+        String[] shArray={"Bismi","Solutions","Sulfikar","Ali","Nazar"};
+        xlbook.addSheets(shArray);
+        List<ExcelWorkSheet> sheetList = xlbook.getExcelSheets();
+        ExcelWorkSheet sht3 = sheetList.get(2);
+        String shName=sht3.getSheetName();
+        xlApp.closeAllWorkBooks();
+        assertEquals("Solutions",shName);
+    }
+
+
+
+
+
+
+
 
 
 
