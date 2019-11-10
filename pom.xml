@@ -46,6 +46,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.version>1.0.1</project.version>
+    <javadoc.opts>-Xdoclint:none</javadoc.opts>
   </properties>
 
   <dependencies>
@@ -104,6 +105,9 @@
             <goals>
               <goal>jar</goal>
             </goals>
+            <configuration>
+              <additionalparam>${javadoc.opts}</additionalparam>
+            </configuration>
           </execution>
         </executions>
       </plugin>
