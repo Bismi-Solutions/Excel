@@ -160,8 +160,8 @@ public class ExcelWorkSheet {
      * @param strArrSheets
      * @return
      */
-    protected List<ExcelWorkSheet> addSheets(String[] strArrSheets) {
-        List<ExcelWorkSheet> createdExcelWorkSheets = new ArrayList<>();
+    protected void addSheets(String[] strArrSheets) {
+
         String eShName=null;
         ExcelWorkSheet shExcel = null;
         try {
@@ -171,8 +171,7 @@ public class ExcelWorkSheet {
                 this.sheetName = sSheetName;
                 log.info("Created sheet " + sSheetName);
                 shExcel = new ExcelWorkSheet(this.sheet, this.log, this.sheetName, this.wb);
-                eShName=sSheetName;
-                createdExcelWorkSheets.add(shExcel);
+
             }
 
 
@@ -181,7 +180,7 @@ public class ExcelWorkSheet {
 
         }
 
-        return createdExcelWorkSheets;
+
     }
 
 

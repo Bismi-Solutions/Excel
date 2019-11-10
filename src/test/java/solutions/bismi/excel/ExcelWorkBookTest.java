@@ -41,7 +41,7 @@ public class ExcelWorkBookTest {
      * @author - Sulfikar Ali Nazar
      */
     @Test
-    public void aAddSheetXLSXWorkBook()
+    public void aAddSheetXLSXWorkSheet()
     {
         ExcelApplication xlApp =new ExcelApplication();
         ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/addSheet.xlsx");
@@ -58,7 +58,7 @@ public class ExcelWorkBookTest {
      * @author - Sulfikar Ali Nazar
      */
     @Test
-    public void bAddSheetXLSWorkBook()
+    public void bAddSheetXLSWorkSheet()
     {
         ExcelApplication xlApp =new ExcelApplication();
         ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/addSheet.xls");
@@ -71,6 +71,46 @@ public class ExcelWorkBookTest {
         assertEquals(2,cnt);
 
     }
+
+    /**
+     * @author - Sulfikar Ali Nazar
+     */
+    @Test
+    public void cAddSheetXLSXWorkSheets()
+    {
+        ExcelApplication xlApp =new ExcelApplication();
+        ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/addSheets.xlsx");
+        int cnt=0;
+        cnt=xlbook.getSheetCount();
+        assertEquals(1,cnt);
+
+        String[] shArray={"Bismi","Solutions","Sulfikar","Ali","Nazar"};
+        xlbook.addSheets(shArray);
+        cnt=xlbook.getSheetCount();
+        xlApp.closeAllWorkBooks();
+        assertEquals(6,cnt);
+    }
+
+
+    /**
+     * @author - Sulfikar Ali Nazar
+     */
+    @Test
+    public void dAddSheetXLSWorkSheets()
+    {
+        ExcelApplication xlApp =new ExcelApplication();
+        ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/addSheets.xls");
+        int cnt=0;
+        cnt=xlbook.getSheetCount();
+        assertEquals(1,cnt);
+
+        String[] shArray={"Bismi","Solutions","Sulfikar","Ali","Nazar"};
+        xlbook.addSheets(shArray);
+        cnt=xlbook.getSheetCount();
+        xlApp.closeAllWorkBooks();
+        assertEquals(6,cnt);
+    }
+
 
 
 }

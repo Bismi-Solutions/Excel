@@ -51,7 +51,7 @@ public class ExcelWorkBook {
     FileOutputStream outputStream = null;
     File xlFile = null;
     //List to keep currently available sheets in excel
-    List<ExcelWorkSheet> excelSheets = new ArrayList<>();
+    protected List<ExcelWorkSheet> excelSheets = new ArrayList<>();
     /** The log. */
     private Logger log = LogManager.getLogger(ExcelWorkBook.class);
 
@@ -288,12 +288,11 @@ public class ExcelWorkBook {
      * @param strArrSheets
      * @return
      */
-    public List<ExcelWorkSheet> AddSheets(String[] strArrSheets) {
-        List<ExcelWorkSheet> createdExcelWorkSheets = new ArrayList<>();
+    public void addSheets(String[] strArrSheets) {
 
         ExcelWorkSheet wSheet = new ExcelWorkSheet();
         wSheet.wb = this.wb;
-        createdExcelWorkSheets = wSheet.addSheets(strArrSheets);
+        wSheet.addSheets(strArrSheets);
 
         try {
             if (inputStream != null)
@@ -301,13 +300,13 @@ public class ExcelWorkBook {
             outputStream = new FileOutputStream(this.xlFile);
             this.wb.write(outputStream);
             outputStream.close();
+            updateSheetList();
 
         } catch (Exception e) {
-            log.info("Error in creating excel sheet" + e.toString());
+            log.error("Error in creating excel sheet" + e.toString());
 
         }
 
-        return createdExcelWorkSheets;
     }
 
     protected Workbook getWb() {
@@ -374,7 +373,7 @@ public class ExcelWorkBook {
      * @param sSheetName
      * @return
      */
-    public ExcelWorkSheet GetExcelSheet(String sSheetName) {
+    public ExcelWorkSheet getExcelSheet(String sSheetName) {
 
         Sheet sheet1=null;
         ExcelWorkSheet shTemp=null;
@@ -402,7 +401,7 @@ public class ExcelWorkBook {
      * @param iIndex
      * @return
      */
-    public ExcelWorkSheet GetExcelSheet(int iIndex) {
+    public ExcelWorkSheet getExcelSheet(int iIndex) {
 
         Sheet sheet1=null;
         ExcelWorkSheet shTemp=null;
