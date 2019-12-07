@@ -2,6 +2,28 @@ language: java
 
 jdk:
   - openjdk8
+## export GPG details
+before_install:
+  - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+  - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+install:
+  mvn --settings .maven.xml install -DskipTests=true -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
 
+## Build and release to maven central
+script:
+  mvn clean deploy --settings .maven.xml -DskipTests=true -B -U -Prelease
+before_deploy:
+  - mvn help:evaluate -N -Dexpression=project.version|grep -v '\['
+  - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep
+  -v '\[')
 
-      
+deploy:
+  provider: releases
+  api_key:
+    secure: BSjOuDOtofJRAqEL5fjuuNvWN5H+s5/Uh8+sR0EdrcJsBZeqTuN4M+U6jRq3wuYxY8GPJL1LAftxpp/qvgzkFYhDM9Y7qFMmkn5msc6Da0/M54j5YwduEEbitAcHJvBjU3eD2x1QTqmnY5NCMxpXVIGV029WH70KDTjjhLMxeO5OuamMA9qnyK6xyFRnEEzgC/EZJtxj65yTSUOXdC9H/oTjOOJ80/1ZXx+OwK9Xw4GzG1I03nak/KjKcY9cg7/5XMMBCw22QrMWEF49r6DUtFJM9u7k1XK1njADcry71slB3m4L095xU9RZX/1bSY8pb8zzlZ7w6D4ELoxgYKmty6cncD0eG9KhUzfYmnUB8m3GJeZeYoinQHZQ8/5c/mDo2KnGm15Zy0cve5FPR3LMxCW+V7fdLe8dLRJ8hCaipFWTT0RYNtLgg/O3nBAym514aRIitm1mUzMR9ccRQXnewfr1ZXnVlHcF+b7mzY6jOecIS71dZoBbImEojTlle9SbYF7va5PMWvZuk47yxTWeoy09rEQwTAqMueygFLaBgY22/vRIknt5P45Dn7n1oICxsa2RKTYjksN9uJKgHKNnOt07r6yKmRbtVjAM6CNkIsO9ZEWegIP/zsn1v95FGsL7VKFRpH+NWALN8T6OT/DktPi8IyV+VDI6vf+z+9oN3jI=
+  file:
+    - Excel/target/Excel-$project_version.jar
+  skip_cleanup: true
+  on:
+    repo: Bismi-Solutions/Excel
+  name: $project_version

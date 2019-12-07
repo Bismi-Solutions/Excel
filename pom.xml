@@ -6,10 +6,10 @@
 
   <groupId>solutions.bismi.excel</groupId>
   <artifactId>Excel</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
 
   <name>Excel</name>
-  <description>Bismi Solution Excel library wrapper for apache poi</description>
+  <description>Bismi.Solutions easy to use Excel library wrapper for apache poi</description>
   <url>https://bismi.solutions/2019/11/excel/</url>
 
   <licenses>
@@ -45,9 +45,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <project.version>1.0.1</project.version>
+    <project.version>1.0.4</project.version>
     <javadoc.opts>-Xdoclint:none</javadoc.opts>
-    <apachepoiversion> 4.1.1</apachepoiversion>
+    <apachepoi.version>4.1.1</apachepoi.version>
   </properties>
 
   <dependencies>
@@ -62,16 +62,12 @@
       <artifactId>log4j-core</artifactId>
       <version>2.12.1</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.poi</groupId>
-      <artifactId>poi</artifactId>
-      <version>${apachepoiversion}</version>
-    </dependency>
+
     <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
-      <version>${apachepoiversion}</version>
+      <version>${apachepoi.version}</version>
     </dependency>
 
     <dependency>
@@ -79,6 +75,7 @@
       <artifactId>commons-lang3</artifactId>
       <version>3.9</version>
     </dependency>
+
   </dependencies>
 
   <build>
