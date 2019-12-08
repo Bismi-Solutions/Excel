@@ -43,13 +43,13 @@ import org.apache.poi.ss.usermodel.Workbook;
  */
 public class ExcelWorkSheet {
     int colNumber;
-
+    String xlFileExtension=null;
 
     FileInputStream inputStream=null;
 
     private Logger log = LogManager.getLogger(ExcelWorkSheet.class);
     FileOutputStream outputStream=null;
-    int rowNumber;
+    private int rowNumber;
     String sCompleteFileName=null;
     Sheet sheet;
     String sheetName = null;
@@ -101,10 +101,13 @@ public class ExcelWorkSheet {
 
     /**
      * @author - Sulfikar Ali Nazar
+     * Function to activate excel sheet
      */
     public void activate() {
 
         this.wb.setActiveSheet(this.wb.getSheetIndex(this.sheet.getSheetName()));
+        this.wb.setSelectedTab(this.wb.getSheetIndex(this.sheet.getSheetName()));
+
         saveWorkBook( inputStream, outputStream, sCompleteFileName);
 
     }
@@ -139,7 +142,6 @@ public class ExcelWorkSheet {
      */
     private void saveWorkBook(FileInputStream inputStream,FileOutputStream outputStream, String sCompleteFileName ) {
         try {
-
             if (inputStream != null)
                 inputStream.close();
             OutputStream fileOut = new FileOutputStream(sCompleteFileName);
@@ -154,6 +156,15 @@ public class ExcelWorkSheet {
 
 
     }
+
+    public void saveWorkBook( ) {
+        saveWorkBook(this.inputStream,this.outputStream, this.sCompleteFileName );
+
+    }
+
+
+
+
 
     /**
      * @author - Sulfikar Ali Nazar
@@ -187,7 +198,7 @@ public class ExcelWorkSheet {
      * @author - Sulfikar Ali Nazar
      * @return
      */
-    public boolean ClearContents() {
+    public boolean clearContents() {
 
         try {
 
@@ -216,7 +227,20 @@ public class ExcelWorkSheet {
     }
 
     public int getColNumber() {
-        return this.sheet.getRow(0).getLastCellNum();
+        int rn=this.sheet.getLastRowNum();
+        int maxcol = 0;
+        for(int i=0;i<=rn;i++){
+            try{
+                if(this.sheet.getRow(i).getLastCellNum()>maxcol){
+                    maxcol=this.sheet.getRow(i).getLastCellNum();
+                }
+            }catch(Exception e){
+
+            }
+
+        }
+
+        return maxcol;
     }
 
 
@@ -259,7 +283,7 @@ public class ExcelWorkSheet {
      * @param col
      * @return
      */
-    public ExcelCell Cells(int row,int col) {
+    public ExcelCell cell(int row,int col) {
         ExcelCell cells =null;
         try {
             cells=new ExcelCell(this.sheet,this.wb,row,col,this.inputStream,this.outputStream,this.sCompleteFileName);
@@ -277,7 +301,7 @@ public class ExcelWorkSheet {
      * @param row
      * @return
      */
-    public ExcelRow Rows(int row) {
+    public ExcelRow row(int row) {
         ExcelRow rows =null;
         try {
             rows=new ExcelRow(this.sheet,this.wb,row,this.inputStream,this.outputStream,this.sCompleteFileName);

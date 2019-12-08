@@ -43,15 +43,24 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
  */
 public class ExcelRow {
     private Logger log = LogManager.getLogger(ExcelRow.class);
-    Sheet sheet;
-    Workbook wb;
-    int row;
+    private Sheet sheet;
+    private Workbook wb;
+    private int row;
 
     FileInputStream inputStream = null;
     FileOutputStream outputStream = null;
     String sCompleteFileName = null;
     Row ROW=null;
-
+    String xlFileExtension=null;
+    /**
+     * @author - Sulfikar Ali Nazar
+     * @param sheet
+     * @param wb
+     * @param row
+     * @param inputStream
+     * @param outputStream
+     * @param sCompleteFileName
+     */
     protected ExcelRow(Sheet sheet, Workbook wb, int row, FileInputStream inputStream,
                        FileOutputStream outputStream, String sCompleteFileName) {
 
@@ -76,94 +85,31 @@ public class ExcelRow {
 
     }
 
-    public void SetTextFieldValues(String[] sValues) {
-        String val="";
+    /**
+     * @author - Sulfikar Ali Nazar
+     * @param sValues
+     * @param startColNumber
+     * @param autoSizeColoumns
+     */
+    public void setRowValues(String[] sValues,int startColNumber,boolean autoSizeColoumns) {
+
+        Row cRow = null;
+
         try {
-            Row cRow = null;
+
             try {
                 cRow = sheet.getRow(this.row - 1);
 
-            } catch (Exception e) {
+            } catch (Exception e1) {
 
             }
-            Row row1 = null;
             if (checkIfRowIsEmpty(cRow)) {
-                row1 = sheet.createRow(this.row - 1);
-            } else {
-                row1 = cRow;
-            }
-            int i=0;
-
-            for (String sValu : sValues) {
-
-                Cell cell1 = row1.createCell(i);
-                cell1.setCellValue(sValu);
-                ++i;
-
-            }
-            SaveWorkBook(inputStream, outputStream, sCompleteFileName);
-
-
-        } catch (Exception e) {
-            log.info("Error in writing record to excel" + e.toString());
-        }
-
-    }
-
-    public void SetTextFieldValues(String[] sValues,int startColNumber) {
-        String val="";
-        try {
-            Row cRow = null;
-            try {
-                cRow = sheet.getRow(this.row - 1);
-
-            } catch (Exception e) {
-
-            }
-            Row row1 = null;
-            if (checkIfRowIsEmpty(cRow)) {
-                row1 = sheet.createRow(this.row - 1);
-            } else {
-                row1 = cRow;
+                cRow = sheet.createRow(this.row - 1);
             }
             int i=startColNumber;
-
             for (String sValu : sValues) {
 
-                Cell cell1 = row1.createCell(i);
-                cell1.setCellValue(sValu);
-                ++i;
-
-            }
-            SaveWorkBook(inputStream, outputStream, sCompleteFileName);
-
-
-        } catch (Exception e) {
-            log.info("Error in writing record to excel" + e.toString());
-        }
-
-    }
-    public void SetTextFieldValues(String[] sValues, boolean autoSizeColoumns) {
-        String val="";
-        try {
-            Row cRow = null;
-            try {
-                cRow = sheet.getRow(this.row - 1);
-
-            } catch (Exception e) {
-
-            }
-            Row row1 = null;
-            if (checkIfRowIsEmpty(cRow)) {
-                row1 = sheet.createRow(this.row - 1);
-            } else {
-                row1 = cRow;
-            }
-            int i=0;
-
-            for (String sValu : sValues) {
-
-                Cell cell1 = row1.createCell(i);
+                Cell cell1 = cRow.createCell(i);
                 cell1.setCellValue(sValu);
                 if(autoSizeColoumns) {
                     sheet.autoSizeColumn(i);
@@ -171,14 +117,25 @@ public class ExcelRow {
                 ++i;
 
             }
-            SaveWorkBook(inputStream, outputStream, sCompleteFileName);
-
+            //SaveWorkBook(inputStream, outputStream, sCompleteFileName);
 
         } catch (Exception e) {
             log.info("Error in writing record to excel" + e.toString());
         }
 
     }
+
+    public void setRowValues(String[] sValues,int startColNumber) {
+        setRowValues(sValues, startColNumber, false);
+    }
+    public void setRowValues(String[] sValues,boolean autoSizeColoumns) {
+        setRowValues(sValues, 0, autoSizeColoumns);
+    }
+    public void setRowValues(String[] sValues) {
+        setRowValues(sValues, 0, false);
+    }
+
+
 
     private void SaveWorkBook(FileInputStream inputStream, FileOutputStream outputStream, String sCompleteFileName) {
         try {
@@ -196,20 +153,28 @@ public class ExcelRow {
 
     }
 
-    @SuppressWarnings("deprecation")
+    /**
+     * @author - Sulfikar Ali Nazar
+     *
+     * @param ROW
+     * @return
+     */
     private boolean checkIfRowIsEmpty(Row ROW) {
-        if (ROW == null) {
-            return true;
-        }
-        if (ROW.getLastCellNum() <= 0) {
-            return true;
-        }
-        for (int cellNum = ROW.getFirstCellNum(); cellNum < ROW.getLastCellNum(); cellNum++) {
-            Cell cell = ROW.getCell(cellNum);
-            if (cell != null && cell.getCellTypeEnum() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
-                return false;
+        try {
+            if (ROW == null || ROW.getLastCellNum() <= 0) {
+                return true;
             }
+
+            for (int cellNum = ROW.getFirstCellNum(); cellNum < ROW.getLastCellNum(); cellNum++) {
+                Cell cell = ROW.getCell(cellNum);
+                if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
+                    return false;
+                }
+            }
+        }catch (Exception e){
+            return true;
         }
+
         return true;
     }
 

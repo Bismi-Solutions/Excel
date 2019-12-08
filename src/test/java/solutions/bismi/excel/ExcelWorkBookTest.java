@@ -45,8 +45,17 @@ public class ExcelWorkBookTest {
     @Test
     public void aAddSheetXLSXWorkSheet()
     {
+        addSheetXLWorkSheet("./resources/testdata/addSheet.xlsx");
+        addSheetXLWorkSheet("./resources/testdata/addSheet.xls");
+    }
+    /**
+     * @author - Sulfikar Ali Nazar
+     */
+
+    private void addSheetXLWorkSheet(String strCompleteFileName)
+    {
         ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/addSheet.xlsx");
+        ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
         int cnt=0;
         cnt=xlbook.getSheetCount();
         assertEquals(1,cnt);
@@ -56,52 +65,26 @@ public class ExcelWorkBookTest {
         assertEquals(2,cnt);
 
     }
-    /**
-     * @author - Sulfikar Ali Nazar
-     */
-    @Test
-    public void bAddSheetXLSWorkSheet()
-    {
-        ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/addSheet.xls");
-        int cnt=0;
-        cnt=xlbook.getSheetCount();
-        assertEquals(1,cnt);
-        xlbook.addSheet("Bismi1");
-        cnt=xlbook.getSheetCount();
-        xlApp.closeAllWorkBooks();
-        assertEquals(2,cnt);
-
-    }
 
     /**
      * @author - Sulfikar Ali Nazar
      */
     @Test
-    public void cAddSheetXLSXWorkSheets()
+    public void bAddSheetXLSXWorkSheets()
     {
-        ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/addSheets.xlsx");
-        int cnt=0;
-        cnt=xlbook.getSheetCount();
-        assertEquals(1,cnt);
-
-        String[] shArray={"Bismi","Solutions","Sulfikar","Ali","Nazar"};
-        xlbook.addSheets(shArray);
-        cnt=xlbook.getSheetCount();
-        xlApp.closeAllWorkBooks();
-        assertEquals(6,cnt);
+        dAddSheetXLWorkSheets("./resources/testdata/addSheets.xlsx");
+        dAddSheetXLWorkSheets("./resources/testdata/addSheets.xls");
     }
 
 
     /**
      * @author - Sulfikar Ali Nazar
      */
-    @Test
-    public void dAddSheetXLSWorkSheets()
+
+    private void dAddSheetXLWorkSheets(String strCompleteFileName)
     {
         ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/addSheets.xls");
+        ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
         int cnt=0;
         cnt=xlbook.getSheetCount();
         assertEquals(1,cnt);
@@ -120,30 +103,19 @@ public class ExcelWorkBookTest {
     @Test
     public void eGetXLSXWorkSheet()
     {
-        ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/getSheet.xlsx");
-        int cnt=0;
-        cnt=xlbook.getSheetCount();
-        assertEquals(1,cnt);
 
-        ExcelWorkSheet xlsht=xlbook.addSheet("Bismi");
-        String shName=xlsht.getSheetName();
-
-
-        String shName1=xlbook.getExcelSheet(0).getSheetName();
-        xlApp.closeAllWorkBooks();
-        assertEquals("Bismi",shName);
-        assertEquals("Sheet1",shName1);
+        getXLSWorkSheet("./resources/testdata/getSheet.xls");
+        getXLSWorkSheet("./resources/testdata/getSheet.xlsx");
     }
 
     /**
      * @author - Sulfikar Ali Nazar
      */
-    @Test
-    public void fGetXLSWorkSheet()
+
+    private void getXLSWorkSheet(String strCompleteFileName)
     {
         ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/getSheet.xls");
+        ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
         int cnt=0;
         cnt=xlbook.getSheetCount();
         assertEquals(1,cnt);
@@ -159,11 +131,11 @@ public class ExcelWorkBookTest {
     /**
      * @author - Sulfikar Ali Nazar
      */
-    @Test
-    public void gGetXLSXWorkSheets()
+
+    private void gGetXLSXWorkSheets(String strCompleteFileName)
     {
         ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/getSheets.xlsx");
+        ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
         int cnt=0;
         cnt=xlbook.getSheetCount();
         assertEquals(1,cnt);
@@ -177,6 +149,14 @@ public class ExcelWorkBookTest {
         assertEquals("Solutions",shName);
     }
 
+    /**
+     * @author - Sulfikar Ali Nazar
+     */
+    @Test
+    public  void hgetExcelWokSheets(){
+        gGetXLSXWorkSheets("./resources/testdata/getSheets.xlsx");
+        gGetXLSXWorkSheets("./resources/testdata/getSheets.xls");
+    }
 
 
 

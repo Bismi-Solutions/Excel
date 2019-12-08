@@ -55,7 +55,7 @@ public class ExcelWorkBook {
     protected List<ExcelWorkSheet> excelSheets = new ArrayList<>();
     /** The log. */
     private Logger log = LogManager.getLogger(ExcelWorkBook.class);
-
+    String xlFileExtension=null;
 
 
     /**
@@ -108,7 +108,7 @@ public class ExcelWorkBook {
                 this.xlFile = new File(sCompleteFileName);
                 this.excelBookName = getFileName(sCompleteFileName);
                 String[] fileExtn = this.excelBookName.split("[.]");
-                if (fileExtn[1].equalsIgnoreCase("xlsx")) {
+                if (fileExtn[1].equalsIgnoreCase("xlsx") || fileExtn[1].equalsIgnoreCase("xlsm")) {
                     wb = new XSSFWorkbook();
 
                     OutputStream fileOut = new FileOutputStream(sCompleteFileName);
@@ -152,7 +152,9 @@ public class ExcelWorkBook {
             if (isValidPath(sCompleteFilePath)) {
                 File file = new File(sCompleteFilePath);
                 log.info("GetFileName: -> Returning file name " + file.getName());
+
                 this.excelBookName = file.getName();
+                this.xlFileExtension = this.excelBookName.substring(this.excelBookName.lastIndexOf("."));
                 return file.getName();
 
             }
@@ -280,7 +282,8 @@ public class ExcelWorkBook {
 
         }
         excelSheets.add(tempSheet);
-        return tempSheet;
+
+        return getExcelSheet(sSheetName);
 
     }
 
@@ -422,9 +425,46 @@ public class ExcelWorkBook {
         return shTemp;//new ExcelWorkSheet(this.wb.getSheetAt(iIndex), this.wb.getSheetAt(iIndex).getSheetName(), this.wb);
     }
 
+    public ExcelWorkSheet getActiveSheet() {
+        int iIndex=getActiveSheetIndex();
+        Sheet sheet1=null;
+        ExcelWorkSheet shTemp=null;
+        try {
+
+            sheet1=this.wb.getSheetAt(iIndex);
+            if(sheet1 != null)   {
+                int index = this.wb.getSheetIndex(sheet1);
+                // this.wb.removeSheetAt(index);
+                String pth= excelBookPath+"\\"+excelBookName;
+                shTemp=new ExcelWorkSheet(this.wb.getSheetAt(iIndex), this.wb.getSheetAt(iIndex).getSheetName(), this.wb,this.inputStream,this.outputStream,pth);
+            }
+        } catch (Exception e) {
+            log.info("Error in getting sheet index" + iIndex);
+        }
+
+        return shTemp;//new ExcelWorkSheet(this.wb.getSheetAt(iIndex), this.wb.getSheetAt(iIndex).getSheetName(), this.wb);
+    }
+
+
+
+
     public int getSheetCount(){
 
         return excelSheets.size();
+    }
+
+    public String getActiveSheetName(){
+
+        return this.wb.getSheetName(this.wb.getActiveSheetIndex());
+    }
+
+    /**
+     * @author - Sulfikar Ali Nazar
+     * @return
+     */
+    public int getActiveSheetIndex(){
+
+        return this.wb.getActiveSheetIndex();
     }
 
 

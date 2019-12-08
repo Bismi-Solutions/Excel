@@ -25,19 +25,18 @@
  */
 
 package solutions.bismi.excel;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellUtil;
+
 /**
  * @author Sulfikar Ali Nazar
  */
@@ -52,48 +51,45 @@ public class ExcelCell {
     FileOutputStream outputStream = null;
     String sCompleteFileName = null;
     Cell CELL = null;
-
-    protected Cell getCELL() {
+    String xlFileExtension=null;
+    private Cell getCELL() {
         return CELL;
     }
 
-    protected void setCELL(Cell cELL) {
+    private void setCELL(Cell cELL) {
         CELL = cELL;
     }
 
-    protected int getRow() {
+    private int getRow() {
         return row;
     }
 
-    protected void setRow(int row) {
+    private void setRow(int row) {
         this.row = row;
     }
 
-    protected int getCol() {
+    private int getCol() {
         return col;
     }
 
-    protected void setCol(int col) {
+    private void setCol(int col) {
         this.col = col;
     }
 
-    public boolean SetText(String sText) {
+    public boolean setText(String sText) {
 
-        try {
 
-            this.getCELL().setCellValue(sText);
-
-            SaveWorkBook(inputStream, outputStream, sCompleteFileName);
-
-        } catch (Exception e) {
-            log.info("Error in setting text value " + e.toString());
-        }
-
-        return false;
+        return setText(sText, false);
 
     }
 
-    public boolean SetText(String sText, boolean autoSizeColoumn) {
+    /**
+     * @author - Sulfikar Ali Nazar
+     * @param sText
+     * @param autoSizeColoumn
+     * @return
+     */
+    public boolean setText(String sText, boolean autoSizeColoumn) {
 
         try {
 
@@ -102,7 +98,7 @@ public class ExcelCell {
                 this.sheet.autoSizeColumn(col - 1);
             }
 
-            SaveWorkBook(inputStream, outputStream, sCompleteFileName);
+            //SaveWorkBook(inputStream, outputStream, sCompleteFileName);
 
         } catch (Exception e) {
             log.info("Error in setting text value " + e.toString());
@@ -112,7 +108,42 @@ public class ExcelCell {
 
     }
 
-    public String GetTextValue() {
+
+    public void setFontColor(String fontColor){
+        Cell cCell=null;
+        String val="";
+        CellStyle cStyle=null;
+        try{
+            cCell = this.getCELL();
+            val = cCell.getStringCellValue();
+
+            Font font = null;//this.wb.findFont(false, )
+
+            if (font == null) { // Create new font
+                font = cCell.getSheet().getWorkbook().createFont();
+
+                font.setColor(Common.getColorCode(fontColor));
+
+            }
+            CellUtil.setFont(cCell, font);
+
+
+        }catch (Exception e){
+            log.info("Error in setting Font color " + e.toString());
+        }
+
+
+    }
+
+    private CellStyle getCellStyle(CellStyle cStyle){
+            return cStyle;
+    }
+
+    public String getValue(){
+        return getTextValue();
+    }
+
+    public String getTextValue() {
         String val = null;
         try {
             inputStream = new FileInputStream(this.sCompleteFileName);
@@ -151,6 +182,7 @@ public class ExcelCell {
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.sCompleteFileName = sCompleteFileName;
+        this.xlFileExtension=getFileExtension(sCompleteFileName);
         try {
             Row cRow = null;
             try {
@@ -192,23 +224,46 @@ public class ExcelCell {
     }
 
 
-    @SuppressWarnings("deprecation")
+
     private boolean checkIfRowIsEmpty(Row ROW) {
-        if (ROW == null) {
-            return true;
-        }
-        if (ROW.getLastCellNum() <= 0) {
-            return true;
-        }
-        for (int cellNum = ROW.getFirstCellNum(); cellNum < ROW.getLastCellNum(); cellNum++) {
-            Cell cell = ROW.getCell(cellNum);
-            if (cell != null && cell.getCellTypeEnum() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
-                return false;
+        try {
+            if (ROW == null || ROW.getLastCellNum() <= 0) {
+                return true;
             }
+
+            for (int cellNum = ROW.getFirstCellNum(); cellNum < ROW.getLastCellNum(); cellNum++) {
+                Cell cell = ROW.getCell(cellNum);
+                if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
+                    return false;
+                }
+            }
+        }catch (Exception e){
+            return true;
+        }
+
+        return true;
+    }
+
+    private boolean checkIfCellIsEmpty(Cell cell){
+        if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
+            return false;
         }
         return true;
     }
 
 
+    private String getFileExtension(String sCompleteFilePath) {
+        try {
+
+                File file = new File(sCompleteFilePath);
+                return sCompleteFilePath.substring(sCompleteFilePath.lastIndexOf("."));
+
+        } catch (Exception e) {
+            log.info("Error in getting file name " + e.toString());
+
+        }
+
+        return "";// return null on error
+    }
 
 }

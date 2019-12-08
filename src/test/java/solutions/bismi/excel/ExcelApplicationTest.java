@@ -18,24 +18,17 @@ public class ExcelApplicationTest
      * Create xlsx work book
      */
     @Test
-    public void aCreateXLSXWorkBook()
+    public void aCreateExcelWorkBook()
+    {
+        bCreateXLSWorkBook("./resources/testdata/er.xlsx");
+        bCreateXLSWorkBook("./resources/testdata/er.xls");
+        //bCreateXLSWorkBook("./resources/testdata/er.xlsm");
+    }
+
+    private void bCreateXLSWorkBook(String strCompleteFileName)
     {
         ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/er.xlsx");
-        int cnt=xlApp.getOpenWorkbookCount();
-        xlApp.closeAllWorkBooks();
-        //Verify only one work book is created
-        assertEquals(1,cnt);
-    }
-    /**
-     * @author - Sulfikar Ali Nazar
-     * Create xls work book
-     */
-    @Test
-    public void bCreateXLSWorkBook()
-    {
-        ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook("./resources/testdata/er.xls");
+        ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
         int cnt=xlApp.getOpenWorkbookCount();
         xlApp.closeAllWorkBooks();
         //Verify only one work book is created
@@ -47,24 +40,18 @@ public class ExcelApplicationTest
      * @author - Sulfikar Ali Nazar
      */
     @Test
-    public void cOpenXLSXWorkbook(){
-        ExcelApplication xlApp =new ExcelApplication();
-        xlApp.openWorkbook("./resources/testdata/er.xlsx");
-        int cnt=xlApp.getOpenWorkbookCount();
-        xlApp.closeAllWorkBooks();
-        //Verify only one work book is created
-        assertEquals(1,cnt);
-
-
+    public void cOpenExcelXWorkbook(){
+        dOpenXLSWorkbook("./resources/testdata/er.xlsx");
+        dOpenXLSWorkbook("./resources/testdata/er.xls");
     }
 
     /**
      * @author - Sulfikar Ali Nazar
      */
-    @Test
-    public void dOpenXLSWorkbook(){
+
+    private void dOpenXLSWorkbook(String strCompleteFileName){
         ExcelApplication xlApp =new ExcelApplication();
-        xlApp.openWorkbook("./resources/testdata/er.xls");
+        xlApp.openWorkbook(strCompleteFileName);
         int cnt=xlApp.getOpenWorkbookCount();
         xlApp.closeAllWorkBooks();
         //Verify only one work book is created
@@ -76,23 +63,20 @@ public class ExcelApplicationTest
      */
     @Test
     public void eCloseWorkBookByIndex(){
+        closeBookByindex("./resources/testdata/er.xls");
+        closeBookByindex("./resources/testdata/er.xlsx");
+
+    }
+
+    private void closeBookByindex(String strCompleteFileName){
         ExcelApplication xlApp =new ExcelApplication();
-        xlApp.openWorkbook("./resources/testdata/er.xls");
+        xlApp.openWorkbook(strCompleteFileName);
         int cnt=xlApp.getOpenWorkbookCount();
         assertEquals(1,cnt);
         xlApp.closeWorkBook(0);
         cnt=xlApp.getOpenWorkbookCount();
         assertEquals(0,cnt);
-
-        //Verifying the close functionality of xlsx
-        xlApp.openWorkbook("./resources/testdata/er.xlsx");
-        cnt=xlApp.getOpenWorkbookCount();
-        assertEquals(1,cnt);
-        xlApp.closeWorkBook(0);
-        cnt=xlApp.getOpenWorkbookCount();
         assertEquals(0,cnt);
-        assertEquals(0,cnt);
-
     }
 
     /**
@@ -100,23 +84,21 @@ public class ExcelApplicationTest
      */
     @Test
     public void fCloseWorkBookByName(){
+
+
+        closeBookByName("./resources/testdata/er.xls");
+        closeBookByName("./resources/testdata/er.xlsx");
+
+    }
+
+    private void closeBookByName(String strCompleteFileName ){
         ExcelApplication xlApp =new ExcelApplication();
-        xlApp.openWorkbook("./resources/testdata/er.xls");
+        ExcelWorkBook xlBook = xlApp.openWorkbook(strCompleteFileName);
         int cnt=xlApp.getOpenWorkbookCount();
         assertEquals(1,cnt);
-        xlApp.closeWorkBook("er.xls");
+        xlApp.closeWorkBook(xlBook.getExcelBookName());
         cnt=xlApp.getOpenWorkbookCount();
         assertEquals(0,cnt);
-
-        //Verifying the close functionality of xlsx
-        xlApp.openWorkbook("./resources/testdata/er.xlsx");
-        cnt=xlApp.getOpenWorkbookCount();
-        assertEquals(1,cnt);
-        xlApp.closeWorkBook("er.xlsx");
-        cnt=xlApp.getOpenWorkbookCount();
-        assertEquals(0,cnt);
-
-
     }
 
     /**
@@ -139,6 +121,8 @@ public class ExcelApplicationTest
 
 
     }
+
+
 
 
 
