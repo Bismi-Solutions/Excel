@@ -6,7 +6,7 @@
 
   <groupId>solutions.bismi.excel</groupId>
   <artifactId>Excel</artifactId>
-  <version>1.0.6</version>
+  <version>1.0.8</version>
 
   <name>Excel</name>
   <description>Bismi.Solutions easy to use Excel library wrapper for apache poi</description>
@@ -45,7 +45,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <project.version>1.0.6</project.version>
+    <project.version>1.0.8</project.version>
     <javadoc.opts>-Xdoclint:none</javadoc.opts>
     <apachepoi.version>4.1.1</apachepoi.version>
     <junit.version>4.11</junit.version>
