@@ -25,27 +25,62 @@
  */
 
 package solutions.bismi.excel;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.IndexedColors;
 
 /**
  * @author Sulfikar Ali Nazar
  */
 public abstract class Common {
+    private static Logger log = LogManager.getLogger(Common.class);
 
+    private static IndexedColors[] values=null;
+    private static Map<String,Short> map = new HashMap<String,Short>();
 
-    public static short  getColorCode(String color){
-
-        switch (color.toUpperCase()){
-            case "RED":
-                return IndexedColors.RED.getIndex();
-
-            case "GREEN":
-                return IndexedColors.GREEN.getIndex();
-            default:
-                return IndexedColors.BLACK.getIndex();
+    public static void updateIndexedValues(){
+        if(values==null){
+            values = getEnumValues(IndexedColors.class);
+            for (IndexedColors ele:values) {
+                map.put(ele.toString(),ele.getIndex());
+            }
         }
 
+    }
+    public static short  getColorCode(String color){
+        updateIndexedValues();
+
+        String _colors=Arrays.toString(values);
+        if(map.containsKey(color.toUpperCase().trim())){
+            return map.get(color.toUpperCase().trim());
+        }else{
+            log.info("Supported string constant colors are :" + _colors);
+            log.info("Hex code can also be passed if you need more colors...");
+            return 0;
+        }
+
+
+
+    }
+
+    private static <E extends Enum> E[] getEnumValues(Class<E> enumClass) {
+
+        try{
+            Field fld = enumClass.getDeclaredField("$VALUES");
+            fld.setAccessible(true);
+            Object o = fld.get(null);
+            return (E[]) o;
+        }catch(Exception e){
+            log.info("Error in getting color enumerators");
+        return null;
+        }
 
     }
 

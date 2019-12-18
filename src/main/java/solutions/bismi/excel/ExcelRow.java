@@ -28,16 +28,16 @@ package solutions.bismi.excel;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellUtil;
+
 /**
  * @author Sulfikar Ali Nazar
  */
@@ -108,8 +108,15 @@ public class ExcelRow {
             }
             int i=startColNumber;
             for (String sValu : sValues) {
+                Cell cell1=null;
+                try{
+                    cell1=cRow.getCell(i);
+                }catch (Exception e){
 
-                Cell cell1 = cRow.createCell(i);
+                }
+                if(checkIfCellIsEmpty(cell1)){
+                    cell1 = cRow.createCell(i);
+                }
                 cell1.setCellValue(sValu);
                 if(autoSizeColoumns) {
                     sheet.autoSizeColumn(i);
@@ -135,6 +142,223 @@ public class ExcelRow {
         setRowValues(sValues, 0, false);
     }
 
+    /**
+     * @author - Sulfikar Ali Nazar
+     *
+     */
+    public void setFontColor(String fontColor,int startColNumber, int endColNumber) {
+
+        Row cRow = null;
+
+        try {
+
+            try {
+                cRow = sheet.getRow(this.row - 1);
+            } catch (Exception e1) {
+
+            }
+            if (checkIfRowIsEmpty(cRow)) {
+                cRow = sheet.createRow(this.row - 1);
+            }
+
+
+            for (int iCol=startColNumber;iCol<endColNumber;iCol++) {
+                Cell cell1=null;
+                try{
+                    cell1=cRow.getCell(iCol-1);
+                }catch (Exception e){
+
+                }
+                if(checkIfCellIsEmpty(cell1)){
+                    cell1 = cRow.createCell(iCol-1);
+                }
+
+                Font font = null;//this.wb.findFont(false, )
+
+                if (font == null) { // Create new font
+                    font = cell1.getSheet().getWorkbook().createFont();
+
+                    font.setColor(Common.getColorCode(fontColor));
+
+                }
+                CellUtil.setFont(cell1, font);
+
+
+
+            }
+            //SaveWorkBook(inputStream, outputStream, sCompleteFileName);
+
+        } catch (Exception e) {
+            log.info("Error in setting font color record to excel" + e.toString());
+        }
+
+    }
+
+
+    public void setFontColor(String fontColor) {
+        Row cRow = null;
+
+
+
+            try {
+                cRow = sheet.getRow(this.row - 1);
+            } catch (Exception e1) {
+
+            }
+            if (checkIfRowIsEmpty(cRow)) {
+                cRow = sheet.createRow(this.row - 1);
+            }
+
+            int endColNumber=cRow.getLastCellNum();
+            setFontColor(fontColor, 1, endColNumber+1);
+
+    }
+
+    /**
+     * @author - Sulfikar Ali Nazar
+     * @param fillColor
+     * @param startColNumber
+     * @param endColNumber
+     */
+    public void setFillColor(String fillColor,int startColNumber, int endColNumber) {
+
+        Row cRow = null;
+
+        try {
+
+            try {
+                cRow = sheet.getRow(this.row - 1);
+            } catch (Exception e1) {
+
+            }
+            if (checkIfRowIsEmpty(cRow)) {
+                cRow = sheet.createRow(this.row - 1);
+            }
+
+
+            for (int iCol=startColNumber;iCol<endColNumber;iCol++) {
+                Cell cell1=null;
+                try{
+                    cell1=cRow.getCell(iCol-1);
+                }catch (Exception e){
+
+                }
+                if(checkIfCellIsEmpty(cell1)){
+                    cell1 = cRow.createCell(iCol-1);
+                }
+
+                Map<String, Object> properties = new HashMap<String, Object>();
+                properties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
+                properties.put(CellUtil.FILL_FOREGROUND_COLOR, Common.getColorCode(fillColor));
+                CellUtil.setCellStyleProperties(cell1, properties);
+
+
+
+            }
+            //SaveWorkBook(inputStream, outputStream, sCompleteFileName);
+
+        } catch (Exception e) {
+            log.info("Error in setting font color record to excel" + e.toString());
+        }
+
+    }
+
+
+
+    public void setFillColor(String fillColor) {
+        Row cRow = null;
+
+
+
+        try {
+            cRow = sheet.getRow(this.row - 1);
+        } catch (Exception e1) {
+
+        }
+        if (checkIfRowIsEmpty(cRow)) {
+            cRow = sheet.createRow(this.row - 1);
+        }
+
+        int endColNumber=cRow.getLastCellNum();
+        setFillColor(fillColor, 1, endColNumber+1);
+
+    }
+
+    /**
+     * @author Sulfikar Ali Nazar
+     * @param fillColor
+     * @param startColNumber
+     * @param endColNumber
+     */
+
+    public void setFullBorder(String fillColor,int startColNumber, int endColNumber) {
+
+        Row cRow = null;
+
+        try {
+
+            try {
+                cRow = sheet.getRow(this.row - 1);
+            } catch (Exception e1) {
+
+            }
+            if (checkIfRowIsEmpty(cRow)) {
+                cRow = sheet.createRow(this.row - 1);
+            }
+
+
+            for (int iCol=startColNumber;iCol<endColNumber;iCol++) {
+                Cell cell1=null;
+                try{
+                    cell1=cRow.getCell(iCol-1);
+                }catch (Exception e){
+
+                }
+                if(checkIfCellIsEmpty(cell1)){
+                    cell1 = cRow.createCell(iCol-1);
+                }
+
+                Map<String, Object> properties = new HashMap<String, Object>();
+                properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
+                properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
+                properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
+                properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
+                properties.put(CellUtil.BOTTOM_BORDER_COLOR, Common.getColorCode(fillColor));
+                properties.put(CellUtil.LEFT_BORDER_COLOR, Common.getColorCode(fillColor));
+                properties.put(CellUtil.TOP_BORDER_COLOR, Common.getColorCode(fillColor));
+                properties.put(CellUtil.RIGHT_BORDER_COLOR, Common.getColorCode(fillColor));
+
+                CellUtil.setCellStyleProperties(cell1, properties);
+
+
+
+            }
+            //SaveWorkBook(inputStream, outputStream, sCompleteFileName);
+
+        } catch (Exception e) {
+            log.info("Error in setting font color record to excel" + e.toString());
+        }
+
+    }
+
+    public void setFullBorder(String fillColor) {
+        Row cRow = null;
+
+
+
+        try {
+            cRow = sheet.getRow(this.row - 1);
+        } catch (Exception e1) {
+
+        }
+        if (checkIfRowIsEmpty(cRow)) {
+            cRow = sheet.createRow(this.row - 1);
+        }
+
+        int endColNumber=cRow.getLastCellNum();
+        setFullBorder(fillColor, 1, endColNumber+1);
+
+    }
 
 
     private void SaveWorkBook(FileInputStream inputStream, FileOutputStream outputStream, String sCompleteFileName) {
@@ -175,6 +399,12 @@ public class ExcelRow {
             return true;
         }
 
+        return true;
+    }
+    private boolean checkIfCellIsEmpty(Cell cell){
+        if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
+            return false;
+        }
         return true;
     }
 

@@ -30,39 +30,12 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author Sulfikar Ali Nazar
- */
-public class ExcellCellTest {
-
+public class ExcelRowTest {
 
     @Test
-    public void aSetFontColor(){
-        setColor("./resources/testdata/cellFormatCheck1.XLSX");
-        setColor("./resources/testdata/cellFormatCheck1.XLS");
-    }
-
-    private void setColor(String strCompleteFileName){
-        ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
-        int cnt=0;
-        cnt=xlbook.getSheetCount();
-        assertEquals(1,cnt);
-        ExcelWorkSheet sh1 = xlbook.addSheet("Bismi1");
-        sh1.activate();
-        ExcelCell c1 = sh1.cell(3, 4);
-        c1.setText("Alpha lion");
-        c1.setFontColor("blue");
-        ExcelCell c2 = sh1.cell(5, 7);
-        c2.setText("Beta");
-        c2.setFontColor("RED");
-        sh1.saveWorkBook();
-        xlApp.closeAllWorkBooks();
-    }
-    @Test
-    public void bSetFillcolor(){
-        setColor2("./resources/testdata/cellFormatCheck2.XLSX");
-        setColor2("./resources/testdata/cellFormatCheck2.XLS");
+    public void aSetfontcolor(){
+        setColor2("./resources/testdata/cellFormatCheckrow1.XLSX");
+        setColor2("./resources/testdata/cellFormatCheckrow1.XLS");
     }
 
     private void setColor2(String strCompleteFileName){
@@ -73,16 +46,20 @@ public class ExcellCellTest {
         assertEquals(1,cnt);
         ExcelWorkSheet sh1 = xlbook.addSheet("Bismi1");
         sh1.activate();
-        sh1.cell(10,10).setText("TestColor");
-        sh1.cell(10,10).setFontColor("blue");
-        sh1.cell(10,10).setFillColor("yellow");
-        sh1.cell(1,1).setFillColor("GREEN");
-        sh1.cell(3,17).setFullBorder("Red");
+
+        String[] arrRow= {"A","B","C","D","E"};
+        sh1.row(11).setRowValues(arrRow);
+        sh1.row(11).setFontColor("Red",1,3);
+        sh1.row(11).setFontColor("green",3,7);
+        sh1.row(2).setRowValues(arrRow);
+        sh1.row(2).setFontColor("White");
+        sh1.row(2).setFillColor("Green");
+        sh1.row(2).setFullBorder("Red");
+        sh1.row(11).setFullBorder("blue");
+        sh1.row(5).setFullBorder("blue",1,10);
         sh1.saveWorkBook();
         xlApp.closeAllWorkBooks();
     }
-
-
 
 
 
