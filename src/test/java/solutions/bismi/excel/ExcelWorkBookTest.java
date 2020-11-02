@@ -26,18 +26,20 @@
 
 package solutions.bismi.excel;
 
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
+
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+
 
 /**
  * @author Sulfikar Ali Nazar
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.Alphanumeric.class)
 public class ExcelWorkBookTest {
     /**
      * @author - Sulfikar Ali Nazar
@@ -58,11 +60,11 @@ public class ExcelWorkBookTest {
         ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
         int cnt=0;
         cnt=xlbook.getSheetCount();
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
         xlbook.addSheet("Bismi1");
         cnt=xlbook.getSheetCount();
         xlApp.closeAllWorkBooks();
-        assertEquals(2,cnt);
+        Assertions.assertEquals(2,cnt);
 
     }
 
@@ -87,13 +89,13 @@ public class ExcelWorkBookTest {
         ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
         int cnt=0;
         cnt=xlbook.getSheetCount();
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
 
         String[] shArray={"Bismi","Solutions","Sulfikar","Ali","Nazar"};
         xlbook.addSheets(shArray);
         cnt=xlbook.getSheetCount();
         xlApp.closeAllWorkBooks();
-        assertEquals(6,cnt);
+        Assertions.assertEquals(6,cnt);
     }
 
 
@@ -118,14 +120,14 @@ public class ExcelWorkBookTest {
         ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
         int cnt=0;
         cnt=xlbook.getSheetCount();
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
 
         ExcelWorkSheet xlsht=xlbook.addSheet("Bismi");
         String shName=xlsht.getSheetName();
         String shName1=xlbook.getExcelSheet(0).getSheetName();
         xlApp.closeAllWorkBooks();
-        assertEquals("Sheet1",shName1);
-        assertEquals("Bismi",shName);
+        Assertions.assertEquals("Sheet1",shName1);
+        Assertions.assertEquals("Bismi",shName);
     }
 
     /**
@@ -138,7 +140,7 @@ public class ExcelWorkBookTest {
         ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
         int cnt=0;
         cnt=xlbook.getSheetCount();
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
 
         String[] shArray={"Bismi","Solutions","Sulfikar","Ali","Nazar"};
         xlbook.addSheets(shArray);
@@ -146,7 +148,7 @@ public class ExcelWorkBookTest {
         ExcelWorkSheet sht3 = sheetList.get(2);
         String shName=sht3.getSheetName();
         xlApp.closeAllWorkBooks();
-        assertEquals("Solutions",shName);
+        Assertions.assertEquals("Solutions",shName);
     }
 
     /**

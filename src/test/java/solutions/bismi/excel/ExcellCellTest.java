@@ -26,13 +26,16 @@
 
 package solutions.bismi.excel;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.TestMethodOrder;
 
 /**
  * @author Sulfikar Ali Nazar
  */
+@TestMethodOrder(MethodOrderer.Alphanumeric.class)
 public class ExcellCellTest {
 
 
@@ -47,7 +50,7 @@ public class ExcellCellTest {
         ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
         int cnt=0;
         cnt=xlbook.getSheetCount();
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
         ExcelWorkSheet sh1 = xlbook.addSheet("Bismi1");
         sh1.activate();
         ExcelCell c1 = sh1.cell(3, 4);
@@ -70,7 +73,7 @@ public class ExcellCellTest {
         ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
         int cnt=0;
         cnt=xlbook.getSheetCount();
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
         ExcelWorkSheet sh1 = xlbook.addSheet("Bismi1");
         sh1.activate();
         sh1.cell(10,10).setText("TestColor");

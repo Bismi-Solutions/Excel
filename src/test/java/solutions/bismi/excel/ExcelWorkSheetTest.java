@@ -26,13 +26,16 @@
 
 package solutions.bismi.excel;
 
-import org.junit.Test;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.TestMethodOrder;
 
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Sulfikar Ali Nazar
  */
+@TestMethodOrder(MethodOrderer.Alphanumeric.class)
 public class ExcelWorkSheetTest {
 
 
@@ -60,19 +63,19 @@ public class ExcelWorkSheetTest {
         ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
         int cnt=0;
         cnt=xlbook.getSheetCount();
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
         xlbook.addSheet("Bismi1");
         cnt=xlbook.getSheetCount();
         xlbook.getExcelSheet("Bismi1").activate();
         xlApp.closeAllWorkBooks();
-        assertEquals(2,cnt);
+        Assertions.assertEquals(2,cnt);
         xlbook=xlApp.openWorkbook(strCompleteFileName);
         cnt=xlApp.getOpenWorkbookCount();
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
         cnt=xlbook.getSheetCount();
-        assertEquals(2,cnt);
+        Assertions.assertEquals(2,cnt);
         String sheetName=xlbook.getActiveSheetName();
-        assertEquals("Bismi1",sheetName);
+        Assertions.assertEquals("Bismi1",sheetName);
         xlApp.closeAllWorkBooks();
     }
     /**
@@ -97,34 +100,34 @@ public class ExcelWorkSheetTest {
         ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
         int cnt=0;
         cnt=xlbook.getSheetCount();
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
         xlbook.addSheet("Bismi1");
         cnt=xlbook.getSheetCount();
         ExcelWorkSheet cSheet = xlbook.getExcelSheet("Bismi1");
         cSheet.activate();
         int cRownum = cSheet.getRowNumber();
-        assertEquals(1,cRownum);
+        Assertions.assertEquals(0,cRownum);
         String[] arrRow= {"A","B","C","D"};
         cSheet.row(11).setRowValues(arrRow);
         cRownum = cSheet.getRowNumber();
-        assertEquals(11,cRownum);
+        Assertions.assertEquals(11,cRownum);
 
         int cColNumber = cSheet.getColNumber();
-        assertEquals(4,cColNumber);
+        Assertions.assertEquals(4,cColNumber);
 
         cSheet.row(16).setRowValues(arrRow,5);
         cRownum = cSheet.getRowNumber();
-        assertEquals(16,cRownum);
+        Assertions.assertEquals(16,cRownum);
 
         cColNumber = cSheet.getColNumber();
-        assertEquals(9,cColNumber);
+        Assertions.assertEquals(9,cColNumber);
 
         String[] arrRow1= {"A","10.5","Cwwwwwwwwwwwwwwwwwwwwww","D","02/04/2019"};
         cSheet.row(34).setRowValues(arrRow1,true);
         cRownum = cSheet.getRowNumber();
-        assertEquals(34,cRownum);
+        Assertions.assertEquals(34,cRownum);
         cColNumber = cSheet.getColNumber();
-        assertEquals(9,cColNumber);
+        Assertions.assertEquals(9,cColNumber);
         cSheet.saveWorkBook();
         xlApp.closeAllWorkBooks();
     }
@@ -143,7 +146,7 @@ public class ExcelWorkSheetTest {
         ExcelWorkBook  xlbook=xlApp.createWorkBook(strMultipleFileName);
         int cnt=0;
         cnt=xlbook.getSheetCount();
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
         xlbook.addSheet("Bismi1");
         xlbook.addSheet("Bismi2");
         cnt=xlbook.getSheetCount();
@@ -155,22 +158,22 @@ public class ExcelWorkSheetTest {
         String[] arrRow1= {"A","10.5","Cwwwwwwwwwwwwwwwwwwwwww","D","02/04/2019"};
         cSheet.row(34).setRowValues(arrRow1,true);
         int cRownum = cSheet.getRowNumber();
-        assertEquals(34,cRownum);
+        Assertions.assertEquals(34,cRownum);
         int cColNumber = cSheet.getColNumber();
-        assertEquals(5,cColNumber);
+        Assertions.assertEquals(5,cColNumber);
 
         String[] arrRow2= {"A","10.5","Cwwwwwwwwwwwwwwwwwwwwww","D","02/04/2019"};
         cSheet2.row(4).setRowValues(arrRow2,true);
         cRownum = cSheet2.getRowNumber();
-        assertEquals(4,cRownum);
+        Assertions.assertEquals(4,cRownum);
         cColNumber = cSheet2.getColNumber();
-        assertEquals(5,cColNumber);
+        Assertions.assertEquals(5,cColNumber);
         cSheet2.saveWorkBook();
         xlApp.closeAllWorkBooks();
         xlbook=xlApp.openWorkbook(strMultipleFileName);
         ExcelWorkSheet gSheet = xlbook.getExcelSheet("Bismi2");
         String val = gSheet.cell(4, 2).getTextValue();
-        assertEquals("10.5",val);
+        Assertions.assertEquals("10.5",val);
 
         xlApp.closeAllWorkBooks();
     }
@@ -187,7 +190,7 @@ public class ExcelWorkSheetTest {
         ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFilePath);
         int cnt=0;
         cnt=xlbook.getSheetCount();
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
         xlbook.addSheet("Bismi1");
         xlbook.addSheet("Bismi2");
         cnt=xlbook.getSheetCount();
@@ -204,7 +207,7 @@ public class ExcelWorkSheetTest {
         xlbook=xlApp.openWorkbook(strCompleteFilePath);
         ExcelWorkSheet gSheet = xlbook.getExcelSheet("Bismi2");
         String val = gSheet.cell(3, 4).getTextValue();
-        assertEquals("Alpha lion",val);
+        Assertions.assertEquals("Alpha lion",val);
 
         xlApp.closeAllWorkBooks();
 

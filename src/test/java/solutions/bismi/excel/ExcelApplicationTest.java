@@ -1,16 +1,16 @@
 package solutions.bismi.excel;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.TestMethodOrder;
+
 
 /**
  * Unit test for simple App.
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.Alphanumeric.class)
 public class ExcelApplicationTest
 {
     /**
@@ -32,7 +32,7 @@ public class ExcelApplicationTest
         int cnt=xlApp.getOpenWorkbookCount();
         xlApp.closeAllWorkBooks();
         //Verify only one work book is created
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
 
     }
 
@@ -55,7 +55,7 @@ public class ExcelApplicationTest
         int cnt=xlApp.getOpenWorkbookCount();
         xlApp.closeAllWorkBooks();
         //Verify only one work book is created
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
     }
 
     /**
@@ -72,11 +72,11 @@ public class ExcelApplicationTest
         ExcelApplication xlApp =new ExcelApplication();
         xlApp.openWorkbook(strCompleteFileName);
         int cnt=xlApp.getOpenWorkbookCount();
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
         xlApp.closeWorkBook(0);
         cnt=xlApp.getOpenWorkbookCount();
-        assertEquals(0,cnt);
-        assertEquals(0,cnt);
+        Assertions.assertEquals(0,cnt);
+        Assertions.assertEquals(0,cnt);
     }
 
     /**
@@ -95,10 +95,10 @@ public class ExcelApplicationTest
         ExcelApplication xlApp =new ExcelApplication();
         ExcelWorkBook xlBook = xlApp.openWorkbook(strCompleteFileName);
         int cnt=xlApp.getOpenWorkbookCount();
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
         xlApp.closeWorkBook(xlBook.getExcelBookName());
         cnt=xlApp.getOpenWorkbookCount();
-        assertEquals(0,cnt);
+        Assertions.assertEquals(0,cnt);
     }
 
     /**
@@ -109,15 +109,15 @@ public class ExcelApplicationTest
         ExcelApplication xlApp =new ExcelApplication();
         xlApp.openWorkbook("./er.xls");
         int cnt=xlApp.getOpenWorkbookCount();
-        assertEquals(1,cnt);
+        Assertions.assertEquals(1,cnt);
 
         //Verifying the close functionality of xlsx
         xlApp.openWorkbook("./resources/testdata/er.xlsx");
         cnt=xlApp.getOpenWorkbookCount();
-        assertEquals(2,cnt);
+        Assertions.assertEquals(2,cnt);
         xlApp.closeAllWorkBooks();
         cnt=xlApp.getOpenWorkbookCount();
-        assertEquals(0,cnt);
+        Assertions.assertEquals(0,cnt);
 
 
     }

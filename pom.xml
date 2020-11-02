@@ -6,7 +6,7 @@
 
   <groupId>solutions.bismi.excel</groupId>
   <artifactId>Excel</artifactId>
-  <version>1.0.8</version>
+  <version>1.0.9</version>
 
   <name>Excel</name>
   <description>Bismi.Solutions easy to use Excel library wrapper for apache poi</description>
@@ -45,18 +45,18 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <project.version>1.0.8</project.version>
+    <project.version>1.0.9</project.version>
     <javadoc.opts>-Xdoclint:none</javadoc.opts>
-    <apachepoi.version>4.1.1</apachepoi.version>
-    <junit.version>4.11</junit.version>
-    <log4j.version>2.12.1</log4j.version>
-    <commons.lang.version>3.9</commons.lang.version>
+    <apachepoi.version>4.1.2</apachepoi.version>
+    <junit.version>5.7.0</junit.version>
+    <log4j.version>2.13.3</log4j.version>
+    <commons.lang.version>3.11</commons.lang.version>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
