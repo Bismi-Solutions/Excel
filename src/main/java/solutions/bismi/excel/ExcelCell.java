@@ -83,7 +83,36 @@ public class ExcelCell {
         return setText(sText, false);
 
     }
+    public boolean setCellValue(String sText) {
 
+
+        return setCellValue(sText, false);
+
+    }
+    /**
+     * @author - Sulfikar Ali Nazar
+     * @param sText
+     * @param autoSizeColoumn
+     * @return
+     */
+    public boolean setCellValue(String sText, boolean autoSizeColoumn) {
+
+        try {
+
+            this.getCELL().setCellValue(sText);
+            if (autoSizeColoumn) {
+                this.sheet.autoSizeColumn(col - 1);
+            }
+
+            //SaveWorkBook(inputStream, outputStream, sCompleteFileName);
+
+        } catch (Exception e) {
+            log.info("Error in setting text value " + e.toString());
+        }
+
+        return false;
+
+    }
     /**
      * @author - Sulfikar Ali Nazar
      * @param sText
@@ -91,10 +120,20 @@ public class ExcelCell {
      * @return
      */
     public boolean setText(String sText, boolean autoSizeColoumn) {
+        Cell cCell=null;
+        String val="";
+        CellStyle cStyle=null;
+
 
         try {
+            cCell = this.getCELL();
+           //
 
-            this.getCELL().setCellValue(sText);
+            Map<String, Object> properties = new HashMap<String, Object>();
+            properties.put(CellUtil.DATA_FORMAT, BuiltinFormats.getBuiltinFormat("Text"));
+            cCell.setCellValue(sText);
+            CellUtil.setCellStyleProperties(cCell, properties);
+
             if (autoSizeColoumn) {
                 this.sheet.autoSizeColumn(col - 1);
             }

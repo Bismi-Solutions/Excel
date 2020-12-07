@@ -81,6 +81,10 @@ public class ExcellCellTest {
         sh1.cell(10,10).setFillColor("yellow");
         sh1.cell(1,1).setFillColor("GREEN");
         sh1.cell(3,17).setFullBorder("Red");
+        sh1.cell(12,13).setCellValue("123");
+        sh1.cell(12,13).setCellValue("0");
+        sh1.cell(13,13).setText("0");
+        sh1.cell(12,22).setCellValue("0.123",true);
         sh1.saveWorkBook();
         xlApp.closeAllWorkBooks();
     }

@@ -50,7 +50,7 @@ public class ExcelRowTest {
         ExcelWorkSheet sh1 = xlbook.addSheet("Bismi1");
         sh1.activate();
 
-        String[] arrRow= {"A","B","C","D","E"};
+        String[] arrRow= {"A","B","C","D","E","0","1.1","0.0000",".000A",".0000"};
         sh1.row(11).setRowValues(arrRow);
         sh1.row(11).setFontColor("Red",1,3);
         sh1.row(11).setFontColor("green",3,7);
