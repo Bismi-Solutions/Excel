@@ -13,7 +13,7 @@ Add Maven dependency:
 <dependency>
     <groupId>solutions.bismi.excel</groupId>
     <artifactId>Excel</artifactId>
-    <version>1.0.10</version>
+    <version>1.0.11</version>
 </dependency>
 
 ```
