@@ -3,33 +3,41 @@ name: CI / Release
 on:
   push:
     branches: [ master, main ]
-    tags: ['v*']
+    tags: ['v*']          # ↳ deploy only on version tags
   pull_request:
     branches: [ master, main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    # ➊ Make the pass-phrase available to every step
+    env:
+      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Java
+      - name: Set up Temurin 17 and import GPG key
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: 17
           server-id: ossrh
           server-username: ${{ secrets.OSSRH_USERNAME }}
           server-password: ${{ secrets.OSSRH_PASSWORD }}
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          gpg-passphrase:  ${{ secrets.GPG_PASSPHRASE }}
 
-      - name: Build with Maven (skip tests)
-        run: mvn -B -DskipTests verify
+      # ➋ Sign during verify (tests are skipped here to keep CI quick)
+      - name: Build & sign (skip tests)
+        run: mvn -B -DskipTests -Dgpg.passphrase="$GPG_PASSPHRASE" verify
 
-      - name: Run Tests
+      # ➌ Run the tests separately (not signed)
+      - name: Run unit tests
         run: mvn test
 
+      # ➍ Deploy only when a version tag is pushed
       - name: Deploy to Maven Central
         if: startsWith(github.ref, 'refs/tags/')
-        run: mvn -B deploy
+        run: mvn -B -Dgpg.passphrase="$GPG_PASSPHRASE" deploy
