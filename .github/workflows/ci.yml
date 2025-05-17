@@ -1,0 +1,35 @@
+name: CI / Release
+
+on:
+  push:
+    branches: [ master, main ]
+    tags: ['v*']
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          server-id: ossrh
+          server-username: ${{ secrets.OSSRH_USERNAME }}
+          server-password: ${{ secrets.OSSRH_PASSWORD }}
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Build with Maven (skip tests)
+        run: mvn -B -DskipTests verify
+
+      - name: Run Tests
+        run: mvn test
+
+      - name: Deploy to Maven Central
+        if: startsWith(github.ref, 'refs/tags/')
+        run: mvn -B deploy
