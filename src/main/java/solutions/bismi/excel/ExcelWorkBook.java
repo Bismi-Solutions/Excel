@@ -463,8 +463,28 @@ public class ExcelWorkBook {
      * @return
      */
     public int getActiveSheetIndex(){
-
         return this.wb.getActiveSheetIndex();
+    }
+
+
+    /**
+     * Saves the workbook to the file
+     * 
+     * @return true if successful, false otherwise
+     */
+    public boolean saveWorkbook() {
+        try {
+            if (inputStream != null)
+                inputStream.close();
+            outputStream = new FileOutputStream(this.xlFile);
+            this.wb.write(outputStream);
+            outputStream.close();
+            log.info("Workbook saved successfully: " + this.excelBookName);
+            return true;
+        } catch (Exception e) {
+            log.error("Error saving workbook: " + e.getMessage());
+            return false;
+        }
     }
 
 

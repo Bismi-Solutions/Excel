@@ -89,6 +89,119 @@ public class ExcellCellTest {
         xlApp.closeAllWorkBooks();
     }
 
+    @Test
+    public void cTestFormulas() {
+        testFormulas("./resources/testdata/formulaTest.XLSX");
+        testFormulas("./resources/testdata/formulaTest.XLS");
+    }
+
+    private void testFormulas(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
+        ExcelWorkSheet sh1 = xlbook.addSheet("FormulaTest");
+        sh1.activate();
+
+        // Set up some test data
+        sh1.cell(1, 1).setCellValue("Item");
+        sh1.cell(1, 2).setCellValue("Quantity");
+        sh1.cell(1, 3).setCellValue("Price");
+        sh1.cell(1, 4).setCellValue("Total");
+
+        // Format the header row
+        for (int i = 1; i <= 4; i++) {
+            sh1.cell(1, i).setFontStyle(true, false, false);
+            sh1.cell(1, i).setFillColor("GREY_25_PERCENT");
+        }
+
+        // Add some data rows
+        sh1.cell(2, 1).setCellValue("Apples");
+        sh1.cell(2, 2).setNumericValue(10);
+        sh1.cell(2, 3).setNumericValue(1.5);
+
+        sh1.cell(3, 1).setCellValue("Oranges");
+        sh1.cell(3, 2).setNumericValue(5);
+        sh1.cell(3, 3).setNumericValue(2.0);
+
+        sh1.cell(4, 1).setCellValue("Bananas");
+        sh1.cell(4, 2).setNumericValue(8);
+        sh1.cell(4, 3).setNumericValue(1.2);
+
+        // Add formulas for calculating totals
+        sh1.cell(2, 4).setFormula("B2*C2");
+        sh1.cell(3, 4).setFormula("B3*C3");
+        sh1.cell(4, 4).setFormula("B4*C4");
+
+        // Add a sum formula
+        sh1.cell(5, 1).setCellValue("Total");
+        sh1.cell(5, 1).setFontStyle(true, false, false);
+        sh1.cell(5, 4).setFormula("SUM(D2:D4)");
+
+        // Format the total cell
+        sh1.cell(5, 4).setFontStyle(true, false, false);
+        sh1.cell(5, 4).setFillColor("LIGHT_YELLOW");
+
+        // Format the number cells
+        for (int row = 2; row <= 5; row++) {
+            for (int col = 2; col <= 4; col++) {
+                if (col == 3 || col == 4) {
+                    sh1.cell(row, col).setNumberFormat("$#,##0.00");
+                }
+            }
+        }
+
+        // Set column alignment
+        for (int row = 2; row <= 5; row++) {
+            sh1.cell(row, 1).setHorizontalAlignment("LEFT");
+            sh1.cell(row, 2).setHorizontalAlignment("CENTER");
+            sh1.cell(row, 3).setHorizontalAlignment("RIGHT");
+            sh1.cell(row, 4).setHorizontalAlignment("RIGHT");
+        }
+
+        sh1.saveWorkBook();
+        xlApp.closeAllWorkBooks();
+    }
+
+    @Test
+    public void dTestCellMerging() {
+        testCellMerging("./resources/testdata/mergeTest.XLSX");
+        testCellMerging("./resources/testdata/mergeTest.XLS");
+    }
+
+    private void testCellMerging(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
+        ExcelWorkSheet sh1 = xlbook.addSheet("MergeTest");
+        sh1.activate();
+
+        // Create a title and merge cells
+        sh1.cell(1, 1).setCellValue("Sales Report");
+        sh1.cell(1, 1).setFontStyle(true, false, false);
+        sh1.cell(1, 1).setHorizontalAlignment("CENTER");
+
+        // Merge cells for the title
+        sh1.mergeCells(1, 1, 1, 5);
+
+        // Add a subtitle
+        sh1.cell(2, 1).setCellValue("Q1 2023");
+        sh1.cell(2, 1).setFontStyle(false, true, false);
+        sh1.cell(2, 1).setHorizontalAlignment("CENTER");
+
+        // Merge cells for the subtitle
+        sh1.mergeCells(2, 2, 1, 5);
+
+        // Verify that cells are merged
+        boolean isMerged = sh1.isCellMerged(1, 3);
+        Assertions.assertTrue(isMerged, "Cell (1,3) should be part of a merged region");
+
+        // Test unmerging
+        sh1.unmergeCells(2, 2, 1, 5);
+        isMerged = sh1.isCellMerged(2, 3);
+        Assertions.assertFalse(isMerged, "Cell (2,3) should not be merged after unmerging");
+
+        sh1.saveWorkBook();
+        xlApp.closeAllWorkBooks();
+    }
+
 
 
 

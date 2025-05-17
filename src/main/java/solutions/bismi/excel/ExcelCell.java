@@ -96,22 +96,107 @@ public class ExcelCell {
      * @return
      */
     public boolean setCellValue(String sText, boolean autoSizeColoumn) {
-
         try {
-
             this.getCELL().setCellValue(sText);
             if (autoSizeColoumn) {
                 this.sheet.autoSizeColumn(col - 1);
             }
-
             //SaveWorkBook(inputStream, outputStream, sCompleteFileName);
-
+            return true;
         } catch (Exception e) {
-            log.info("Error in setting text value " + e.toString());
+            log.error("Error in setting cell value: " + e.getMessage());
+            return false;
         }
+    }
 
-        return false;
+    /**
+     * Sets a numeric value in the cell
+     * 
+     * @param value The numeric value to set
+     * @param autoSizeColumn Whether to auto-size the column
+     * @return true if successful, false otherwise
+     */
+    public boolean setNumericValue(double value, boolean autoSizeColumn) {
+        try {
+            this.getCELL().setCellValue(value);
+            if (autoSizeColumn) {
+                this.sheet.autoSizeColumn(col - 1);
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("Error in setting numeric value: " + e.getMessage());
+            return false;
+        }
+    }
 
+    /**
+     * Sets a numeric value in the cell
+     * 
+     * @param value The numeric value to set
+     * @return true if successful, false otherwise
+     */
+    public boolean setNumericValue(double value) {
+        return setNumericValue(value, false);
+    }
+
+    /**
+     * Sets a date value in the cell
+     * 
+     * @param date The date value to set
+     * @param autoSizeColumn Whether to auto-size the column
+     * @return true if successful, false otherwise
+     */
+    public boolean setDateValue(java.util.Date date, boolean autoSizeColumn) {
+        try {
+            this.getCELL().setCellValue(date);
+            if (autoSizeColumn) {
+                this.sheet.autoSizeColumn(col - 1);
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("Error in setting date value: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Sets a date value in the cell
+     * 
+     * @param date The date value to set
+     * @return true if successful, false otherwise
+     */
+    public boolean setDateValue(java.util.Date date) {
+        return setDateValue(date, false);
+    }
+
+    /**
+     * Sets a formula in the cell
+     * 
+     * @param formula The formula to set (without the leading '=')
+     * @param autoSizeColumn Whether to auto-size the column
+     * @return true if successful, false otherwise
+     */
+    public boolean setFormula(String formula, boolean autoSizeColumn) {
+        try {
+            this.getCELL().setCellFormula(formula);
+            if (autoSizeColumn) {
+                this.sheet.autoSizeColumn(col - 1);
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("Error in setting formula: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Sets a formula in the cell
+     * 
+     * @param formula The formula to set (without the leading '=')
+     * @return true if successful, false otherwise
+     */
+    public boolean setFormula(String formula) {
+        return setFormula(formula, false);
     }
     /**
      * @author - Sulfikar Ali Nazar
@@ -182,7 +267,6 @@ public class ExcelCell {
         CellStyle cStyle=null;
         try{
             cCell = this.getCELL();
-            val = cCell.getStringCellValue();
 
             Map<String, Object> properties = new HashMap<String, Object>();
             properties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
@@ -190,10 +274,135 @@ public class ExcelCell {
             CellUtil.setCellStyleProperties(cCell, properties);
 
         }catch (Exception e){
-            log.info("Error in setting Font color " + e.toString());
+            log.error("Error in setting fill color: " + e.getMessage());
         }
+    }
 
+    /**
+     * Sets the horizontal alignment of the cell content
+     * 
+     * @param alignment The alignment to set (LEFT, CENTER, RIGHT, etc.)
+     * @return true if successful, false otherwise
+     */
+    public boolean setHorizontalAlignment(String alignment) {
+        try {
+            Cell cCell = this.getCELL();
+            Map<String, Object> properties = new HashMap<String, Object>();
 
+            HorizontalAlignment hAlign;
+            switch(alignment.toUpperCase()) {
+                case "LEFT":
+                    hAlign = HorizontalAlignment.LEFT;
+                    break;
+                case "CENTER":
+                    hAlign = HorizontalAlignment.CENTER;
+                    break;
+                case "RIGHT":
+                    hAlign = HorizontalAlignment.RIGHT;
+                    break;
+                case "JUSTIFY":
+                    hAlign = HorizontalAlignment.JUSTIFY;
+                    break;
+                case "FILL":
+                    hAlign = HorizontalAlignment.FILL;
+                    break;
+                default:
+                    hAlign = HorizontalAlignment.GENERAL;
+            }
+
+            properties.put(CellUtil.ALIGNMENT, hAlign);
+            CellUtil.setCellStyleProperties(cCell, properties);
+            return true;
+        } catch (Exception e) {
+            log.error("Error in setting horizontal alignment: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Sets the vertical alignment of the cell content
+     * 
+     * @param alignment The alignment to set (TOP, CENTER, BOTTOM, etc.)
+     * @return true if successful, false otherwise
+     */
+    public boolean setVerticalAlignment(String alignment) {
+        try {
+            Cell cCell = this.getCELL();
+            Map<String, Object> properties = new HashMap<String, Object>();
+
+            VerticalAlignment vAlign;
+            switch(alignment.toUpperCase()) {
+                case "TOP":
+                    vAlign = VerticalAlignment.TOP;
+                    break;
+                case "CENTER":
+                    vAlign = VerticalAlignment.CENTER;
+                    break;
+                case "BOTTOM":
+                    vAlign = VerticalAlignment.BOTTOM;
+                    break;
+                case "JUSTIFY":
+                    vAlign = VerticalAlignment.JUSTIFY;
+                    break;
+                case "DISTRIBUTED":
+                    vAlign = VerticalAlignment.DISTRIBUTED;
+                    break;
+                default:
+                    vAlign = VerticalAlignment.CENTER;
+            }
+
+            properties.put(CellUtil.VERTICAL_ALIGNMENT, vAlign);
+            CellUtil.setCellStyleProperties(cCell, properties);
+            return true;
+        } catch (Exception e) {
+            log.error("Error in setting vertical alignment: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Sets the number format for the cell
+     * 
+     * @param formatPattern The format pattern to use (e.g., "#,##0.00", "dd/mm/yyyy")
+     * @return true if successful, false otherwise
+     */
+    public boolean setNumberFormat(String formatPattern) {
+        try {
+            Cell cCell = this.getCELL();
+            DataFormat format = wb.createDataFormat();
+            Map<String, Object> properties = new HashMap<String, Object>();
+            properties.put(CellUtil.DATA_FORMAT, format.getFormat(formatPattern));
+            CellUtil.setCellStyleProperties(cCell, properties);
+            return true;
+        } catch (Exception e) {
+            log.error("Error in setting number format: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Sets the font style (bold, italic, etc.)
+     * 
+     * @param bold true to make the font bold
+     * @param italic true to make the font italic
+     * @param underline true to underline the text
+     * @return true if successful, false otherwise
+     */
+    public boolean setFontStyle(boolean bold, boolean italic, boolean underline) {
+        try {
+            Cell cCell = this.getCELL();
+            Font font = wb.createFont();
+            font.setBold(bold);
+            font.setItalic(italic);
+            if (underline) {
+                font.setUnderline(Font.U_SINGLE);
+            }
+            CellUtil.setFont(cCell, font);
+            return true;
+        } catch (Exception e) {
+            log.error("Error in setting font style: " + e.getMessage());
+            return false;
+        }
     }
     public void setFullBorder(String fillColor){
         Cell cCell=null;

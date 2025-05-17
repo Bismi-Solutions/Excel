@@ -279,16 +279,94 @@ public class ExcelWorkSheet {
      * @return
      */
     public ExcelRow row(int row) {
-        ExcelRow rows =null;
+        ExcelRow rows = null;
         try {
-            rows=new ExcelRow(this.sheet,this.wb,row,this.inputStream,this.outputStream,this.sCompleteFileName);
-
+            rows = new ExcelRow(this.sheet, this.wb, row, this.inputStream, this.outputStream, this.sCompleteFileName);
         } catch (Exception e) {
-            log.info("Error Excel rows operation " + e.toString());
+            log.error("Error in Excel rows operation: " + e.getMessage());
         }
-
         return rows;
-
     }
+
+    /**
+     * Merges cells in the specified range
+     * 
+     * @param firstRow First row of the range (1-based)
+     * @param lastRow Last row of the range (1-based)
+     * @param firstCol First column of the range (1-based)
+     * @param lastCol Last column of the range (1-based)
+     * @return true if successful, false otherwise
+     */
+    public boolean mergeCells(int firstRow, int lastRow, int firstCol, int lastCol) {
+        try {
+            // Convert to 0-based indices for POI
+            this.sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(
+                firstRow - 1, lastRow - 1, firstCol - 1, lastCol - 1));
+            saveWorkBook(inputStream, outputStream, sCompleteFileName);
+            return true;
+        } catch (Exception e) {
+            log.error("Error merging cells: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Unmerges the cells in the specified range
+     * 
+     * @param firstRow First row of the range (1-based)
+     * @param lastRow Last row of the range (1-based)
+     * @param firstCol First column of the range (1-based)
+     * @param lastCol Last column of the range (1-based)
+     * @return true if successful, false otherwise
+     */
+    public boolean unmergeCells(int firstRow, int lastRow, int firstCol, int lastCol) {
+        try {
+            // Convert to 0-based indices for POI
+            org.apache.poi.ss.util.CellRangeAddress rangeToRemove = new org.apache.poi.ss.util.CellRangeAddress(
+                firstRow - 1, lastRow - 1, firstCol - 1, lastCol - 1);
+
+            // Find the merged region that matches our range
+            for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
+                org.apache.poi.ss.util.CellRangeAddress mergedRegion = sheet.getMergedRegion(i);
+                if (mergedRegion.equals(rangeToRemove)) {
+                    sheet.removeMergedRegion(i);
+                    saveWorkBook(inputStream, outputStream, sCompleteFileName);
+                    return true;
+                }
+            }
+            log.warn("No matching merged region found to unmerge");
+            return false;
+        } catch (Exception e) {
+            log.error("Error unmerging cells: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Checks if a cell is part of a merged region
+     * 
+     * @param row Row index (1-based)
+     * @param col Column index (1-based)
+     * @return true if the cell is part of a merged region, false otherwise
+     */
+    public boolean isCellMerged(int row, int col) {
+        try {
+            // Convert to 0-based indices for POI
+            int rowIndex = row - 1;
+            int colIndex = col - 1;
+
+            for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
+                org.apache.poi.ss.util.CellRangeAddress mergedRegion = sheet.getMergedRegion(i);
+                if (mergedRegion.isInRange(rowIndex, colIndex)) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            log.error("Error checking if cell is merged: " + e.getMessage());
+            return false;
+        }
+    }
+
 
 }
