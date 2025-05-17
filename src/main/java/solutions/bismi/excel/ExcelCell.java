@@ -306,20 +306,26 @@ public class ExcelCell {
         }
     }
 
-    private void SaveWorkBook(FileInputStream inputStream, FileOutputStream outputStream, String sCompleteFileName) {
+    /**
+     * Saves the workbook to the specified file.
+     *
+     * @param inputStream The input stream to close
+     * @param outputStream The output stream (not used)
+     * @param sCompleteFileName The complete file path and name to save to
+     */
+    private void saveWorkBook(FileInputStream inputStream, FileOutputStream outputStream, String sCompleteFileName) {
         try {
-
-            if (inputStream != null)
+            if (inputStream != null) {
                 inputStream.close();
+            }
             OutputStream fileOut = new FileOutputStream(sCompleteFileName);
             wb.write(fileOut);
             // wb.close();
             fileOut.close();
-
+            log.info("Workbook saved successfully to: " + sCompleteFileName);
         } catch (Exception e) {
-            log.info("Error in saving record " + e.toString());
+            log.error("Error in saving workbook: " + e.getMessage());
         }
-
     }
 
 

@@ -6,7 +6,7 @@
 
   <groupId>solutions.bismi.excel</groupId>
   <artifactId>Excel</artifactId>
-  <version>1.0.11</version>
+  <version>1.1.0</version>
 
   <name>Excel</name>
   <description>Bismi.Solutions easy to use Excel library wrapper for apache poi</description>
@@ -47,10 +47,10 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.version>1.0.11</project.version>
     <javadoc.opts>-Xdoclint:none</javadoc.opts>
-    <apachepoi.version>5.2.2</apachepoi.version>
-    <junit.version>5.9.0</junit.version>
-    <log4j.version>2.18.0</log4j.version>
-    <commons.lang.version>3.12.0</commons.lang.version>
+    <apachepoi.version>5.4.1</apachepoi.version>
+    <junit.version>5.10.0</junit.version>
+    <log4j.version>2.20.0</log4j.version>
+    <commons.lang.version>3.13.0</commons.lang.version>
   </properties>
 
   <dependencies>
@@ -60,6 +60,14 @@
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
@@ -93,7 +101,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.2.1</version>
+        <version>3.2.1</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -106,7 +114,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9.1</version>
+        <version>3.5.0</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -114,7 +122,7 @@
               <goal>jar</goal>
             </goals>
             <configuration>
-              <additionalparam>${javadoc.opts}</additionalparam>
+              <additionalOptions>${javadoc.opts}</additionalOptions>
             </configuration>
           </execution>
         </executions>
@@ -122,7 +130,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.5</version>
+        <version>3.1.0</version>
         <executions>
           <execution>
             <id>sign-artifacts</id>
@@ -135,9 +143,15 @@
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.1.2</version>
+      </plugin>
+
+      <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.7</version>
+        <version>1.6.13</version>
         <extensions>true</extensions>
         <configuration>
           <serverId>ossrh</serverId>

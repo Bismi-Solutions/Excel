@@ -213,7 +213,7 @@ public class ExcelWorkSheet {
 
             }
 
-            SaveWorkBook( inputStream, outputStream, sCompleteFileName);
+            saveWorkBook(inputStream, outputStream, sCompleteFileName);
             log.info("Cleared sheet contents successfully " );
             return true;
 
@@ -252,29 +252,6 @@ public class ExcelWorkSheet {
         return sheetName;
     }
 
-    /**
-     * @author - Sulfikar Ali Nazar
-     * @param inputStream
-     * @param outputStream
-     * @param sCompleteFileName
-     */
-    private void SaveWorkBook(FileInputStream inputStream,FileOutputStream outputStream, String sCompleteFileName ) {
-        try {
-
-            if (inputStream != null)
-                inputStream.close();
-            OutputStream fileOut = new FileOutputStream(sCompleteFileName);
-            wb.write(fileOut);
-            //wb.close();
-            fileOut.close();
-
-
-        } catch (Exception e) {
-            log.info("Error in saving record " + e.toString());
-        }
-
-
-    }
 
 
     /**
