@@ -10,7 +10,7 @@
     <!-- ───────── coordinates ───────── -->
     <groupId>solutions.bismi.excel</groupId>
     <artifactId>excel</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.5</version>
 
     <name>Excel</name>
     <description>Easy-to-use Excel wrapper for Apache POI</description>
@@ -50,10 +50,19 @@
         <log4j.version>2.20.0</log4j.version>
         <commons.lang.version>3.13.0</commons.lang.version>
         <jacoco.version>0.8.11</jacoco.version>
+        <lombok.version>1.18.30</lombok.version>
     </properties>
 
     <!-- ───────── dependencies ───────── -->
     <dependencies>
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

@@ -1,106 +1,103 @@
-/*
- * Copyright (c) 2019. Bismi Solutions
- *
- * https://bismi.solutions/
- * support@bismi.solutions
- * sulfikar.ali.nazar@gmail.com
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package solutions.bismi.excel;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.*;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
-
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 /**
  * Represents an Excel workbook.
  * Provides methods for creating, opening, and manipulating Excel workbooks and their sheets.
  */
+@NoArgsConstructor
+@AllArgsConstructor
 public class ExcelWorkBook {
 
-    Workbook wb;
-    String excelBookName = "";
-    String excelBookPath = "";
-    FileInputStream inputStream = null;
-    FileOutputStream outputStream = null;
-    File xlFile = null;
     // List to keep currently available sheets in excel
+    @Getter
+    @Setter
     protected List<ExcelWorkSheet> excelSheets = new ArrayList<>();
-    private Logger log = LogManager.getLogger(ExcelWorkBook.class);
+
+    @Getter
+    @Setter
+    Workbook wb;
+
+    @Getter
+    @Setter
+    String excelBookName = "";
+
+    @Getter
+    @Setter
+    String excelBookPath = "";
+
+    @Getter
+    @Setter
+    FileInputStream inputStream = null;
+
+    @Getter
+    @Setter
+    FileOutputStream outputStream = null;
+
+    @Getter
+    @Setter
+    File xlFile = null;
+
+    @Getter
+    @Setter
     String xlFileExtension = null;
 
+    @Getter
+    @Setter
+    private Logger log = LogManager.getLogger(ExcelWorkBook.class);
+
 
     /**
-     * Default constructor for ExcelWorkBook.
+     * Constructor with essential parameters.
+     *
+     * @param wb            The workbook
+     * @param excelBookName The name of the Excel book
+     * @param excelBookPath The path of the Excel book
      */
-    ExcelWorkBook() {
-        // Default constructor
-    }
-
-    /**
-     * Creates a new ExcelWorkBook with the specified parameters.
-     * 
-     * @param wb The Apache POI Workbook object
-     * @param excelBookName The name of the Excel workbook
-     * @param excelBookPath The path to the Excel workbook
-     */
-    ExcelWorkBook(Workbook wb, String excelBookName, String excelBookPath) {
+    public ExcelWorkBook(Workbook wb, String excelBookName, String excelBookPath) {
         this.wb = wb;
         this.excelBookName = excelBookName;
         this.excelBookPath = excelBookPath;
+        this.excelSheets = new ArrayList<>();
     }
 
     /**
      * Closes the workbook and releases resources.
-     * 
+     *
      * @return true if the workbook was closed successfully, false otherwise
      */
     protected boolean closeWorkBook() {
         try {
             this.wb.close();
             this.wb = null;
-            log.info("Closed workbook: " + this.excelBookName);
+            log.info("Closed workbook: {}", this.excelBookName);
             return true;
         } catch (IOException e) {
-            log.error("Error in closing workbook: " + e.getMessage());
+            log.error("Error in closing workbook: {}", e.getMessage());
             return false;
         }
     }
 
     /**
      * Creates a new Excel workbook at the specified file path.
-     * 
+     *
      * @param sCompleteFileName The complete file path and name for the new workbook
      * @return The newly created ExcelWorkBook object
      */
@@ -112,26 +109,24 @@ public class ExcelWorkBook {
                 this.excelBookName = getFileName(sCompleteFileName);
                 String[] fileExtn = this.excelBookName.split("[.]");
 
-                if (fileExtn[1].equalsIgnoreCase("xlsx") || fileExtn[1].equalsIgnoreCase("xlsm")) {
-                    wb = new XSSFWorkbook();
-                    OutputStream fileOut = new FileOutputStream(sCompleteFileName);
-                    Sheet sheet1 = wb.createSheet("Sheet1");
-                    wb.write(fileOut);
-                    updateSheetList();
-                    fileOut.close();
-                    log.info("Created XLSX file: " + this.excelBookName);
-                } else if (fileExtn[1].equalsIgnoreCase("xls")) {
-                    wb = new HSSFWorkbook();
-                    OutputStream fileOut = new FileOutputStream(sCompleteFileName);
-                    Sheet sheet1 = wb.createSheet("Sheet1");
-                    wb.write(fileOut);
-                    updateSheetList();
-                    fileOut.close();
-                    log.info("Created XLS file: " + this.excelBookName);
+                if (fileExtn.length > 1) {
+                    String extension = fileExtn[fileExtn.length - 1].toLowerCase();
+
+                    if ("xlsx".equals(extension) || "xlsm".equals(extension)) {
+                        wb = new XSSFWorkbook();
+                        createInitialSheet(sCompleteFileName, "XLSX");
+                    } else if ("xls".equals(extension)) {
+                        wb = new HSSFWorkbook();
+                        createInitialSheet(sCompleteFileName, "XLS");
+                    }
+                } else {
+                    log.warn("File {} has no extension", this.excelBookName);
                 }
             }
+        } catch (IOException e) {
+            log.error("IO error creating workbook: {}", e.getMessage());
         } catch (Exception e) {
-            log.error("Error creating workbook: " + e.getMessage());
+            log.error("Error creating workbook: {}", e.getMessage());
         }
 
         xlWbook = new ExcelWorkBook(this.wb, this.excelBookName, this.excelBookPath);
@@ -139,22 +134,54 @@ public class ExcelWorkBook {
     }
 
     /**
+     * Creates an initial sheet in the workbook and saves it
+     *
+     * @param fileName The file path to save the workbook to
+     * @param fileType The type of file being created (for logging)
+     * @throws IOException If an I/O error occurs
+     */
+    private void createInitialSheet(String fileName, String fileType) throws IOException {
+        try (OutputStream fileOut = new FileOutputStream(fileName)) {
+            Sheet sheet1 = wb.createSheet("Sheet1");
+            wb.write(fileOut);
+            updateSheetList();
+            log.info("Created {} file: {}", fileType, this.excelBookName);
+        }
+    }
+
+    /**
      * Extracts the file name from a complete file path.
-     * 
+     *
      * @param sCompleteFilePath The complete file path
      * @return The file name, or an empty string if an error occurs
      */
     private String getFileName(String sCompleteFilePath) {
+        if (sCompleteFilePath == null || sCompleteFilePath.trim().isEmpty()) {
+            log.error("File path is null or empty");
+            return "";
+        }
+
         try {
             if (isValidPath(sCompleteFilePath)) {
                 File file = new File(sCompleteFilePath);
-                this.excelBookName = file.getName();
-                this.xlFileExtension = this.excelBookName.substring(this.excelBookName.lastIndexOf("."));
-                log.debug("Extracted file name: " + file.getName());
-                return file.getName();
+                String fileName = file.getName();
+                this.excelBookName = fileName;
+
+                // Check if file has an extension before extracting it
+                int lastDotIndex = fileName.lastIndexOf(".");
+                if (lastDotIndex > 0 && lastDotIndex < fileName.length() - 1) {
+                    this.xlFileExtension = fileName.substring(lastDotIndex);
+                } else {
+                    this.xlFileExtension = "";
+                }
+
+                log.debug("Extracted file name: {}", fileName);
+                return fileName;
             }
+        } catch (StringIndexOutOfBoundsException e) {
+            log.error("Error extracting file extension: {}", e.getMessage());
         } catch (Exception e) {
-            log.error("Error extracting file name: " + e.getMessage());
+            log.error("Error extracting file name: {}", e.getMessage());
         }
 
         return ""; // Return empty string on error
@@ -162,14 +189,14 @@ public class ExcelWorkBook {
 
     /**
      * Validates a file path and creates any missing directories.
-     * 
+     *
      * @param path The file path to validate
      * @return true if the path is valid, false otherwise
      */
     private boolean isValidPath(String path) {
         try {
             Paths.get(path);
-            log.debug("Verified path is valid: " + path);
+            log.debug("Verified path is valid: {}", path);
             File file = new File(path);
 
             if (!file.isDirectory()) {
@@ -183,28 +210,11 @@ public class ExcelWorkBook {
             }
             return true;
         } catch (InvalidPathException | NullPointerException ex) {
-            log.error("Invalid path: " + ex.getMessage());
+            log.error("Invalid path: {}", ex.getMessage());
             return false;
         }
     }
 
-    /**
-     * Gets the name of the Excel workbook.
-     * 
-     * @return The name of the workbook
-     */
-    public String getExcelBookName() {
-        return excelBookName;
-    }
-
-    /**
-     * Gets the path to the Excel workbook.
-     * 
-     * @return The path to the workbook
-     */
-    public String getExcelBookPath() {
-        return excelBookPath;
-    }
 
     /**
      * Updates the list of worksheets in the workbook.
@@ -213,67 +223,99 @@ public class ExcelWorkBook {
     protected void updateSheetList() {
         excelSheets.clear();
         int sheetCount = this.wb.getNumberOfSheets();
-        String path = excelBookPath + "\\" + excelBookName;
 
         try {
             for (int i = 0; i < sheetCount; i++) {
                 String sheetName = this.wb.getSheetName(i);
-                ExcelWorkSheet sheetTemp = new ExcelWorkSheet(
-                    this.wb.getSheet(sheetName), 
-                    sheetName, 
-                    this.wb,
-                    this.inputStream,
-                    this.outputStream,
-                    path
-                );
-                excelSheets.add(sheetTemp);
+                Sheet sheet = this.wb.getSheet(sheetName);
+                ExcelWorkSheet sheetTemp = createWorkSheet(sheet);
+                if (sheetTemp != null) {
+                    excelSheets.add(sheetTemp);
+                }
             }
-            log.debug("Updated sheet list in workbook. Total sheets: " + sheetCount);
+            log.debug("Updated sheet list in workbook. Total sheets: {}", sheetCount);
         } catch (Exception e) {
-            log.error("Error updating sheet list: " + e.getMessage());
+            log.error("Error updating sheet list: {}", e.getMessage());
         }
     }
 
-
     /**
      * Opens an existing Excel workbook from the specified file path.
-     * 
+     *
      * @param sCompleteFileName The complete file path and name of the workbook to open
      * @return The opened ExcelWorkBook object, or null if an error occurs
      */
     protected ExcelWorkBook openWorkbook(String sCompleteFileName) {
         ExcelWorkBook xlWbook = null;
-        log.info("Opening Excel workbook: " + sCompleteFileName);
+        log.info("Opening Excel workbook: {}", sCompleteFileName);
 
         try {
             if (isValidPath(sCompleteFileName)) {
                 this.xlFile = new File(sCompleteFileName);
                 this.excelBookName = getFileName(sCompleteFileName);
-                inputStream = new FileInputStream(this.xlFile);
-                this.wb = WorkbookFactory.create(inputStream);
 
-                // Get the active sheet index before creating the ExcelWorkBook
-                int activeSheetIndex = this.wb.getActiveSheetIndex();
+                try (FileInputStream fileIn = new FileInputStream(this.xlFile)) {
+                    this.wb = WorkbookFactory.create(fileIn);
+                    this.inputStream = null; // We don't need to store the input stream anymore
 
-                xlWbook = new ExcelWorkBook(this.wb, this.excelBookName, this.excelBookPath);
-                updateSheetList();
+                    // Get the active sheet index before creating the ExcelWorkBook
+                    int activeSheetIndex = this.wb.getActiveSheetIndex();
 
-                // Ensure the active sheet is properly set
-                if (activeSheetIndex >= 0 && activeSheetIndex < this.wb.getNumberOfSheets()) {
-                    this.wb.setActiveSheet(activeSheetIndex);
-                    log.debug("Set active sheet to: " + this.wb.getSheetName(activeSheetIndex));
+                    xlWbook = new ExcelWorkBook(this.wb, this.excelBookName, this.excelBookPath);
+                    updateSheetList();
+
+                    // Ensure the active sheet is properly set
+                    if (activeSheetIndex >= 0 && activeSheetIndex < this.wb.getNumberOfSheets()) {
+                        this.wb.setActiveSheet(activeSheetIndex);
+                        log.debug("Set active sheet to: {}", this.wb.getSheetName(activeSheetIndex));
+                    }
                 }
             }
+        } catch (IOException e) {
+            log.error("IO error opening workbook: {}", e.getMessage());
         } catch (Exception e) {
-            log.error("Error opening workbook: " + e.getMessage());
+            log.error("Error opening workbook: {}", e.getMessage());
         }
 
         return xlWbook;
     }
 
     /**
+     * Saves the workbook to the file.
+     *
+     * @param logMessage Message to log on successful save
+     * @return true if successful, false otherwise
+     */
+    private boolean saveWorkbookToFile(String logMessage) {
+        try {
+            // Close input stream if open
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                    inputStream = null;
+                } catch (IOException e) {
+                    log.warn("Error closing input stream: {}", e.getMessage());
+                }
+            }
+
+            // Use try-with-resources for output stream
+            try (FileOutputStream fileOut = new FileOutputStream(this.xlFile)) {
+                this.wb.write(fileOut);
+                log.debug(logMessage);
+                return true;
+            }
+        } catch (IOException e) {
+            log.error("IO error saving workbook: {}", e.getMessage());
+            return false;
+        } catch (Exception e) {
+            log.error("Error saving workbook: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Adds a new worksheet to the workbook.
-     * 
+     *
      * @param sSheetName The name of the new worksheet
      * @return The newly created ExcelWorkSheet object
      */
@@ -282,25 +324,14 @@ public class ExcelWorkBook {
         wSheet.wb = this.wb;
         ExcelWorkSheet tempSheet = wSheet.addSheet(sSheetName);
 
-        try {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-            outputStream = new FileOutputStream(this.xlFile);
-            this.wb.write(outputStream);
-            outputStream.close();
-            log.debug("Added new sheet: " + sSheetName);
-        } catch (Exception e) {
-            log.error("Error creating worksheet: " + e.getMessage());
-        }
-
+        saveWorkbookToFile("Added new sheet: {}".replace("{}", sSheetName));
         excelSheets.add(tempSheet);
         return getExcelSheet(sSheetName);
     }
 
     /**
      * Adds multiple worksheets to the workbook.
-     * 
+     *
      * @param strArrSheets Array of sheet names to add
      */
     public void addSheets(String[] strArrSheets) {
@@ -308,192 +339,114 @@ public class ExcelWorkBook {
         wSheet.wb = this.wb;
         wSheet.addSheets(strArrSheets);
 
-        try {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-            outputStream = new FileOutputStream(this.xlFile);
-            this.wb.write(outputStream);
-            outputStream.close();
-            updateSheetList();
-            log.debug("Added " + strArrSheets.length + " new sheets");
-        } catch (Exception e) {
-            log.error("Error creating worksheets: " + e.getMessage());
-        }
-    }
-
-    protected Workbook getWb() {
-        return wb;
-    }
-
-    protected void setWb(Workbook wb) {
-        this.wb = wb;
-    }
-
-    protected FileInputStream getInputStream() {
-        return inputStream;
-    }
-
-    protected void setInputStream(FileInputStream inputStream) {
-        this.inputStream = inputStream;
-    }
-
-    protected FileOutputStream getOutputStream() {
-        return outputStream;
-    }
-
-    protected void setOutputStream(FileOutputStream outputStream) {
-        this.outputStream = outputStream;
-    }
-
-    protected File getXlFile() {
-        return xlFile;
-    }
-
-    protected void setXlFile(File xlFile) {
-        this.xlFile = xlFile;
+        saveWorkbookToFile("Added {} new sheets".replace("{}", Integer.toString(strArrSheets.length)));
+        updateSheetList();
     }
 
 
-
-
-    protected Logger getLog() {
-        return log;
-    }
-
-    protected void setLog(Logger log) {
-        this.log = log;
-    }
-
-    protected List<ExcelWorkSheet> getExcelSheets() {
-        return excelSheets;
-    }
-
-    protected void setExcelSheets(List<ExcelWorkSheet> excelSheets) {
-        this.excelSheets = excelSheets;
-    }
-
-    protected void setExcelBookName(String excelBookName) {
-        this.excelBookName = excelBookName;
-    }
-
-    protected void setExcelBookPath(String excelBookPath) {
-        this.excelBookPath = excelBookPath;
+    /**
+     * Gets the full path of the Excel file.
+     *
+     * @return The full path of the Excel file
+     */
+    private String getFullPath() {
+        return excelBookPath + "\\" + excelBookName;
     }
 
     /**
-     * @author - Sulfikar Ali Nazar
-     * @param sSheetName
-     * @return
+     * Creates an ExcelWorkSheet object from a Sheet object.
+     *
+     * @param sheet The Sheet object to create an ExcelWorkSheet from
+     * @return The created ExcelWorkSheet object, or null if the sheet is null
+     */
+    private ExcelWorkSheet createWorkSheet(Sheet sheet) {
+        if (sheet == null) {
+            return null;
+        }
+
+        try {
+            return new ExcelWorkSheet(sheet, sheet.getSheetName(), this.wb, this.inputStream, this.outputStream, getFullPath());
+        } catch (Exception e) {
+            log.debug("Error creating worksheet: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Gets a worksheet by name.
+     *
+     * @param sSheetName The name of the worksheet to get
+     * @return The worksheet with the specified name, or null if not found
      */
     public ExcelWorkSheet getExcelSheet(String sSheetName) {
-
-        Sheet sheet1=null;
-        ExcelWorkSheet shTemp=null;
         try {
-            sheet1=this.wb.getSheet(sSheetName);
-
-            if(sheet1 != null)   {
-                int index = this.wb.getSheetIndex(sheet1);
-                // this.wb.removeSheetAt(index);
-
-                String pth= excelBookPath+"\\"+excelBookName;
-                shTemp=new ExcelWorkSheet(this.wb.getSheet(sSheetName), this.wb.getSheet(sSheetName).getSheetName(), this.wb,this.inputStream,this.outputStream,pth);
-            }
-
+            Sheet sheet = this.wb.getSheet(sSheetName);
+            return createWorkSheet(sheet);
         } catch (Exception e) {
-            log.debug("Error in getting sheet " + sSheetName);
+            log.debug("Error in getting sheet {}", sSheetName);
+            return null;
         }
-
-
-        return shTemp;
     }
 
     /**
-     * @author - Sulfikar Ali Nazar
-     * @param iIndex
-     * @return
+     * Gets a worksheet by index.
+     *
+     * @param iIndex The index of the worksheet to get
+     * @return The worksheet at the specified index, or null if not found
      */
     public ExcelWorkSheet getExcelSheet(int iIndex) {
-
-        Sheet sheet1=null;
-        ExcelWorkSheet shTemp=null;
         try {
-
-            sheet1=this.wb.getSheetAt(iIndex);
-            if(sheet1 != null)   {
-                int index = this.wb.getSheetIndex(sheet1);
-                // this.wb.removeSheetAt(index);
-                String pth= excelBookPath+"\\"+excelBookName;
-                shTemp=new ExcelWorkSheet(this.wb.getSheetAt(iIndex), this.wb.getSheetAt(iIndex).getSheetName(), this.wb,this.inputStream,this.outputStream,pth);
-            }
+            Sheet sheet = this.wb.getSheetAt(iIndex);
+            return createWorkSheet(sheet);
         } catch (Exception e) {
-            log.debug("Error in getting sheet index" + iIndex);
+            log.debug("Error in getting sheet index {}", iIndex);
+            return null;
         }
-
-        return shTemp;//new ExcelWorkSheet(this.wb.getSheetAt(iIndex), this.wb.getSheetAt(iIndex).getSheetName(), this.wb);
     }
 
+    /**
+     * Gets the active worksheet.
+     *
+     * @return The active worksheet, or null if not found
+     */
     public ExcelWorkSheet getActiveSheet() {
-        int iIndex=getActiveSheetIndex();
-        Sheet sheet1=null;
-        ExcelWorkSheet shTemp=null;
         try {
-
-            sheet1=this.wb.getSheetAt(iIndex);
-            if(sheet1 != null)   {
-                int index = this.wb.getSheetIndex(sheet1);
-                // this.wb.removeSheetAt(index);
-                String pth= excelBookPath+"\\"+excelBookName;
-                shTemp=new ExcelWorkSheet(this.wb.getSheetAt(iIndex), this.wb.getSheetAt(iIndex).getSheetName(), this.wb,this.inputStream,this.outputStream,pth);
-            }
+            int iIndex = getActiveSheetIndex();
+            Sheet sheet = this.wb.getSheetAt(iIndex);
+            return createWorkSheet(sheet);
         } catch (Exception e) {
-            log.debug("Error in getting sheet index" + iIndex);
+            log.debug("Error in getting active sheet: {}", e.getMessage());
+            return null;
         }
-
-        return shTemp;//new ExcelWorkSheet(this.wb.getSheetAt(iIndex), this.wb.getSheetAt(iIndex).getSheetName(), this.wb);
     }
 
 
-
-
-    public int getSheetCount(){
+    public int getSheetCount() {
 
         return excelSheets.size();
     }
 
-    public String getActiveSheetName(){
+    public String getActiveSheetName() {
 
         return this.wb.getSheetName(this.wb.getActiveSheetIndex());
     }
 
     /**
-     * @author - Sulfikar Ali Nazar
      * @return
+     * @author - Sulfikar Ali Nazar
      */
-    public int getActiveSheetIndex(){
+    public int getActiveSheetIndex() {
         return this.wb.getActiveSheetIndex();
     }
 
 
     /**
      * Saves the workbook to the file
-     * 
+     *
      * @return true if successful, false otherwise
      */
     public boolean saveWorkbook() {
-        try {
-            if (inputStream != null)
-                inputStream.close();
-            outputStream = new FileOutputStream(this.xlFile);
-            this.wb.write(outputStream);
-            outputStream.close();
-            log.info("Workbook saved successfully: " + this.excelBookName);
-            return true;
-        } catch (Exception e) {
-            log.error("Error saving workbook: " + e.getMessage());
-            return false;
-        }
+        return saveWorkbookToFile("Workbook saved successfully: {}".replace("{}", this.excelBookName));
     }
 
 

@@ -140,21 +140,30 @@ public class ExcelWorkSheet {
      * @param outputStream
      * @param sCompleteFileName
      */
-    private void saveWorkBook(FileInputStream inputStream,FileOutputStream outputStream, String sCompleteFileName ) {
+    private void saveWorkBook(FileInputStream inputStream, FileOutputStream outputStream, String sCompleteFileName ) {
         try {
             if (inputStream != null)
                 inputStream.close();
-            OutputStream fileOut = new FileOutputStream(sCompleteFileName);
+
+            // Use the provided outputStream if it's not null, otherwise create a new one
+            OutputStream fileOut;
+            if (outputStream != null) {
+                fileOut = outputStream;
+            } else {
+                fileOut = new FileOutputStream(sCompleteFileName);
+            }
+
             wb.write(fileOut);
             //wb.close();
-            fileOut.close();
 
+            // Only close the stream if we created it
+            if (outputStream == null) {
+                fileOut.close();
+            }
 
         } catch (Exception e) {
             log.debug("Error in saving record " + e.toString());
         }
-
-
     }
 
     public void saveWorkBook( ) {
