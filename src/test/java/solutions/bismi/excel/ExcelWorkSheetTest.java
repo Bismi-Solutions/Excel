@@ -182,21 +182,21 @@ public class ExcelWorkSheetTest {
         sheet.cell(2, 1).setText("Cell 2,1");
         sheet.cell(2, 2).setText("Cell 2,2");
 
-        // Test merge cells
-        boolean mergeResult = sheet.mergeCells(1, 1, 1, 2);
-        Assertions.assertTrue(mergeResult, "Cell merge should succeed");
-
-        // Test if cell is merged
-        boolean isMerged = sheet.isCellMerged(1, 1);
-        Assertions.assertTrue(isMerged, "Cell (1,1) should be merged");
-
-        isMerged = sheet.isCellMerged(1, 2);
-        Assertions.assertTrue(isMerged, "Cell (1,2) should be merged");
-
-        isMerged = sheet.isCellMerged(2, 1);
-        Assertions.assertFalse(isMerged, "Cell (2,1) should not be merged");
-
-        // Test unmerge cells
+            // Test merge cells (row1, col1, row2, col2)
+            boolean mergeResult = sheet.mergeCells(1, 1, 1, 2);
+            Assertions.assertTrue(mergeResult, "Cell merge should succeed");
+    
+            // Test if cell is merged
+            boolean isMerged = sheet.isCellMerged(1, 1);
+            Assertions.assertTrue(isMerged, "Cell (1,1) should be merged");
+    
+            isMerged = sheet.isCellMerged(1, 2);
+            Assertions.assertTrue(isMerged, "Cell (1,2) should be merged");
+    
+            isMerged = sheet.isCellMerged(2, 1);
+            Assertions.assertFalse(isMerged, "Cell (2,1) should not be merged");
+    
+            // Test unmerge cells (row1, col1, row2, col2)
         boolean unmergeResult = sheet.unmergeCells(1, 1, 1, 2);
         Assertions.assertTrue(unmergeResult, "Cell unmerge should succeed");
 

@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.util.CellUtil;
 
 import java.io.FileInputStream;
@@ -188,17 +189,43 @@ public class ExcelRow {
 
     /**
      * Sets the font color for a range of cells in the row.
-     *
-     * @param fontColor      The color name to set for the font
-     * @param startColNumber The starting column number (1-based)
-     * @param endColNumber   The ending column number (exclusive)
-     */
-    public void setFontColor(String fontColor, int startColNumber, int endColNumber) {
-        applyCellOperation(startColNumber, endColNumber, cell -> {
-            Font font = cell.getSheet().getWorkbook().createFont();
-            font.setColor(Common.getColorCode(fontColor));
-            CellUtil.setFont(cell, font);
-        }, "Error in setting font color");
+         * Preserves all existing cell style properties including borders and fill.
+         *
+         * @param fontColor      The color name to set for the font
+         * @param startColNumber The starting column number (1-based)
+         * @param endColNumber   The ending column number (exclusive)
+         */
+        public void setFontColor(String fontColor, int startColNumber, int endColNumber) {
+            applyCellOperation(startColNumber, endColNumber, cell -> {
+                Workbook workbook = cell.getSheet().getWorkbook();
+                CellStyle originalStyle = cell.getCellStyle();
+                CellStyle newStyle = workbook.createCellStyle();
+                newStyle.cloneStyleFrom(originalStyle);
+                Font oldFont = workbook.getFontAt(originalStyle.getFontIndex());
+                Font newFont = workbook.createFont();
+                copyFontProperties(oldFont, newFont);
+                newFont.setColor(Common.getColorCode(fontColor));
+                newStyle.setFont(newFont);
+                cell.setCellStyle(newStyle);
+            }, "Error in setting font color");
+        }
+        
+        /**
+         * Helper method to copy all properties from one font to another.
+         * 
+         * @param source The source font to copy properties from
+         * @param target The target font to copy properties to
+         */
+        private void copyFontProperties(Font source, Font target) {
+            target.setBold(source.getBold());
+            target.setItalic(source.getItalic());
+            target.setStrikeout(source.getStrikeout());
+            target.setUnderline(source.getUnderline());
+            target.setFontHeightInPoints(source.getFontHeightInPoints());
+            target.setFontName(source.getFontName());
+            
+            // For XSSF specific fonts, we could copy more properties if needed
+            // But these are the core properties available in both HSSF and XSSF
     }
 
     /**
@@ -209,11 +236,15 @@ public class ExcelRow {
     public void setFontColor(String fontColor) {
         Row cRow = getOrCreateRow();
         int endColNumber = cRow.getLastCellNum();
+            if (endColNumber <= 0) {
+                endColNumber = 1; // If row is empty, assume at least one cell
+            }
         setFontColor(fontColor, 1, endColNumber + 1);
     }
 
     /**
      * Sets the background fill color for a range of cells in the row.
+     * Uses direct cell style manipulation instead of setCellStyleProperties.
      *
      * @param fillColor      The color name to set for the cell background
      * @param startColNumber The starting column number (1-based)
@@ -221,10 +252,20 @@ public class ExcelRow {
      */
     public void setFillColor(String fillColor, int startColNumber, int endColNumber) {
         applyCellOperation(startColNumber, endColNumber, cell -> {
-            Map<String, Object> properties = new HashMap<>();
-            properties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
-            properties.put(CellUtil.FILL_FOREGROUND_COLOR, Common.getColorCode(fillColor));
-            CellUtil.setCellStyleProperties(cell, properties);
+            // Get the current cell style
+            CellStyle currentStyle = cell.getCellStyle();
+
+            // Create a new style with the same properties
+            Workbook workbook = cell.getSheet().getWorkbook();
+            CellStyle newStyle = workbook.createCellStyle();
+            newStyle.cloneStyleFrom(currentStyle);
+
+            // Set the fill pattern and color directly
+            newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            newStyle.setFillForegroundColor(Common.getColorCode(fillColor));
+
+            // Apply the new style to the cell
+            cell.setCellStyle(newStyle);
         }, "Error in setting fill color");
     }
 
@@ -241,6 +282,7 @@ public class ExcelRow {
 
     /**
      * Sets a full border around a range of cells in the row.
+     * Uses direct cell style manipulation instead of setCellStyleProperties.
      *
      * @param borderColor    The color name to set for the border
      * @param startColNumber The starting column number (1-based)
@@ -248,17 +290,29 @@ public class ExcelRow {
      */
     public void setFullBorder(String borderColor, int startColNumber, int endColNumber) {
         applyCellOperation(startColNumber, endColNumber, cell -> {
-            Map<String, Object> properties = new HashMap<>();
-            properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BOTTOM_BORDER_COLOR, Common.getColorCode(borderColor));
-            properties.put(CellUtil.LEFT_BORDER_COLOR, Common.getColorCode(borderColor));
-            properties.put(CellUtil.TOP_BORDER_COLOR, Common.getColorCode(borderColor));
-            properties.put(CellUtil.RIGHT_BORDER_COLOR, Common.getColorCode(borderColor));
+            // Get the current cell style
+            CellStyle currentStyle = cell.getCellStyle();
 
-            CellUtil.setCellStyleProperties(cell, properties);
+            // Create a new style with the same properties
+            Workbook workbook = cell.getSheet().getWorkbook();
+            CellStyle newStyle = workbook.createCellStyle();
+            newStyle.cloneStyleFrom(currentStyle);
+
+            // Set border styles directly
+            short colorCode = Common.getColorCode(borderColor);
+
+            newStyle.setBorderLeft(BorderStyle.MEDIUM);
+            newStyle.setBorderRight(BorderStyle.MEDIUM);
+            newStyle.setBorderTop(BorderStyle.MEDIUM);
+            newStyle.setBorderBottom(BorderStyle.MEDIUM);
+
+            newStyle.setLeftBorderColor(colorCode);
+            newStyle.setRightBorderColor(colorCode);
+            newStyle.setTopBorderColor(colorCode);
+            newStyle.setBottomBorderColor(colorCode);
+
+            // Apply the new style to the cell
+            cell.setCellStyle(newStyle);
         }, "Error in setting border");
     }
 

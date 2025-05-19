@@ -265,19 +265,34 @@ public class ExcelCell {
     }
 
     /**
-     * Sets the font color for the cell.
-     *
-     * @param fontColor The color name to set for the font
-     */
-    public void setFontColor(String fontColor) {
-        try {
-            Cell cCell = this.getCELL();
-            Font font = cCell.getSheet().getWorkbook().createFont();
-            font.setColor(Common.getColorCode(fontColor));
-
-            CellUtil.setFont(cCell, font);
-        } catch (Exception e) {
-            log.error("Error in setting font color: {}", e.getMessage());
+         * Sets the font color for the cell while preserving existing formatting.
+         *
+         * @param fontColor The color name to set for the font
+         * @return this ExcelCell instance for method chaining
+         */
+        public ExcelCell setFontColor(String fontColor) {
+            try {
+                Cell cCell = this.getCELL();
+                Workbook workbook = cCell.getSheet().getWorkbook();
+                CellStyle originalStyle = cCell.getCellStyle();
+                CellStyle newStyle = workbook.createCellStyle();
+                newStyle.cloneStyleFrom(originalStyle);
+                Font existingFont = workbook.getFontAt(originalStyle.getFontIndex());
+                Font newFont = workbook.createFont();
+                newFont.setBold(existingFont.getBold());
+                newFont.setItalic(existingFont.getItalic());
+                newFont.setFontName(existingFont.getFontName());
+                newFont.setFontHeightInPoints(existingFont.getFontHeightInPoints());
+                newFont.setStrikeout(existingFont.getStrikeout());
+                newFont.setUnderline(existingFont.getUnderline());
+                newFont.setColor(Common.getColorCode(fontColor));
+                newStyle.setFont(newFont);
+                cCell.setCellStyle(newStyle);
+                
+                return this;
+            } catch (Exception e) {
+                log.error("Error in setting font color: {}", e.getMessage());
+                return this;
         }
     }
 

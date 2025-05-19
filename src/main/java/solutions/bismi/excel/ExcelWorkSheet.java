@@ -300,21 +300,43 @@ public class ExcelWorkSheet {
     /**
      * Merges cells in the specified range
      * 
-     * @param firstRow First row of the range (1-based)
-     * @param lastRow Last row of the range (1-based)
-     * @param firstCol First column of the range (1-based)
-     * @param lastCol Last column of the range (1-based)
-     * @return true if successful, false otherwise
-     */
-    public boolean mergeCells(int firstRow, int lastRow, int firstCol, int lastCol) {
-        try {
-            // Convert to 0-based indices for POI
-            this.sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(
-                firstRow - 1, lastRow - 1, firstCol - 1, lastCol - 1));
-            saveWorkBook(inputStream, outputStream, sCompleteFileName);
-            return true;
-        } catch (Exception e) {
-            log.error("Error merging cells: " + e.getMessage());
+         * @param row1 First row of the range (1-based)
+         * @param col1 First column of the range (1-based)
+         * @param row2 Last row of the range (1-based)
+         * @param col2 Last column of the range (1-based)
+         * @return true if successful, false otherwise
+         */
+        public boolean mergeCells(int row1, int col1, int row2, int col2) {
+            try {
+                // Input validation
+                if (row1 <= 0 || col1 <= 0 || row2 <= 0 || col2 <= 0) {
+                    log.error("Invalid merge range: (" + row1 + "," + col1 + ") to (" + row2 + "," + col2 + ")");
+                    return false;
+                }
+
+                // Determine actual first/last row/column
+                int firstRow = Math.min(row1, row2);
+                int lastRow = Math.max(row1, row2);
+                int firstCol = Math.min(col1, col2);
+                int lastCol = Math.max(col1, col2);
+
+                // Convert to 0-based indices for POI
+                org.apache.poi.ss.util.CellRangeAddress range = new org.apache.poi.ss.util.CellRangeAddress(
+                    firstRow - 1, lastRow - 1, firstCol - 1, lastCol - 1);
+
+                // Check for overlapping regions
+                for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
+                    if (range.intersects(sheet.getMergedRegion(i))) {
+                        log.warn("Cannot merge cells - overlaps with existing merged region");
+                        return false;
+                    }
+                }
+
+                this.sheet.addMergedRegion(range);
+                saveWorkBook();
+                return true;
+            } catch (Exception e) {
+                log.error("Error merging cells: " + e.getMessage(), e);
             return false;
         }
     }
@@ -330,20 +352,45 @@ public class ExcelWorkSheet {
      */
     public boolean unmergeCells(int firstRow, int lastRow, int firstCol, int lastCol) {
         try {
+            // Input validation
+            if (firstRow <= 0 || firstCol <= 0 || lastRow <= 0 || lastCol <= 0) {
+                log.error("Invalid unmerge range: (" + firstRow + "," + firstCol + ") to (" + lastRow + "," + lastCol + ")");
+                return false;
+            }
+
+            // Determine actual first/last row/column
+            int actualFirstRow = Math.min(firstRow, lastRow);
+            int actualLastRow = Math.max(firstRow, lastRow);
+            int actualFirstCol = Math.min(firstCol, lastCol);
+            int actualLastCol = Math.max(firstCol, lastCol);
+
             // Convert to 0-based indices for POI
             org.apache.poi.ss.util.CellRangeAddress rangeToRemove = new org.apache.poi.ss.util.CellRangeAddress(
-                firstRow - 1, lastRow - 1, firstCol - 1, lastCol - 1);
+                actualFirstRow - 1, actualLastRow - 1, actualFirstCol - 1, actualLastCol - 1);
 
-            // Find the merged region that matches our range
-            for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
+            // Find and remove any merged region that matches or overlaps with our range
+            boolean removed = false;
+            for (int i = sheet.getNumMergedRegions() - 1; i >= 0; i--) {
                 org.apache.poi.ss.util.CellRangeAddress mergedRegion = sheet.getMergedRegion(i);
-                if (mergedRegion.equals(rangeToRemove)) {
+
+                // Check if the regions are equal or if they overlap
+                if (mergedRegion.equals(rangeToRemove) || 
+                    (mergedRegion.getFirstRow() <= rangeToRemove.getLastRow() && 
+                     mergedRegion.getLastRow() >= rangeToRemove.getFirstRow() &&
+                     mergedRegion.getFirstColumn() <= rangeToRemove.getLastColumn() &&
+                     mergedRegion.getLastColumn() >= rangeToRemove.getFirstColumn())) {
+
                     sheet.removeMergedRegion(i);
-                    saveWorkBook(inputStream, outputStream, sCompleteFileName);
-                    return true;
+                    removed = true;
                 }
             }
-            log.warn("No matching merged region found to unmerge");
+
+            if (removed) {
+                saveWorkBook(inputStream, outputStream, sCompleteFileName);
+                return true;
+            }
+
+            log.warn("No matching or overlapping merged region found to unmerge");
             return false;
         } catch (Exception e) {
             log.error("Error unmerging cells: " + e.getMessage());

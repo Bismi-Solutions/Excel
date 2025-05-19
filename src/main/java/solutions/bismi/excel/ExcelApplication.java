@@ -59,7 +59,7 @@ public class ExcelApplication {
      * @return The opened ExcelWorkBook object
      */
     public ExcelWorkBook openWorkbook(String sCompleteFileName) {
-        log.info("Opening excel workbook: {}", sCompleteFileName);
+        log.debug("Opening excel workbook: {}", sCompleteFileName);
         ExcelWorkBook exlWorkBook = new ExcelWorkBook();
         exlWorkBook.openWorkbook(sCompleteFileName);
         exlWorkBooks.add(exlWorkBook);
@@ -185,7 +185,7 @@ public class ExcelApplication {
     public void closeAllWorkBooks() {
         int closedCount = 0;
 
-        log.info("Closing all workbooks. Total count: {}", exlWorkBooks.size());
+        log.debug("Closing all workbooks. Total count: {}", exlWorkBooks.size());
 
         for (ExcelWorkBook excelWorkBook : this.exlWorkBooks) {
             try {

@@ -87,7 +87,7 @@ public class ExcelWorkBook {
         try {
             this.wb.close();
             this.wb = null;
-            log.info("Closed workbook: {}", this.excelBookName);
+            log.debug("Closed workbook: {}", this.excelBookName);
             return true;
         } catch (IOException e) {
             log.error("Error in closing workbook: {}", e.getMessage());
@@ -247,7 +247,7 @@ public class ExcelWorkBook {
      */
     protected ExcelWorkBook openWorkbook(String sCompleteFileName) {
         ExcelWorkBook xlWbook = null;
-        log.info("Opening Excel workbook: {}", sCompleteFileName);
+        log.debug("Opening Excel workbook: {}", sCompleteFileName);
 
         try {
             if (isValidPath(sCompleteFileName)) {
