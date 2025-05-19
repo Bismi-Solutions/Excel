@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.util.CellUtil;
 
 import java.io.FileInputStream;
@@ -66,11 +65,6 @@ public class ExcelRow {
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.sCompleteFileName = sCompleteFileName;
-        try {
-            // Initialize row if needed
-        } catch (Exception e) {
-            log.error("Error in row constructor creation: {}", e.getMessage());
-        }
     }
 
     /**
@@ -175,7 +169,7 @@ public class ExcelRow {
                 cellOperation.apply(cell);
             }
         } catch (Exception e) {
-            log.error(errorMessage + ": " + e.getMessage());
+            log.error("{}: {}", errorMessage, e.getMessage());
         }
     }
 
@@ -189,43 +183,25 @@ public class ExcelRow {
 
     /**
      * Sets the font color for a range of cells in the row.
-         * Preserves all existing cell style properties including borders and fill.
-         *
-         * @param fontColor      The color name to set for the font
-         * @param startColNumber The starting column number (1-based)
-         * @param endColNumber   The ending column number (exclusive)
-         */
-        public void setFontColor(String fontColor, int startColNumber, int endColNumber) {
-            applyCellOperation(startColNumber, endColNumber, cell -> {
-                Workbook workbook = cell.getSheet().getWorkbook();
-                CellStyle originalStyle = cell.getCellStyle();
-                CellStyle newStyle = workbook.createCellStyle();
-                newStyle.cloneStyleFrom(originalStyle);
-                Font oldFont = workbook.getFontAt(originalStyle.getFontIndex());
-                Font newFont = workbook.createFont();
-                copyFontProperties(oldFont, newFont);
-                newFont.setColor(Common.getColorCode(fontColor));
-                newStyle.setFont(newFont);
-                cell.setCellStyle(newStyle);
-            }, "Error in setting font color");
-        }
-        
-        /**
-         * Helper method to copy all properties from one font to another.
-         * 
-         * @param source The source font to copy properties from
-         * @param target The target font to copy properties to
-         */
-        private void copyFontProperties(Font source, Font target) {
-            target.setBold(source.getBold());
-            target.setItalic(source.getItalic());
-            target.setStrikeout(source.getStrikeout());
-            target.setUnderline(source.getUnderline());
-            target.setFontHeightInPoints(source.getFontHeightInPoints());
-            target.setFontName(source.getFontName());
-            
-            // For XSSF specific fonts, we could copy more properties if needed
-            // But these are the core properties available in both HSSF and XSSF
+     * Preserves all existing cell style properties including borders and fill.
+     *
+     * @param fontColor      The color name to set for the font
+     * @param startColNumber The starting column number (1-based)
+     * @param endColNumber   The ending column number (exclusive)
+     */
+    public void setFontColor(String fontColor, int startColNumber, int endColNumber) {
+        applyCellOperation(startColNumber, endColNumber, cell -> {
+            Workbook workbook = cell.getSheet().getWorkbook();
+            CellStyle originalStyle = cell.getCellStyle();
+            CellStyle newStyle = workbook.createCellStyle();
+            newStyle.cloneStyleFrom(originalStyle);
+            Font oldFont = workbook.getFontAt(originalStyle.getFontIndex());
+            Font newFont = workbook.createFont();
+            Common.copyFontProperties(oldFont, newFont);
+            newFont.setColor(Common.getColorCode(fontColor));
+            newStyle.setFont(newFont);
+            cell.setCellStyle(newStyle);
+        }, "Error in setting font color");
     }
 
     /**
@@ -330,51 +306,34 @@ public class ExcelRow {
 
     /**
      * Saves the workbook to the specified file.
+     * Delegates to Common utility method.
      *
      * @param filePath The complete file path and name to save to
      */
     private void saveWorkBook(String filePath) {
-        try (OutputStream fileOut = new FileOutputStream(filePath)) {
-            wb.write(fileOut);
-            log.debug("Workbook saved successfully to: {}", filePath);
-        } catch (Exception e) {
-            log.error("Error in saving workbook: {}", e.getMessage());
-        }
+        Common.saveWorkBook(wb, filePath);
     }
 
     /**
      * Checks if a row is empty or contains only blank cells.
+     * Delegates to Common utility method.
      *
      * @param row The row to check
      * @return true if the row is empty or null, false otherwise
      */
     private boolean checkIfRowIsEmpty(Row row) {
-        try {
-            if (row == null || row.getLastCellNum() <= 0) {
-                return true;
-            }
-
-            for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
-                Cell cell = row.getCell(cellNum);
-                if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
-                    return false;
-                }
-            }
-        } catch (Exception e) {
-            return true;
-        }
-
-        return true;
+        return Common.checkIfRowIsEmpty(row);
     }
 
     /**
      * Checks if a cell is empty or blank.
+     * Delegates to Common utility method.
      *
      * @param cell The cell to check
      * @return true if the cell is empty, null, or blank, false otherwise
      */
     private boolean checkIfCellIsEmpty(Cell cell) {
-        return cell == null || cell.getCellType() == CellType.BLANK || !StringUtils.isNotBlank(cell.toString());
+        return Common.checkIfCellIsEmpty(cell);
     }
 
 

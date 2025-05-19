@@ -324,7 +324,7 @@ public class ExcelWorkBook {
         wSheet.wb = this.wb;
         ExcelWorkSheet tempSheet = wSheet.addSheet(sSheetName);
 
-        saveWorkbookToFile("Added new sheet: {}".replace("{}", sSheetName));
+        saveWorkbookToFile("Added new sheet: " + sSheetName);
         excelSheets.add(tempSheet);
         return getExcelSheet(sSheetName);
     }
@@ -339,7 +339,7 @@ public class ExcelWorkBook {
         wSheet.wb = this.wb;
         wSheet.addSheets(strArrSheets);
 
-        saveWorkbookToFile("Added {} new sheets".replace("{}", Integer.toString(strArrSheets.length)));
+        saveWorkbookToFile("Added " + strArrSheets.length + " new sheets");
         updateSheetList();
     }
 
@@ -446,7 +446,7 @@ public class ExcelWorkBook {
      * @return true if successful, false otherwise
      */
     public boolean saveWorkbook() {
-        return saveWorkbookToFile("Workbook saved successfully: {}".replace("{}", this.excelBookName));
+        return saveWorkbookToFile("Workbook saved successfully: " + this.excelBookName);
     }
 
 

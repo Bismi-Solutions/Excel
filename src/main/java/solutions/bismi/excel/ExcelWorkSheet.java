@@ -123,11 +123,11 @@ public class ExcelWorkSheet {
             sheet = this.wb.createSheet(sSheetName);
 
             this.sheetName = sSheetName;
-            log.debug("Created sheet " + sSheetName);
+            log.debug("Created sheet {}", sSheetName);
             shExcel = new ExcelWorkSheet(this.sheet, this.log, this.sheetName, this.wb);
 
         } catch (Exception e) {
-            log.debug("Error in creating sheet " + sSheetName + e.toString());
+            log.debug("Error in creating sheet {}: {}", sSheetName, e.toString());
 
         }
 
@@ -154,7 +154,6 @@ public class ExcelWorkSheet {
             }
 
             wb.write(fileOut);
-            //wb.close();
 
             // Only close the stream if we created it
             if (outputStream == null) {
@@ -162,7 +161,7 @@ public class ExcelWorkSheet {
             }
 
         } catch (Exception e) {
-            log.debug("Error in saving record " + e.toString());
+            log.debug("Error in saving record: {}", e.toString());
         }
     }
 
@@ -183,20 +182,18 @@ public class ExcelWorkSheet {
     protected void addSheets(String[] strArrSheets) {
 
         String eShName=null;
-        ExcelWorkSheet shExcel = null;
         try {
 
             for (String sSheetName : strArrSheets) {
                 sheet = this.wb.createSheet(sSheetName);
                 this.sheetName = sSheetName;
-                log.debug("Created sheet " + sSheetName);
-                shExcel = new ExcelWorkSheet(this.sheet, this.log, this.sheetName, this.wb);
+                log.debug("Created sheet {}", sSheetName);
 
             }
 
 
         } catch (Exception e) {
-            log.debug("Error in creating sheet " + eShName + e.toString());
+            log.debug("Error in creating sheet {}: {}", eShName, e.toString());
 
         }
 
@@ -217,17 +214,17 @@ public class ExcelWorkSheet {
                     sheet.removeRow(sheet.getRow(i));
 
                 } catch (Exception e) {
-                    log.debug("Empty row removal error " + i);
+                    log.debug("Empty row removal error {}", i);
                 }
 
             }
 
             saveWorkBook(inputStream, outputStream, sCompleteFileName);
-            log.debug("Cleared sheet contents successfully " );
+            log.debug("Cleared sheet contents successfully");
             return true;
 
         } catch (Exception e) {
-            log.debug("Error in clearing sheet contents " + e.toString());
+            log.debug("Error in clearing sheet contents: {}", e.toString());
             return false;
         }
 
@@ -244,7 +241,7 @@ public class ExcelWorkSheet {
                     maxcol=this.sheet.getRow(i).getLastCellNum();
                 }
             }catch(Exception e){
-
+                log.debug("Error getting column count for row {}: {}", i, e.getMessage());
             }
 
         }
@@ -275,7 +272,7 @@ public class ExcelWorkSheet {
             cells=new ExcelCell(this.sheet,this.wb,row,col,this.inputStream,this.outputStream,this.sCompleteFileName);
 
         } catch (Exception e) {
-            log.debug("Error Excel cells operation " + e.toString());
+            log.debug("Error Excel cells operation: {}", e.toString());
         }
 
         return cells;

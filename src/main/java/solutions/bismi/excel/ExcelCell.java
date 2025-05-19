@@ -248,10 +248,18 @@ public class ExcelCell {
         try {
             cCell = this.getCELL();
 
-            Map<String, Object> properties = new HashMap<>();
-            properties.put(CellUtil.DATA_FORMAT, BuiltinFormats.getBuiltinFormat("Text"));
+            // Get the current cell style
+            Workbook workbook = cCell.getSheet().getWorkbook();
+            CellStyle originalStyle = cCell.getCellStyle();
+            CellStyle newStyle = workbook.createCellStyle();
+            newStyle.cloneStyleFrom(originalStyle);
+
+            // Set the data format to Text
+            DataFormat format = workbook.createDataFormat();
+            newStyle.setDataFormat(format.getFormat("@"));  // "@" is the format code for Text
+
             cCell.setCellValue(sText);
-            CellUtil.setCellStyleProperties(cCell, properties);
+            cCell.setCellStyle(newStyle);
 
             if (autoSizeColoumn) {
                 this.sheet.autoSizeColumn(col - 1);
@@ -265,34 +273,29 @@ public class ExcelCell {
     }
 
     /**
-         * Sets the font color for the cell while preserving existing formatting.
-         *
-         * @param fontColor The color name to set for the font
-         * @return this ExcelCell instance for method chaining
-         */
-        public ExcelCell setFontColor(String fontColor) {
-            try {
-                Cell cCell = this.getCELL();
-                Workbook workbook = cCell.getSheet().getWorkbook();
-                CellStyle originalStyle = cCell.getCellStyle();
-                CellStyle newStyle = workbook.createCellStyle();
-                newStyle.cloneStyleFrom(originalStyle);
-                Font existingFont = workbook.getFontAt(originalStyle.getFontIndex());
-                Font newFont = workbook.createFont();
-                newFont.setBold(existingFont.getBold());
-                newFont.setItalic(existingFont.getItalic());
-                newFont.setFontName(existingFont.getFontName());
-                newFont.setFontHeightInPoints(existingFont.getFontHeightInPoints());
-                newFont.setStrikeout(existingFont.getStrikeout());
-                newFont.setUnderline(existingFont.getUnderline());
-                newFont.setColor(Common.getColorCode(fontColor));
-                newStyle.setFont(newFont);
-                cCell.setCellStyle(newStyle);
-                
-                return this;
-            } catch (Exception e) {
-                log.error("Error in setting font color: {}", e.getMessage());
-                return this;
+     * Sets the font color for the cell while preserving existing formatting.
+     *
+     * @param fontColor The color name to set for the font
+     * @return this ExcelCell instance for method chaining
+     */
+    public ExcelCell setFontColor(String fontColor) {
+        try {
+            Cell cCell = this.getCELL();
+            Workbook workbook = cCell.getSheet().getWorkbook();
+            CellStyle originalStyle = cCell.getCellStyle();
+            CellStyle newStyle = workbook.createCellStyle();
+            newStyle.cloneStyleFrom(originalStyle);
+            Font existingFont = workbook.getFontAt(originalStyle.getFontIndex());
+            Font newFont = workbook.createFont();
+            Common.copyFontProperties(existingFont, newFont);
+            newFont.setColor(Common.getColorCode(fontColor));
+            newStyle.setFont(newFont);
+            cCell.setCellStyle(newStyle);
+
+            return this;
+        } catch (Exception e) {
+            log.error("Error in setting font color: {}", e.getMessage());
+            return this;
         }
     }
 
@@ -304,10 +307,19 @@ public class ExcelCell {
     public void setFillColor(String fillColor) {
         try {
             Cell cCell = this.getCELL();
-            Map<String, Object> properties = new HashMap<>();
-            properties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
-            properties.put(CellUtil.FILL_FOREGROUND_COLOR, Common.getColorCode(fillColor));
-            CellUtil.setCellStyleProperties(cCell, properties);
+
+            // Get the current cell style
+            Workbook workbook = cCell.getSheet().getWorkbook();
+            CellStyle originalStyle = cCell.getCellStyle();
+            CellStyle newStyle = workbook.createCellStyle();
+            newStyle.cloneStyleFrom(originalStyle);
+
+            // Set the fill pattern and color
+            newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            newStyle.setFillForegroundColor(Common.getColorCode(fillColor));
+
+            // Apply the new style to the cell
+            cCell.setCellStyle(newStyle);
         } catch (Exception e) {
             log.error("Error in setting fill color: {}", e.getMessage());
         }
@@ -322,7 +334,12 @@ public class ExcelCell {
     public boolean setHorizontalAlignment(String alignment) {
         try {
             Cell cCell = this.getCELL();
-            Map<String, Object> properties = new HashMap<>();
+
+            // Get the current cell style
+            Workbook workbook = cCell.getSheet().getWorkbook();
+            CellStyle originalStyle = cCell.getCellStyle();
+            CellStyle newStyle = workbook.createCellStyle();
+            newStyle.cloneStyleFrom(originalStyle);
 
             HorizontalAlignment hAlign;
             switch (alignment.toUpperCase()) {
@@ -345,8 +362,11 @@ public class ExcelCell {
                     hAlign = HorizontalAlignment.GENERAL;
             }
 
-            properties.put(CellUtil.ALIGNMENT, hAlign);
-            CellUtil.setCellStyleProperties(cCell, properties);
+            // Set the horizontal alignment
+            newStyle.setAlignment(hAlign);
+
+            // Apply the new style to the cell
+            cCell.setCellStyle(newStyle);
             return true;
         } catch (Exception e) {
             log.error("Error in setting horizontal alignment: {}", e.getMessage());
@@ -363,7 +383,12 @@ public class ExcelCell {
     public boolean setVerticalAlignment(String alignment) {
         try {
             Cell cCell = this.getCELL();
-            Map<String, Object> properties = new HashMap<>();
+
+            // Get the current cell style
+            Workbook workbook = cCell.getSheet().getWorkbook();
+            CellStyle originalStyle = cCell.getCellStyle();
+            CellStyle newStyle = workbook.createCellStyle();
+            newStyle.cloneStyleFrom(originalStyle);
 
             VerticalAlignment vAlign;
             switch (alignment.toUpperCase()) {
@@ -386,8 +411,11 @@ public class ExcelCell {
                     vAlign = VerticalAlignment.CENTER;
             }
 
-            properties.put(CellUtil.VERTICAL_ALIGNMENT, vAlign);
-            CellUtil.setCellStyleProperties(cCell, properties);
+            // Set the vertical alignment
+            newStyle.setVerticalAlignment(vAlign);
+
+            // Apply the new style to the cell
+            cCell.setCellStyle(newStyle);
             return true;
         } catch (Exception e) {
             log.error("Error in setting vertical alignment: {}", e.getMessage());
@@ -404,10 +432,19 @@ public class ExcelCell {
     public boolean setNumberFormat(String formatPattern) {
         try {
             Cell cCell = this.getCELL();
-            DataFormat format = wb.createDataFormat();
-            Map<String, Object> properties = new HashMap<>();
-            properties.put(CellUtil.DATA_FORMAT, format.getFormat(formatPattern));
-            CellUtil.setCellStyleProperties(cCell, properties);
+
+            // Get the current cell style
+            Workbook workbook = cCell.getSheet().getWorkbook();
+            CellStyle originalStyle = cCell.getCellStyle();
+            CellStyle newStyle = workbook.createCellStyle();
+            newStyle.cloneStyleFrom(originalStyle);
+
+            // Set the number format
+            DataFormat format = workbook.createDataFormat();
+            newStyle.setDataFormat(format.getFormat(formatPattern));
+
+            // Apply the new style to the cell
+            cCell.setCellStyle(newStyle);
             return true;
         } catch (Exception e) {
             log.error("Error in setting number format: {}", e.getMessage());
@@ -430,7 +467,7 @@ public class ExcelCell {
             font.setBold(bold);
             font.setItalic(italic);
             if (underline) {
-                font.setUnderline(Font.U_SINGLE);
+                font.setUnderline(org.apache.poi.ss.usermodel.FontUnderline.SINGLE.getByteValue());
             }
             CellUtil.setFont(cCell, font);
             return true;
@@ -448,17 +485,28 @@ public class ExcelCell {
     public void setFullBorder(String borderColor) {
         try {
             Cell cCell = this.getCELL();
-            Map<String, Object> properties = new HashMap<>();
-            properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BOTTOM_BORDER_COLOR, Common.getColorCode(borderColor));
-            properties.put(CellUtil.LEFT_BORDER_COLOR, Common.getColorCode(borderColor));
-            properties.put(CellUtil.TOP_BORDER_COLOR, Common.getColorCode(borderColor));
-            properties.put(CellUtil.RIGHT_BORDER_COLOR, Common.getColorCode(borderColor));
 
-            CellUtil.setCellStyleProperties(cCell, properties);
+            // Get the current cell style
+            Workbook workbook = cCell.getSheet().getWorkbook();
+            CellStyle originalStyle = cCell.getCellStyle();
+            CellStyle newStyle = workbook.createCellStyle();
+            newStyle.cloneStyleFrom(originalStyle);
+
+            // Set border styles directly
+            short colorCode = Common.getColorCode(borderColor);
+
+            newStyle.setBorderLeft(BorderStyle.MEDIUM);
+            newStyle.setBorderRight(BorderStyle.MEDIUM);
+            newStyle.setBorderTop(BorderStyle.MEDIUM);
+            newStyle.setBorderBottom(BorderStyle.MEDIUM);
+
+            newStyle.setLeftBorderColor(colorCode);
+            newStyle.setRightBorderColor(colorCode);
+            newStyle.setTopBorderColor(colorCode);
+            newStyle.setBottomBorderColor(colorCode);
+
+            // Apply the new style to the cell
+            cCell.setCellStyle(newStyle);
         } catch (Exception e) {
             log.error("Error in setting border: {}", e.getMessage());
         }
@@ -501,52 +549,35 @@ public class ExcelCell {
 
     /**
      * Saves the workbook to the specified file.
+     * Delegates to Common utility method.
      *
      * @param filePath The complete file path and name to save to
      */
     private void saveWorkBook(String filePath) {
-        try (OutputStream fileOut = new FileOutputStream(filePath)) {
-            wb.write(fileOut);
-            log.debug("Workbook saved successfully to: {}", filePath);
-        } catch (Exception e) {
-            log.error("Error in saving workbook: {}", e.getMessage());
-        }
+        Common.saveWorkBook(wb, filePath);
     }
 
 
     /**
      * Checks if a row is empty or contains only blank cells.
+     * Delegates to Common utility method.
      *
      * @param row The row to check
      * @return true if the row is empty or null, false otherwise
      */
     private boolean checkIfRowIsEmpty(Row row) {
-        try {
-            if (row == null || row.getLastCellNum() <= 0) {
-                return true;
-            }
-
-            for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
-                Cell cell = row.getCell(cellNum);
-                if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
-                    return false;
-                }
-            }
-        } catch (Exception e) {
-            return true;
-        }
-
-        return true;
+        return Common.checkIfRowIsEmpty(row);
     }
 
     /**
      * Checks if a cell is empty or blank.
+     * Delegates to Common utility method.
      *
      * @param cell The cell to check
      * @return true if the cell is empty, null, or blank, false otherwise
      */
     private boolean checkIfCellIsEmpty(Cell cell) {
-        return cell == null || cell.getCellType() == CellType.BLANK || !StringUtils.isNotBlank(cell.toString());
+        return Common.checkIfCellIsEmpty(cell);
     }
 
     /**

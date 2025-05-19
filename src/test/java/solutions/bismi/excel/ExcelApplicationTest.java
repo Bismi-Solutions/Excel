@@ -174,12 +174,17 @@ public class ExcelApplicationTest {
 
         // Test closing by invalid index
         xlApp.closeWorkBook(0); // Should not throw exception
+        Assertions.assertEquals(0, xlApp.getOpenWorkbookCount(), "Workbook count should remain zero after closing invalid index");
 
         // Test closing by null or empty name
         xlApp.closeWorkBook(null); // Should not throw exception
+        Assertions.assertEquals(0, xlApp.getOpenWorkbookCount(), "Workbook count should remain zero after closing null name");
+
         xlApp.closeWorkBook(""); // Should not throw exception
+        Assertions.assertEquals(0, xlApp.getOpenWorkbookCount(), "Workbook count should remain zero after closing empty name");
 
         // Test closing non-existent workbook
         xlApp.closeWorkBook("NonExistentBook"); // Should not throw exception
+        Assertions.assertEquals(0, xlApp.getOpenWorkbookCount(), "Workbook count should remain zero after closing non-existent workbook");
     }
 }

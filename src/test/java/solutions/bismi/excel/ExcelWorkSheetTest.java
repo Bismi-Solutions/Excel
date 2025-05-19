@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 @TestMethodOrder(MethodOrderer.Alphanumeric.class)
-public class ExcelWorkSheetTest {
+class ExcelWorkSheetTest {
 
     @Test
-    public void aVerifySheetActivationXLSX() {
+    void aVerifySheetActivationXLSX() {
 
         verifySheetActivation("./resources/testdata/sheetactivation.xlsx");
         verifySheetActivation("./resources/testdata/sheetactivation.xls");
@@ -39,7 +39,7 @@ public class ExcelWorkSheetTest {
 
 
     @Test
-    public void cAddRowsXLSX() {
+    void cAddRowsXLSX() {
 
         addRowsXL("./resources/testdata/rowCreation.xlsx");
         addRowsXL("./resources/testdata/rowCreation.xls");
@@ -86,7 +86,7 @@ public class ExcelWorkSheetTest {
 
 
     @Test
-    public void dAddRowsInMultipleSheet() {
+    void dAddRowsInMultipleSheet() {
         addRowsInMultipleSheet("./resources/testdata/multiRowMultiSheet.xlsx");
         addRowsInMultipleSheet("./resources/testdata/multiRowMultiSheet.xls");
     }
@@ -130,7 +130,7 @@ public class ExcelWorkSheetTest {
 
 
     @Test
-    public void eSetCellValues() {
+    void eSetCellValues() {
         setCellValues("./resources/testdata/cellvalcheck.xlsx");
         setCellValues("./resources/testdata/cellvalcheck.xls");
     }
@@ -163,7 +163,7 @@ public class ExcelWorkSheetTest {
     }
 
     @Test
-    public void fTestCellMerging() {
+    void fTestCellMerging() {
         testCellMerging("./resources/testdata/cellmerge.xlsx");
         testCellMerging("./resources/testdata/cellmerge.xls");
     }
@@ -185,17 +185,17 @@ public class ExcelWorkSheetTest {
             // Test merge cells (row1, col1, row2, col2)
             boolean mergeResult = sheet.mergeCells(1, 1, 1, 2);
             Assertions.assertTrue(mergeResult, "Cell merge should succeed");
-    
+
             // Test if cell is merged
             boolean isMerged = sheet.isCellMerged(1, 1);
             Assertions.assertTrue(isMerged, "Cell (1,1) should be merged");
-    
+
             isMerged = sheet.isCellMerged(1, 2);
             Assertions.assertTrue(isMerged, "Cell (1,2) should be merged");
-    
+
             isMerged = sheet.isCellMerged(2, 1);
             Assertions.assertFalse(isMerged, "Cell (2,1) should not be merged");
-    
+
             // Test unmerge cells (row1, col1, row2, col2)
         boolean unmergeResult = sheet.unmergeCells(1, 1, 1, 2);
         Assertions.assertTrue(unmergeResult, "Cell unmerge should succeed");
@@ -210,7 +210,7 @@ public class ExcelWorkSheetTest {
     }
 
     @Test
-    public void gTestClearContents() {
+    void gTestClearContents() {
         testClearContents("./resources/testdata/clearcontent.xlsx");
         testClearContents("./resources/testdata/clearcontent.xls");
     }
@@ -253,7 +253,7 @@ public class ExcelWorkSheetTest {
      * Test for error handling in cell operations
      */
     @Test
-    public void hTestErrorHandling() {
+    void hTestErrorHandling() {
         ExcelApplication xlApp = new ExcelApplication();
         ExcelWorkBook xlbook = xlApp.createWorkBook("./resources/testdata/errorhandling.xlsx");
 

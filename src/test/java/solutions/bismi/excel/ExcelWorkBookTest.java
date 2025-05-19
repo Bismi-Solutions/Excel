@@ -9,10 +9,10 @@ import java.util.List;
 
 
 @TestMethodOrder(MethodOrderer.Alphanumeric.class)
-public class ExcelWorkBookTest {
+class ExcelWorkBookTest {
 
     @Test
-    public void aAddSheetXLSXWorkSheet() {
+    void aAddSheetXLSXWorkSheet() {
         addSheetXLWorkSheet("./resources/testdata/addSheet.xlsx");
         addSheetXLWorkSheet("./resources/testdata/addSheet.xls");
     }
@@ -31,7 +31,7 @@ public class ExcelWorkBookTest {
     }
 
     @Test
-    public void bAddSheetXLSXWorkSheets() {
+    void bAddSheetXLSXWorkSheets() {
         dAddSheetXLWorkSheets("./resources/testdata/addSheets.xlsx");
         dAddSheetXLWorkSheets("./resources/testdata/addSheets.xls");
     }
@@ -51,7 +51,7 @@ public class ExcelWorkBookTest {
     }
 
     @Test
-    public void eGetXLSXWorkSheet() {
+    void eGetXLSXWorkSheet() {
 
         getXLSWorkSheet("./resources/testdata/getSheet.xls");
         getXLSWorkSheet("./resources/testdata/getSheet.xlsx");
@@ -89,7 +89,7 @@ public class ExcelWorkBookTest {
     }
 
     @Test
-    public void hgetExcelWokSheets() {
+    void hgetExcelWokSheets() {
         gGetXLSXWorkSheets("./resources/testdata/getSheets.xlsx");
         gGetXLSXWorkSheets("./resources/testdata/getSheets.xls");
     }

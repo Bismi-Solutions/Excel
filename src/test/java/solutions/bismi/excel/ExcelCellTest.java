@@ -7,7 +7,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 
 @TestMethodOrder(MethodOrderer.Alphanumeric.class)
-public class ExcelCellTest {
+class ExcelCellTest {
 
 
     @Test
@@ -152,19 +152,19 @@ public class ExcelCellTest {
 
             // Merge cells for the title (row1, col1, row2, col2)
             sh1.mergeCells(1, 1, 1, 5);
-    
+
             // Add a subtitle
             sh1.cell(2, 1).setCellValue("Q1 2023");
             sh1.cell(2, 1).setFontStyle(false, true, false);
             sh1.cell(2, 1).setHorizontalAlignment("CENTER");
-    
+
             // Merge cells for the subtitle (row1, col1, row2, col2)
             sh1.mergeCells(2, 1, 2, 5);
-    
+
             // Verify that cells are merged
             boolean isMerged = sh1.isCellMerged(1, 3);
             Assertions.assertTrue(isMerged, "Cell (1,3) should be part of a merged region");
-    
+
             // Test unmerging (row1, col1, row2, col2)
             sh1.unmergeCells(2, 1, 2, 5);
         isMerged = sh1.isCellMerged(2, 3);
