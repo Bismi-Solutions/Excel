@@ -1,224 +1,278 @@
-/*
- * Copyright (c) 2019. Bismi Solutions
- *
- * https://bismi.solutions/
- * support@bismi.solutions
- * sulfikar.ali.nazar@gmail.com
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package solutions.bismi.excel;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestMethodOrder;
 
-
-/**
- * @author Sulfikar Ali Nazar
- */
 @TestMethodOrder(MethodOrderer.Alphanumeric.class)
 public class ExcelWorkSheetTest {
 
-
-    /**
-     * @author - Sulfikar Ali Nazar
-     *
-     * Function to verify sheet acticvation. Which verifies by closing and reopening the work book.
-     */
     @Test
-    public void aVerifySheetActivationXLSX()
-    {
+    public void aVerifySheetActivationXLSX() {
 
         verifySheetActivation("./resources/testdata/sheetactivation.xlsx");
         verifySheetActivation("./resources/testdata/sheetactivation.xls");
     }
-    /**
-     * @author - Sulfikar Ali Nazar
-     *
-     * Function to verify sheet acticvation. Which verifies by closing and reopening the work book.
-     */
 
-    private void verifySheetActivation(String strCompleteFileName)
-    {
-        ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
-        int cnt=0;
-        cnt=xlbook.getSheetCount();
-        Assertions.assertEquals(1,cnt);
+    private void verifySheetActivation(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
+        int cnt = 0;
+        cnt = xlbook.getSheetCount();
+        Assertions.assertEquals(1, cnt);
         xlbook.addSheet("Bismi1");
-        cnt=xlbook.getSheetCount();
+        cnt = xlbook.getSheetCount();
         xlbook.getExcelSheet("Bismi1").activate();
         xlApp.closeAllWorkBooks();
-        Assertions.assertEquals(2,cnt);
-        xlbook=xlApp.openWorkbook(strCompleteFileName);
-        cnt=xlApp.getOpenWorkbookCount();
-        Assertions.assertEquals(1,cnt);
-        cnt=xlbook.getSheetCount();
-        Assertions.assertEquals(2,cnt);
+        Assertions.assertEquals(2, cnt);
+        xlbook = xlApp.openWorkbook(strCompleteFileName);
+        cnt = xlApp.getOpenWorkbookCount();
+        Assertions.assertEquals(1, cnt);
+        cnt = xlbook.getSheetCount();
+        Assertions.assertEquals(2, cnt);
         xlbook.getExcelSheet("Bismi1").activate();
-        String sheetName=xlbook.getActiveSheetName();
-        Assertions.assertEquals("Bismi1",sheetName);
+        String sheetName = xlbook.getActiveSheetName();
+        Assertions.assertEquals("Bismi1", sheetName);
         xlApp.closeAllWorkBooks();
     }
-    /**
-     * @author - Sulfikar Ali Nazar
-     * Functions to verify the row functionality in excel
-     */
+
+
     @Test
-    public void cAddRowsXLSX(){
+    public void cAddRowsXLSX() {
 
         addRowsXL("./resources/testdata/rowCreation.xlsx");
         addRowsXL("./resources/testdata/rowCreation.xls");
     }
 
-    /**
-     * @author - Sulfikar Ali Nazar
-     * Functions to verify the row functionality in excel
-     */
 
-    private void addRowsXL(String strCompleteFileName){
+    private void addRowsXL(String strCompleteFileName) {
 
-        ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
-        int cnt=0;
-        cnt=xlbook.getSheetCount();
-        Assertions.assertEquals(1,cnt);
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
+        int cnt = 0;
+        cnt = xlbook.getSheetCount();
+        Assertions.assertEquals(1, cnt);
         xlbook.addSheet("Bismi1");
-        cnt=xlbook.getSheetCount();
+        cnt = xlbook.getSheetCount();
         ExcelWorkSheet cSheet = xlbook.getExcelSheet("Bismi1");
         cSheet.activate();
         int cRownum = cSheet.getRowNumber();
-        Assertions.assertEquals(0,cRownum);
-        String[] arrRow= {"A","B","C","D"};
+        Assertions.assertEquals(0, cRownum);
+        String[] arrRow = {"A", "B", "C", "D"};
         cSheet.row(11).setRowValues(arrRow);
         cRownum = cSheet.getRowNumber();
-        Assertions.assertEquals(11,cRownum);
+        Assertions.assertEquals(11, cRownum);
 
         int cColNumber = cSheet.getColNumber();
-        Assertions.assertEquals(4,cColNumber);
+        Assertions.assertEquals(4, cColNumber);
 
-        cSheet.row(16).setRowValues(arrRow,5);
+        cSheet.row(16).setRowValues(arrRow, 5);
         cRownum = cSheet.getRowNumber();
-        Assertions.assertEquals(16,cRownum);
+        Assertions.assertEquals(16, cRownum);
 
         cColNumber = cSheet.getColNumber();
-        Assertions.assertEquals(9,cColNumber);
+        Assertions.assertEquals(9, cColNumber);
 
-        String[] arrRow1= {"A","10.5","Cwwwwwwwwwwwwwwwwwwwwww","D","02/04/2019"};
-        cSheet.row(34).setRowValues(arrRow1,true);
+        String[] arrRow1 = {"A", "10.5", "Cwwwwwwwwwwwwwwwwwwwwww", "D", "02/04/2019"};
+        cSheet.row(34).setRowValues(arrRow1, true);
         cRownum = cSheet.getRowNumber();
-        Assertions.assertEquals(34,cRownum);
+        Assertions.assertEquals(34, cRownum);
         cColNumber = cSheet.getColNumber();
-        Assertions.assertEquals(9,cColNumber);
+        Assertions.assertEquals(9, cColNumber);
         cSheet.saveWorkBook();
         xlApp.closeAllWorkBooks();
     }
 
-    /**
-     * @author - Sulfikar Ali Nazar
-     */
+
     @Test
-    public void dAddRowsInMultipleSheet(){
+    public void dAddRowsInMultipleSheet() {
         addRowsInMultipleSheet("./resources/testdata/multiRowMultiSheet.xlsx");
         addRowsInMultipleSheet("./resources/testdata/multiRowMultiSheet.xls");
     }
 
-    private  void addRowsInMultipleSheet(String strMultipleFileName){
-        ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook(strMultipleFileName);
-        int cnt=0;
-        cnt=xlbook.getSheetCount();
-        Assertions.assertEquals(1,cnt);
+    private void addRowsInMultipleSheet(String strMultipleFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strMultipleFileName);
+        int cnt = 0;
+        cnt = xlbook.getSheetCount();
+        Assertions.assertEquals(1, cnt);
         xlbook.addSheet("Bismi1");
         xlbook.addSheet("Bismi2");
-        cnt=xlbook.getSheetCount();
+        cnt = xlbook.getSheetCount();
         ExcelWorkSheet cSheet = xlbook.getExcelSheet("Bismi1");
 
         ExcelWorkSheet cSheet2 = xlbook.getExcelSheet("Bismi2");
         cSheet2.activate();
 
-        String[] arrRow1= {"A","10.5","Cwwwwwwwwwwwwwwwwwwwwww","D","02/04/2019"};
-        cSheet.row(34).setRowValues(arrRow1,true);
+        String[] arrRow1 = {"A", "10.5", "Cwwwwwwwwwwwwwwwwwwwwww", "D", "02/04/2019"};
+        cSheet.row(34).setRowValues(arrRow1, true);
         int cRownum = cSheet.getRowNumber();
-        Assertions.assertEquals(34,cRownum);
+        Assertions.assertEquals(34, cRownum);
         int cColNumber = cSheet.getColNumber();
-        Assertions.assertEquals(5,cColNumber);
+        Assertions.assertEquals(5, cColNumber);
 
-        String[] arrRow2= {"A","10.5","Cwwwwwwwwwwwwwwwwwwwwww","D","02/04/2019"};
-        cSheet2.row(4).setRowValues(arrRow2,true);
+        String[] arrRow2 = {"A", "10.5", "Cwwwwwwwwwwwwwwwwwwwwww", "D", "02/04/2019"};
+        cSheet2.row(4).setRowValues(arrRow2, true);
         cRownum = cSheet2.getRowNumber();
-        Assertions.assertEquals(4,cRownum);
+        Assertions.assertEquals(4, cRownum);
         cColNumber = cSheet2.getColNumber();
-        Assertions.assertEquals(5,cColNumber);
+        Assertions.assertEquals(5, cColNumber);
         cSheet2.saveWorkBook();
         xlApp.closeAllWorkBooks();
-        xlbook=xlApp.openWorkbook(strMultipleFileName);
+        xlbook = xlApp.openWorkbook(strMultipleFileName);
         ExcelWorkSheet gSheet = xlbook.getExcelSheet("Bismi2");
         String val = gSheet.cell(4, 2).getTextValue();
-        Assertions.assertEquals("10.5",val);
+        Assertions.assertEquals("10.5", val);
 
         xlApp.closeAllWorkBooks();
     }
 
 
     @Test
-    public void eSetCellValues(){
+    public void eSetCellValues() {
         setCellValues("./resources/testdata/cellvalcheck.xlsx");
         setCellValues("./resources/testdata/cellvalcheck.xls");
     }
 
-    private void setCellValues(String strCompleteFilePath){
-        ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFilePath);
-        int cnt=0;
-        cnt=xlbook.getSheetCount();
-        Assertions.assertEquals(1,cnt);
+    private void setCellValues(String strCompleteFilePath) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFilePath);
+        int cnt = 0;
+        cnt = xlbook.getSheetCount();
+        Assertions.assertEquals(1, cnt);
         xlbook.addSheet("Bismi1");
         xlbook.addSheet("Bismi2");
-        cnt=xlbook.getSheetCount();
+        cnt = xlbook.getSheetCount();
         ExcelWorkSheet cSheet = xlbook.getExcelSheet("Bismi1");
 
         ExcelWorkSheet cSheet2 = xlbook.getExcelSheet("Bismi2");
         cSheet2.activate();
-        cSheet.cell(5,4).setText("Alpha lion");
-        cSheet2.cell(3,4).setText("Alpha lion");
+        cSheet.cell(5, 4).setText("Alpha lion");
+        cSheet2.cell(3, 4).setText("Alpha lion");
         cSheet2.saveWorkBook();
 
         xlApp.closeAllWorkBooks();
 
-        xlbook=xlApp.openWorkbook(strCompleteFilePath);
+        xlbook = xlApp.openWorkbook(strCompleteFilePath);
         ExcelWorkSheet gSheet = xlbook.getExcelSheet("Bismi2");
         String val = gSheet.cell(3, 4).getTextValue();
-        Assertions.assertEquals("Alpha lion",val);
+        Assertions.assertEquals("Alpha lion", val);
 
         xlApp.closeAllWorkBooks();
-
     }
 
+    @Test
+    public void fTestCellMerging() {
+        testCellMerging("./resources/testdata/cellmerge.xlsx");
+        testCellMerging("./resources/testdata/cellmerge.xls");
+    }
 
+    private void testCellMerging(String strCompleteFilePath) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFilePath);
 
+        // Add a sheet
+        xlbook.addSheet("MergeTest");
+        ExcelWorkSheet sheet = xlbook.getExcelSheet("MergeTest");
 
+        // Add some data
+        sheet.cell(1, 1).setText("Merged Cell Content");
+        sheet.cell(1, 2).setText("Cell 1,2");
+        sheet.cell(2, 1).setText("Cell 2,1");
+        sheet.cell(2, 2).setText("Cell 2,2");
 
+        // Test merge cells
+        boolean mergeResult = sheet.mergeCells(1, 1, 1, 2);
+        Assertions.assertTrue(mergeResult, "Cell merge should succeed");
 
+        // Test if cell is merged
+        boolean isMerged = sheet.isCellMerged(1, 1);
+        Assertions.assertTrue(isMerged, "Cell (1,1) should be merged");
 
+        isMerged = sheet.isCellMerged(1, 2);
+        Assertions.assertTrue(isMerged, "Cell (1,2) should be merged");
 
+        isMerged = sheet.isCellMerged(2, 1);
+        Assertions.assertFalse(isMerged, "Cell (2,1) should not be merged");
+
+        // Test unmerge cells
+        boolean unmergeResult = sheet.unmergeCells(1, 1, 1, 2);
+        Assertions.assertTrue(unmergeResult, "Cell unmerge should succeed");
+
+        // Verify cells are no longer merged
+        isMerged = sheet.isCellMerged(1, 1);
+        Assertions.assertFalse(isMerged, "Cell (1,1) should no longer be merged");
+
+        // Save and close
+        sheet.saveWorkBook();
+        xlApp.closeAllWorkBooks();
+    }
+
+    @Test
+    public void gTestClearContents() {
+        testClearContents("./resources/testdata/clearcontent.xlsx");
+        testClearContents("./resources/testdata/clearcontent.xls");
+    }
+
+    private void testClearContents(String strCompleteFilePath) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFilePath);
+
+        // Add a sheet
+        xlbook.addSheet("ClearTest");
+        ExcelWorkSheet sheet = xlbook.getExcelSheet("ClearTest");
+
+        // Add some data
+        sheet.cell(1, 1).setText("Test Data 1");
+        sheet.cell(2, 1).setText("Test Data 2");
+        sheet.cell(3, 1).setText("Test Data 3");
+
+        // Verify row count before clearing
+        int rowCount = sheet.getRowNumber();
+        Assertions.assertEquals(3, rowCount, "Sheet should have 3 rows before clearing");
+
+        // Clear contents
+        boolean clearResult = sheet.clearContents();
+        Assertions.assertTrue(clearResult, "Clear contents should succeed");
+
+        // Verify row count after clearing
+        // Note: In some Excel implementations, clearing doesn't reset the row count until reopening
+        // So reopen the workbook to check
+        xlApp.closeAllWorkBooks();
+
+        xlbook = xlApp.openWorkbook(strCompleteFilePath);
+        sheet = xlbook.getExcelSheet("ClearTest");
+        rowCount = sheet.getRowNumber();
+        Assertions.assertEquals(0, rowCount, "Sheet should have 0 rows after clearing");
+
+        xlApp.closeAllWorkBooks();
+    }
+
+    /**
+     * Test for error handling in cell operations
+     */
+    @Test
+    public void hTestErrorHandling() {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook("./resources/testdata/errorhandling.xlsx");
+
+        // Add a sheet
+        xlbook.addSheet("ErrorTest");
+        ExcelWorkSheet sheet = xlbook.getExcelSheet("ErrorTest");
+
+        // Test unmerging cells that aren't merged
+        boolean unmergeResult = sheet.unmergeCells(1, 1, 1, 2);
+        Assertions.assertFalse(unmergeResult, "Unmerging non-merged cells should return false");
+
+        // Test merging with invalid indices
+        boolean mergeResult = sheet.mergeCells(-1, 1, 1, 2);
+        // This should not throw an exception, but may return false
+
+        // Test isCellMerged with invalid indices
+        boolean isMerged = sheet.isCellMerged(-1, -1);
+        Assertions.assertFalse(isMerged, "Invalid cell indices should not be reported as merged");
+
+        xlApp.closeAllWorkBooks();
+    }
 }

@@ -1,130 +1,185 @@
 package solutions.bismi.excel;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
-
 import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.util.List;
 
-/**
- * Unit test for simple App.
- */
+
 @TestMethodOrder(MethodOrderer.Alphanumeric.class)
-public class ExcelApplicationTest
-{
-    /**
-     * @author - Sulfikar Ali Nazar
-     * Create xlsx work book
-     */
+public class ExcelApplicationTest {
+
     @Test
-    public void aCreateExcelWorkBook()
-    {
-        bCreateXLSWorkBook("./resources/testdata/er.xlsx");
-        bCreateXLSWorkBook("./resources/testdata/er.xls");
-        //bCreateXLSWorkBook("./resources/testdata/er.xlsm");
+    public void aCreateExcelWorkBook() {
+        bCreateXLSWorkBook("./resources/testdata/basicWorkbook.xlsx");
+        bCreateXLSWorkBook("./resources/testdata/basicWorkbook.xls");
+        //bCreateXLSWorkBook("./resources/testdata/basicWorkbook.xlsm");
     }
 
-    private void bCreateXLSWorkBook(String strCompleteFileName)
-    {
-        ExcelApplication xlApp =new ExcelApplication();
-        ExcelWorkBook  xlbook=xlApp.createWorkBook(strCompleteFileName);
-        int cnt=xlApp.getOpenWorkbookCount();
+    private void bCreateXLSWorkBook(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
+        int cnt = xlApp.getOpenWorkbookCount();
         xlApp.closeAllWorkBooks();
         //Verify only one work book is created
-        Assertions.assertEquals(1,cnt);
+        Assertions.assertEquals(1, cnt);
 
     }
 
-    /**
-     * @author - Sulfikar Ali Nazar
-     */
     @Test
-    public void cOpenExcelXWorkbook(){
-        dOpenXLSWorkbook("./resources/testdata/er.xlsx");
-        dOpenXLSWorkbook("./resources/testdata/er.xls");
+    public void cOpenExcelXWorkbook() {
+        dOpenXLSWorkbook("./resources/testdata/basicWorkbook.xlsx");
+        dOpenXLSWorkbook("./resources/testdata/basicWorkbook.xls");
     }
 
-    /**
-     * @author - Sulfikar Ali Nazar
-     */
-
-    private void dOpenXLSWorkbook(String strCompleteFileName){
-        ExcelApplication xlApp =new ExcelApplication();
+    private void dOpenXLSWorkbook(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
         xlApp.openWorkbook(strCompleteFileName);
-        int cnt=xlApp.getOpenWorkbookCount();
+        int cnt = xlApp.getOpenWorkbookCount();
         xlApp.closeAllWorkBooks();
         //Verify only one work book is created
-        Assertions.assertEquals(1,cnt);
+        Assertions.assertEquals(1, cnt);
     }
 
-    /**
-     * @author - Sulfikar Ali Nazar
-     */
     @Test
-    public void eCloseWorkBookByIndex(){
-        closeBookByindex("./resources/testdata/er.xls");
-        closeBookByindex("./resources/testdata/er.xlsx");
+    public void eCloseWorkBookByIndex() {
+        closeBookByindex("./resources/testdata/basicWorkbook.xls");
+        closeBookByindex("./resources/testdata/basicWorkbook.xlsx");
 
     }
 
-    private void closeBookByindex(String strCompleteFileName){
-        ExcelApplication xlApp =new ExcelApplication();
+    private void closeBookByindex(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
         xlApp.openWorkbook(strCompleteFileName);
-        int cnt=xlApp.getOpenWorkbookCount();
-        Assertions.assertEquals(1,cnt);
+        int cnt = xlApp.getOpenWorkbookCount();
+        Assertions.assertEquals(1, cnt);
         xlApp.closeWorkBook(0);
-        cnt=xlApp.getOpenWorkbookCount();
-        Assertions.assertEquals(0,cnt);
-        Assertions.assertEquals(0,cnt);
+        cnt = xlApp.getOpenWorkbookCount();
+        Assertions.assertEquals(0, cnt);
+        Assertions.assertEquals(0, cnt);
     }
 
-    /**
-     * @author - Sulfikar Ali Nazar
-     */
     @Test
-    public void fCloseWorkBookByName(){
-
-
-        closeBookByName("./resources/testdata/er.xls");
-        closeBookByName("./resources/testdata/er.xlsx");
-
+    public void fCloseWorkBookByName() {
+        closeBookByName("./resources/testdata/basicWorkbook.xls");
+        closeBookByName("./resources/testdata/basicWorkbook.xlsx");
     }
 
-    private void closeBookByName(String strCompleteFileName ){
-        ExcelApplication xlApp =new ExcelApplication();
+    private void closeBookByName(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
         ExcelWorkBook xlBook = xlApp.openWorkbook(strCompleteFileName);
-        int cnt=xlApp.getOpenWorkbookCount();
-        Assertions.assertEquals(1,cnt);
+        int cnt = xlApp.getOpenWorkbookCount();
+        Assertions.assertEquals(1, cnt);
         xlApp.closeWorkBook(xlBook.getExcelBookName());
-        cnt=xlApp.getOpenWorkbookCount();
-        Assertions.assertEquals(0,cnt);
+        cnt = xlApp.getOpenWorkbookCount();
+        Assertions.assertEquals(0, cnt);
     }
 
-    /**
-     * @author - Sulfikar Ali Nazar
-     */
     @Test
-    public void gCloseAllWorkBooks(){
-        ExcelApplication xlApp =new ExcelApplication();
-        xlApp.openWorkbook("./er.xls");
-        int cnt=xlApp.getOpenWorkbookCount();
-        Assertions.assertEquals(1,cnt);
+    public void gCloseAllWorkBooks() {
+        ExcelApplication xlApp = new ExcelApplication();
+        xlApp.openWorkbook("./resources/testdata/basicWorkbook.xls");
+        int cnt = xlApp.getOpenWorkbookCount();
+        Assertions.assertEquals(1, cnt);
 
         //Verifying the close functionality of xlsx
-        xlApp.openWorkbook("./resources/testdata/er.xlsx");
-        cnt=xlApp.getOpenWorkbookCount();
-        Assertions.assertEquals(2,cnt);
+        xlApp.openWorkbook("./resources/testdata/basicWorkbook.xlsx");
+        cnt = xlApp.getOpenWorkbookCount();
+        Assertions.assertEquals(2, cnt);
         xlApp.closeAllWorkBooks();
-        cnt=xlApp.getOpenWorkbookCount();
-        Assertions.assertEquals(0,cnt);
+        cnt = xlApp.getOpenWorkbookCount();
+        Assertions.assertEquals(0, cnt);
 
 
     }
 
+    @Test
+    public void hGetWorkbooks() {
+        ExcelApplication xlApp = new ExcelApplication();
 
+        // Initially should be empty
+        List<ExcelWorkBook> workbooks = xlApp.getWorkbooks();
+        Assertions.assertEquals(0, workbooks.size());
 
+        // Add a workbook and check
+        xlApp.openWorkbook("./resources/testdata/basicWorkbook.xlsx");
+        workbooks = xlApp.getWorkbooks();
+        Assertions.assertEquals(1, workbooks.size());
 
+        // Add another workbook and check
+        xlApp.openWorkbook("./resources/testdata/basicWorkbook.xls");
+        workbooks = xlApp.getWorkbooks();
+        Assertions.assertEquals(2, workbooks.size());
 
+        xlApp.closeAllWorkBooks();
+    }
 
+    @Test
+    public void iGetWorkbookByIndex() {
+        ExcelApplication xlApp = new ExcelApplication();
+
+        // Test with valid index
+        ExcelWorkBook xlBook1 = xlApp.openWorkbook("./resources/testdata/basicWorkbook.xlsx");
+        ExcelWorkBook xlBook2 = xlApp.openWorkbook("./resources/testdata/basicWorkbook.xls");
+
+        ExcelWorkBook retrievedBook = xlApp.getWorkbook(0);
+        Assertions.assertNotNull(retrievedBook);
+        Assertions.assertEquals(xlBook1.getExcelBookName(), retrievedBook.getExcelBookName());
+
+        retrievedBook = xlApp.getWorkbook(1);
+        Assertions.assertNotNull(retrievedBook);
+        Assertions.assertEquals(xlBook2.getExcelBookName(), retrievedBook.getExcelBookName());
+
+        // Test with invalid index
+        retrievedBook = xlApp.getWorkbook(2);
+        Assertions.assertNull(retrievedBook);
+
+        retrievedBook = xlApp.getWorkbook(-1);
+        Assertions.assertNull(retrievedBook);
+
+        xlApp.closeAllWorkBooks();
+    }
+
+    @Test
+    public void jGetWorkbookByName() {
+        ExcelApplication xlApp = new ExcelApplication();
+
+        // Test with valid name
+        ExcelWorkBook xlBook1 = xlApp.openWorkbook("./resources/testdata/basicWorkbook.xlsx");
+        String bookName = xlBook1.getExcelBookName();
+
+        ExcelWorkBook retrievedBook = xlApp.getWorkbook(bookName);
+        Assertions.assertNotNull(retrievedBook);
+        Assertions.assertEquals(bookName, retrievedBook.getExcelBookName());
+
+        // Test with invalid name
+        retrievedBook = xlApp.getWorkbook("NonExistentBook");
+        Assertions.assertNull(retrievedBook);
+
+        // Test with null and empty name
+        retrievedBook = xlApp.getWorkbook(null);
+        Assertions.assertNull(retrievedBook);
+
+        retrievedBook = xlApp.getWorkbook("");
+        Assertions.assertNull(retrievedBook);
+
+        xlApp.closeAllWorkBooks();
+    }
+
+    @Test
+    public void kCloseWorkBookErrorCases() {
+        ExcelApplication xlApp = new ExcelApplication();
+
+        // Test closing by invalid index
+        xlApp.closeWorkBook(0); // Should not throw exception
+
+        // Test closing by null or empty name
+        xlApp.closeWorkBook(null); // Should not throw exception
+        xlApp.closeWorkBook(""); // Should not throw exception
+
+        // Test closing non-existent workbook
+        xlApp.closeWorkBook("NonExistentBook"); // Should not throw exception
+    }
 }
