@@ -270,10 +270,8 @@ public class ExcelCell {
      * @param fontColor The color name to set for the font
      */
     public void setFontColor(String fontColor) {
-        Cell cCell = null;
         try {
-            cCell = this.getCELL();
-
+            Cell cCell = this.getCELL();
             Font font = cCell.getSheet().getWorkbook().createFont();
             font.setColor(Common.getColorCode(fontColor));
 
@@ -289,10 +287,8 @@ public class ExcelCell {
      * @param fillColor The color name to set for the cell background
      */
     public void setFillColor(String fillColor) {
-        Cell cCell = null;
         try {
-            cCell = this.getCELL();
-
+            Cell cCell = this.getCELL();
             Map<String, Object> properties = new HashMap<>();
             properties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
             properties.put(CellUtil.FILL_FOREGROUND_COLOR, Common.getColorCode(fillColor));
@@ -311,7 +307,7 @@ public class ExcelCell {
     public boolean setHorizontalAlignment(String alignment) {
         try {
             Cell cCell = this.getCELL();
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
 
             HorizontalAlignment hAlign;
             switch (alignment.toUpperCase()) {
@@ -352,7 +348,7 @@ public class ExcelCell {
     public boolean setVerticalAlignment(String alignment) {
         try {
             Cell cCell = this.getCELL();
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
 
             VerticalAlignment vAlign;
             switch (alignment.toUpperCase()) {
@@ -394,7 +390,7 @@ public class ExcelCell {
         try {
             Cell cCell = this.getCELL();
             DataFormat format = wb.createDataFormat();
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put(CellUtil.DATA_FORMAT, format.getFormat(formatPattern));
             CellUtil.setCellStyleProperties(cCell, properties);
             return true;
@@ -435,10 +431,8 @@ public class ExcelCell {
      * @param borderColor The color name to set for the border
      */
     public void setFullBorder(String borderColor) {
-        Cell cCell = null;
         try {
-            cCell = this.getCELL();
-
+            Cell cCell = this.getCELL();
             Map<String, Object> properties = new HashMap<>();
             properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
             properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
@@ -455,15 +449,6 @@ public class ExcelCell {
         }
     }
 
-    /**
-     * Returns the cell style.
-     *
-     * @param cStyle The cell style to return
-     * @return The provided cell style
-     */
-    private CellStyle getCellStyle(CellStyle cStyle) {
-        return cStyle;
-    }
 
     /**
      * Gets the value of the cell as a string.
@@ -480,21 +465,18 @@ public class ExcelCell {
      * @return The text value of the cell, or an empty string if not found or on error
      */
     public String getTextValue() {
-        String val = null;
-        try {
-            inputStream = new FileInputStream(this.sCompleteFileName);
-            this.wb = WorkbookFactory.create(inputStream);
+        String val = "";
+        try (FileInputStream fis = new FileInputStream(this.sCompleteFileName);
+             Workbook workbook = WorkbookFactory.create(fis)) {
+
             String strSheetName = sheet.getSheetName();
-            this.sheet = this.wb.getSheet(strSheetName);
+            Sheet currentSheet = workbook.getSheet(strSheetName);
 
             try {
-                val = this.sheet.getRow(this.row - 1).getCell(this.col - 1).getStringCellValue();
+                val = currentSheet.getRow(this.row - 1).getCell(this.col - 1).getStringCellValue();
             } catch (Exception e) {
-                val = "";
+                // If cell value can't be retrieved, return empty string
             }
-
-            inputStream.close();
-            this.wb.close();
         } catch (Exception e) {
             log.error("Error in getting text value: {}", e.getMessage());
         }
@@ -505,20 +487,12 @@ public class ExcelCell {
     /**
      * Saves the workbook to the specified file.
      *
-     * @param inputStream       The input stream to close
-     * @param outputStream      The output stream (not used)
-     * @param sCompleteFileName The complete file path and name to save to
+     * @param filePath The complete file path and name to save to
      */
-    private void saveWorkBook(FileInputStream inputStream, FileOutputStream outputStream, String sCompleteFileName) {
-        try {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-            OutputStream fileOut = new FileOutputStream(sCompleteFileName);
+    private void saveWorkBook(String filePath) {
+        try (OutputStream fileOut = new FileOutputStream(filePath)) {
             wb.write(fileOut);
-            // wb.close();
-            fileOut.close();
-            log.debug("Workbook saved successfully to: {}", sCompleteFileName);
+            log.debug("Workbook saved successfully to: {}", filePath);
         } catch (Exception e) {
             log.error("Error in saving workbook: {}", e.getMessage());
         }

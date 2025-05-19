@@ -37,9 +37,7 @@ public class ExcelRow {
     @Getter
     @Setter
     String xlFileExtension = null;
-    @Getter
-    @Setter
-    private Logger log = LogManager.getLogger(ExcelRow.class);
+    private final Logger log = LogManager.getLogger(ExcelRow.class);
     @Getter
     @Setter
     private Sheet sheet;
@@ -48,29 +46,29 @@ public class ExcelRow {
     private Workbook wb;
     @Getter
     @Setter
-    private int row;
+    private int rowNumber;
 
     /**
      * Creates a new ExcelRow with the specified parameters.
      *
      * @param sheet             The worksheet containing the row
      * @param wb                The workbook containing the sheet
-     * @param row               The row number (1-based)
+     * @param rowNumber         The row number (1-based)
      * @param inputStream       The input stream for the workbook file
      * @param outputStream      The output stream for the workbook file
      * @param sCompleteFileName The complete file path and name of the workbook
      */
-    protected ExcelRow(Sheet sheet, Workbook wb, int row, FileInputStream inputStream, FileOutputStream outputStream, String sCompleteFileName) {
+    protected ExcelRow(Sheet sheet, Workbook wb, int rowNumber, FileInputStream inputStream, FileOutputStream outputStream, String sCompleteFileName) {
         this.sheet = sheet;
         this.wb = wb;
-        this.row = row;
+        this.rowNumber = rowNumber;
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.sCompleteFileName = sCompleteFileName;
         try {
             // Initialize row if needed
         } catch (Exception e) {
-            log.error("Error in row constructor creation: " + e.getMessage());
+            log.error("Error in row constructor creation: {}", e.getMessage());
         }
     }
 
@@ -100,7 +98,7 @@ public class ExcelRow {
                 ++i;
             }
         } catch (Exception e) {
-            log.error("Error in writing values to row: " + e.getMessage());
+            log.error("Error in writing values to row: {}", e.getMessage());
         }
     }
 
@@ -124,13 +122,13 @@ public class ExcelRow {
     private Row getOrCreateRow() {
         Row cRow = null;
         try {
-            cRow = sheet.getRow(this.row - 1);
+            cRow = sheet.getRow(this.rowNumber - 1);
         } catch (Exception e1) {
             // Row doesn't exist
         }
 
         if (checkIfRowIsEmpty(cRow)) {
-            cRow = sheet.createRow(this.row - 1);
+            cRow = sheet.createRow(this.rowNumber - 1);
         }
 
         return cRow;
@@ -279,22 +277,14 @@ public class ExcelRow {
     /**
      * Saves the workbook to the specified file.
      *
-     * @param inputStream       The input stream to close
-     * @param outputStream      The output stream (not used)
-     * @param sCompleteFileName The complete file path and name to save to
+     * @param filePath The complete file path and name to save to
      */
-    private void saveWorkBook(FileInputStream inputStream, FileOutputStream outputStream, String sCompleteFileName) {
-        try {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-            OutputStream fileOut = new FileOutputStream(sCompleteFileName);
+    private void saveWorkBook(String filePath) {
+        try (OutputStream fileOut = new FileOutputStream(filePath)) {
             wb.write(fileOut);
-            // wb.close();
-            fileOut.close();
-            log.debug("Workbook saved successfully to: " + sCompleteFileName);
+            log.debug("Workbook saved successfully to: {}", filePath);
         } catch (Exception e) {
-            log.error("Error in saving workbook: " + e.getMessage());
+            log.error("Error in saving workbook: {}", e.getMessage());
         }
     }
 

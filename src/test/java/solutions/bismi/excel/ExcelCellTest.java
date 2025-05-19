@@ -175,4 +175,78 @@ public class ExcelCellTest {
     }
 
 
+    @Test
+    public void eTestDateAndVerticalAlignment() {
+        testDateAndVerticalAlignment("./resources/testdata/dateAlignTest.XLSX");
+        testDateAndVerticalAlignment("./resources/testdata/dateAlignTest.XLS");
+    }
+
+    private void testDateAndVerticalAlignment(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
+        ExcelWorkSheet sh1 = xlbook.addSheet("DateAlignTest");
+        sh1.activate();
+
+        // Test date value
+        java.util.Date today = new java.util.Date();
+        sh1.cell(1, 1).setCellValue("Date:");
+        sh1.cell(1, 2).setDateValue(today);
+        sh1.cell(1, 2).setNumberFormat("dd/mm/yyyy");
+
+        // Test date with auto-size
+        sh1.cell(2, 1).setCellValue("Date with auto-size:");
+        sh1.cell(2, 2).setDateValue(today, true);
+        sh1.cell(2, 2).setNumberFormat("yyyy-mm-dd");
+
+        // Test vertical alignment
+        sh1.cell(4, 1).setCellValue("Top aligned");
+        sh1.cell(4, 1).setVerticalAlignment("TOP");
+
+        sh1.cell(5, 1).setCellValue("Center aligned");
+        sh1.cell(5, 1).setVerticalAlignment("CENTER");
+
+        sh1.cell(6, 1).setCellValue("Bottom aligned");
+        sh1.cell(6, 1).setVerticalAlignment("BOTTOM");
+
+        sh1.cell(7, 1).setCellValue("Justified");
+        sh1.cell(7, 1).setVerticalAlignment("JUSTIFY");
+
+        sh1.cell(8, 1).setCellValue("Distributed");
+        sh1.cell(8, 1).setVerticalAlignment("DISTRIBUTED");
+
+        sh1.cell(9, 1).setCellValue("Default alignment");
+        sh1.cell(9, 1).setVerticalAlignment("INVALID"); // Should default to CENTER
+
+        sh1.saveWorkBook();
+        xlApp.closeAllWorkBooks();
+    }
+
+    @Test
+    public void fTestErrorHandling() {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook("./resources/testdata/errorHandlingTest.XLSX");
+        ExcelWorkSheet sh1 = xlbook.addSheet("ErrorTest");
+        sh1.activate();
+
+        // Test with invalid formula (should not throw exception)
+        try {
+            sh1.cell(1, 1).setFormula("INVALID_FORMULA(A1)");
+        } catch (Exception e) {
+            Assertions.fail("Should not throw exception with invalid formula");
+        }
+
+        // Test with invalid color name (should not throw exception)
+        try {
+            sh1.cell(2, 1).setFontColor("NONEXISTENT_COLOR");
+        } catch (Exception e) {
+            Assertions.fail("Should not throw exception with invalid color name");
+        }
+
+        // Test getValue on empty cell
+        String value = sh1.cell(3, 3).getValue();
+        Assertions.assertEquals("", value, "Empty cell should return empty string");
+
+        sh1.saveWorkBook();
+        xlApp.closeAllWorkBooks();
+    }
 }

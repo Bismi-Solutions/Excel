@@ -186,4 +186,55 @@ public class ExcelRowTest {
         sheet.saveWorkBook();
         xlApp.closeAllWorkBooks();
     }
+    /**
+     * Test edge cases and additional error handling
+     */
+    @Test
+    public void fTestEdgeCases() {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook("./resources/testdata/rowEdgeCases.xlsx");
+        ExcelWorkSheet sheet = xlbook.addSheet("EdgeCases");
+
+        // Test with very large column index
+        try {
+            String[] values = {"Value1"};
+            sheet.row(1).setRowValues(values, 1000);
+        } catch (Exception e) {
+            Assertions.fail("Should not throw exception with large column index");
+        }
+
+        // Test with very large row index
+        try {
+            ExcelRow largeRow = sheet.row(10000);
+            largeRow.setFillColor("Yellow");
+        } catch (Exception e) {
+            Assertions.fail("Should not throw exception with large row index");
+        }
+
+        // Test with empty string array
+        try {
+            String[] emptyArray = {""};
+            sheet.row(2).setRowValues(emptyArray);
+        } catch (Exception e) {
+            Assertions.fail("Should not throw exception with empty string array");
+        }
+
+        // Test with null values in array
+        try {
+            String[] nullArray = {null, "Value", null};
+            sheet.row(3).setRowValues(nullArray);
+        } catch (Exception e) {
+            Assertions.fail("Should not throw exception with null values in array");
+        }
+
+        // Test with invalid color
+        try {
+            sheet.row(4).setFillColor("NonExistentColor");
+        } catch (Exception e) {
+            Assertions.fail("Should not throw exception with invalid color");
+        }
+
+        sheet.saveWorkBook();
+        xlApp.closeAllWorkBooks();
+    }
 }
