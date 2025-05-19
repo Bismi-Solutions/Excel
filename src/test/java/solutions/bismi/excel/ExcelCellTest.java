@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 
-@TestMethodOrder(MethodOrderer.Alphanumeric.class)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 class ExcelCellTest {
 
 
     @Test
-    public void aSetFontColor() {
+    void aSetFontColor() {
         setColor("./resources/testdata/cellFormatCheck1.XLSX");
         setColor("./resources/testdata/cellFormatCheck1.XLS");
     }
@@ -30,12 +30,22 @@ class ExcelCellTest {
         ExcelCell c2 = sh1.cell(5, 7);
         c2.setText("Beta");
         c2.setFontColor("RED");
+
+        // Test with hex color codes
+        ExcelCell c3 = sh1.cell(7, 4);
+        c3.setText("Hex Color Test");
+        c3.setFontColor("#FF0000"); // Red in hex
+
+        ExcelCell c4 = sh1.cell(8, 4);
+        c4.setText("Another Hex Color");
+        c4.setFontColor("#0000FF"); // Blue in hex
+
         sh1.saveWorkBook();
         xlApp.closeAllWorkBooks();
     }
 
     @Test
-    public void bSetFillcolor() {
+    void bSetFillcolor() {
         setColor2("./resources/testdata/cellFormatCheck2.XLSX");
         setColor2("./resources/testdata/cellFormatCheck2.XLS");
     }
@@ -48,21 +58,37 @@ class ExcelCellTest {
         Assertions.assertEquals(1, cnt);
         ExcelWorkSheet sh1 = xlbook.addSheet("Bismi1");
         sh1.activate();
+
+        // Test with named colors
         sh1.cell(10, 10).setText("TestColor");
         sh1.cell(10, 10).setFontColor("blue");
         sh1.cell(10, 10).setFillColor("yellow");
         sh1.cell(1, 1).setFillColor("GREEN");
         sh1.cell(3, 17).setFullBorder("Red");
+
+        // Test with hex color codes
+        sh1.cell(5, 5).setText("Hex Fill Color");
+        sh1.cell(5, 5).setFillColor("#00FF00"); // Green in hex
+
+        sh1.cell(6, 6).setText("Hex Border Color");
+        sh1.cell(6, 6).setFullBorder("#0000FF"); // Blue in hex
+
+        sh1.cell(7, 7).setText("Hex Font and Fill");
+        sh1.cell(7, 7).setFontColor("#FF0000"); // Red in hex
+        sh1.cell(7, 7).setFillColor("#FFFF00"); // Yellow in hex
+
+        // Other cell operations
         sh1.cell(12, 13).setCellValue("123");
         sh1.cell(12, 13).setCellValue("0");
         sh1.cell(13, 13).setText("0");
         sh1.cell(12, 22).setCellValue("0.123", true);
+
         sh1.saveWorkBook();
         xlApp.closeAllWorkBooks();
     }
 
     @Test
-    public void cTestFormulas() {
+    void cTestFormulas() {
         testFormulas("./resources/testdata/formulaTest.XLSX");
         testFormulas("./resources/testdata/formulaTest.XLS");
     }
@@ -134,7 +160,7 @@ class ExcelCellTest {
     }
 
     @Test
-    public void dTestCellMerging() {
+    void dTestCellMerging() {
         testCellMerging("./resources/testdata/mergeTest.XLSX");
         testCellMerging("./resources/testdata/mergeTest.XLS");
     }
@@ -176,7 +202,7 @@ class ExcelCellTest {
 
 
     @Test
-    public void eTestDateAndVerticalAlignment() {
+    void eTestDateAndVerticalAlignment() {
         testDateAndVerticalAlignment("./resources/testdata/dateAlignTest.XLSX");
         testDateAndVerticalAlignment("./resources/testdata/dateAlignTest.XLS");
     }
@@ -222,7 +248,7 @@ class ExcelCellTest {
     }
 
     @Test
-    public void fTestErrorHandling() {
+    void fTestErrorHandling() {
         ExcelApplication xlApp = new ExcelApplication();
         ExcelWorkBook xlbook = xlApp.createWorkBook("./resources/testdata/errorHandlingTest.XLSX");
         ExcelWorkSheet sh1 = xlbook.addSheet("ErrorTest");

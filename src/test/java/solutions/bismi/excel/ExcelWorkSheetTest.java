@@ -5,7 +5,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-@TestMethodOrder(MethodOrderer.Alphanumeric.class)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 class ExcelWorkSheetTest {
 
     @Test
@@ -18,8 +18,7 @@ class ExcelWorkSheetTest {
     private void verifySheetActivation(String strCompleteFileName) {
         ExcelApplication xlApp = new ExcelApplication();
         ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
-        int cnt = 0;
-        cnt = xlbook.getSheetCount();
+        int cnt = xlbook.getSheetCount();
         Assertions.assertEquals(1, cnt);
         xlbook.addSheet("Bismi1");
         cnt = xlbook.getSheetCount();
@@ -50,8 +49,7 @@ class ExcelWorkSheetTest {
 
         ExcelApplication xlApp = new ExcelApplication();
         ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
-        int cnt = 0;
-        cnt = xlbook.getSheetCount();
+        int cnt = xlbook.getSheetCount();
         Assertions.assertEquals(1, cnt);
         xlbook.addSheet("Bismi1");
         cnt = xlbook.getSheetCount();
@@ -94,8 +92,8 @@ class ExcelWorkSheetTest {
     private void addRowsInMultipleSheet(String strMultipleFileName) {
         ExcelApplication xlApp = new ExcelApplication();
         ExcelWorkBook xlbook = xlApp.createWorkBook(strMultipleFileName);
-        int cnt = 0;
-        cnt = xlbook.getSheetCount();
+        int cnt = xlbook.getSheetCount();
+        Assertions.assertTrue(cnt > 0, "Sheet count should be greater than zero");
         Assertions.assertEquals(1, cnt);
         xlbook.addSheet("Bismi1");
         xlbook.addSheet("Bismi2");
@@ -138,8 +136,7 @@ class ExcelWorkSheetTest {
     private void setCellValues(String strCompleteFilePath) {
         ExcelApplication xlApp = new ExcelApplication();
         ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFilePath);
-        int cnt = 0;
-        cnt = xlbook.getSheetCount();
+        int cnt = xlbook.getSheetCount();
         Assertions.assertEquals(1, cnt);
         xlbook.addSheet("Bismi1");
         xlbook.addSheet("Bismi2");
@@ -268,6 +265,7 @@ class ExcelWorkSheetTest {
         // Test merging with invalid indices
         boolean mergeResult = sheet.mergeCells(-1, 1, 1, 2);
         // This should not throw an exception, but may return false
+        Assertions.assertFalse(mergeResult, "Merging cells with invalid indices should return false");
 
         // Test isCellMerged with invalid indices
         boolean isMerged = sheet.isCellMerged(-1, -1);

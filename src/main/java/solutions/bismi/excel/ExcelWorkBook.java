@@ -433,7 +433,6 @@ public class ExcelWorkBook {
 
     /**
      * @return
-     * @author - Sulfikar Ali Nazar
      */
     public int getActiveSheetIndex() {
         return this.wb.getActiveSheetIndex();

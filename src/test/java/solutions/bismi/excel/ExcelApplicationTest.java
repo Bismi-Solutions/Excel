@@ -8,19 +8,19 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.List;
 
 
-@TestMethodOrder(MethodOrderer.Alphanumeric.class)
-public class ExcelApplicationTest {
+@TestMethodOrder(MethodOrderer.MethodName.class)
+class ExcelApplicationTest {
 
     @Test
-    public void aCreateExcelWorkBook() {
+    void aCreateExcelWorkBook() {
         bCreateXLSWorkBook("./resources/testdata/basicWorkbook.xlsx");
         bCreateXLSWorkBook("./resources/testdata/basicWorkbook.xls");
-        //bCreateXLSWorkBook("./resources/testdata/basicWorkbook.xlsm");
+
     }
 
     private void bCreateXLSWorkBook(String strCompleteFileName) {
         ExcelApplication xlApp = new ExcelApplication();
-        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
+        xlApp.createWorkBook(strCompleteFileName);
         int cnt = xlApp.getOpenWorkbookCount();
         xlApp.closeAllWorkBooks();
         //Verify only one work book is created
@@ -29,7 +29,7 @@ public class ExcelApplicationTest {
     }
 
     @Test
-    public void cOpenExcelXWorkbook() {
+    void cOpenExcelXWorkbook() {
         dOpenXLSWorkbook("./resources/testdata/basicWorkbook.xlsx");
         dOpenXLSWorkbook("./resources/testdata/basicWorkbook.xls");
     }
@@ -44,7 +44,7 @@ public class ExcelApplicationTest {
     }
 
     @Test
-    public void eCloseWorkBookByIndex() {
+    void eCloseWorkBookByIndex() {
         closeBookByindex("./resources/testdata/basicWorkbook.xls");
         closeBookByindex("./resources/testdata/basicWorkbook.xlsx");
 
@@ -62,7 +62,7 @@ public class ExcelApplicationTest {
     }
 
     @Test
-    public void fCloseWorkBookByName() {
+    void fCloseWorkBookByName() {
         closeBookByName("./resources/testdata/basicWorkbook.xls");
         closeBookByName("./resources/testdata/basicWorkbook.xlsx");
     }
@@ -78,7 +78,7 @@ public class ExcelApplicationTest {
     }
 
     @Test
-    public void gCloseAllWorkBooks() {
+    void gCloseAllWorkBooks() {
         ExcelApplication xlApp = new ExcelApplication();
         xlApp.openWorkbook("./resources/testdata/basicWorkbook.xls");
         int cnt = xlApp.getOpenWorkbookCount();
@@ -96,7 +96,7 @@ public class ExcelApplicationTest {
     }
 
     @Test
-    public void hGetWorkbooks() {
+    void hGetWorkbooks() {
         ExcelApplication xlApp = new ExcelApplication();
 
         // Initially should be empty
@@ -117,7 +117,7 @@ public class ExcelApplicationTest {
     }
 
     @Test
-    public void iGetWorkbookByIndex() {
+    void iGetWorkbookByIndex() {
         ExcelApplication xlApp = new ExcelApplication();
 
         // Test with valid index
@@ -143,7 +143,7 @@ public class ExcelApplicationTest {
     }
 
     @Test
-    public void jGetWorkbookByName() {
+    void jGetWorkbookByName() {
         ExcelApplication xlApp = new ExcelApplication();
 
         // Test with valid name
@@ -169,7 +169,7 @@ public class ExcelApplicationTest {
     }
 
     @Test
-    public void kCloseWorkBookErrorCases() {
+    void kCloseWorkBookErrorCases() {
         ExcelApplication xlApp = new ExcelApplication();
 
         // Test closing by invalid index

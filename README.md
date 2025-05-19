@@ -65,7 +65,7 @@ Add the following Maven dependency to your project:
 <dependency>
     <groupId>solutions.bismi.excel</groupId>
     <artifactId>excel</artifactId>
-    <version>1.1.8</version>
+    <version>1.1.9</version>
 </dependency>
 ```
 

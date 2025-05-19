@@ -5,11 +5,12 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-@TestMethodOrder(MethodOrderer.Alphanumeric.class)
-public class ExcelRowTest {
+
+@TestMethodOrder(MethodOrderer.MethodName.class)
+class ExcelRowTest {
 
     @Test
-    public void aSetfontcolor() {
+    void aSetfontcolor() {
         setColor2("./resources/testdata/cellFormatCheckrow1.XLSX");
         setColor2("./resources/testdata/cellFormatCheckrow1.XLS");
     }
@@ -39,7 +40,7 @@ public class ExcelRowTest {
 
 
     @Test
-    public void bTestSetRowValuesVariants() {
+    void bTestSetRowValuesVariants() {
         testSetRowValuesVariants("./resources/testdata/rowValuesVariants.xlsx");
         testSetRowValuesVariants("./resources/testdata/rowValuesVariants.xls");
     }
@@ -92,7 +93,7 @@ public class ExcelRowTest {
      * Test setFillColor with start and end column
      */
     @Test
-    public void cTestSetFillColorWithRange() {
+    void cTestSetFillColorWithRange() {
         testSetFillColorWithRange("./resources/testdata/fillColorRange.xlsx");
         testSetFillColorWithRange("./resources/testdata/fillColorRange.xls");
     }
@@ -117,7 +118,7 @@ public class ExcelRowTest {
      * Test error handling and edge cases
      */
     @Test
-    public void dTestErrorHandling() {
+    void dTestErrorHandling() {
         ExcelApplication xlApp = new ExcelApplication();
         ExcelWorkBook xlbook = xlApp.createWorkBook("./resources/testdata/rowErrorHandling.xlsx");
         ExcelWorkSheet sheet = xlbook.addSheet("ErrorTest");
@@ -165,16 +166,17 @@ public class ExcelRowTest {
      * Test with large data set to verify performance
      */
     @Test
-    public void eTestLargeDataSet() {
+    void eTestLargeDataSet() {
+        String filePath = "./resources/testdata/largeDataSet.xlsx";
         ExcelApplication xlApp = new ExcelApplication();
-        ExcelWorkBook xlbook = xlApp.createWorkBook("./resources/testdata/largeDataSet.xlsx");
+        ExcelWorkBook xlbook = xlApp.createWorkBook(filePath);
         ExcelWorkSheet sheet = xlbook.addSheet("LargeData");
-
+    
         // Create a large data set (100 rows)
         for (int i = 1; i <= 20; i++) {
             String[] rowData = {"Row" + i + "Col1", "Row" + i + "Col2", "Row" + i + "Col3"};
             sheet.row(i).setRowValues(rowData);
-
+    
             // Apply different formatting to even and odd rows
             if (i % 2 == 0) {
                 sheet.row(i).setFillColor("LightGray");
@@ -182,15 +184,44 @@ public class ExcelRowTest {
                 sheet.row(i).setFontColor("Blue");
             }
         }
-
+    
         sheet.saveWorkBook();
         xlApp.closeAllWorkBooks();
+        
+        // Verify file exists
+        java.io.File file = new java.io.File(filePath);
+        Assertions.assertTrue(file.exists(), "Excel file should have been created");
+        
+        // Reopen and verify content
+        xlApp = new ExcelApplication();
+        xlbook = xlApp.openWorkbook(filePath);
+        sheet = xlbook.getExcelSheet("LargeData");
+        
+        // Verify data for a few rows
+        Assertions.assertEquals("Row1Col1", sheet.cell(1, 1).getTextValue());
+        Assertions.assertEquals("Row5Col2", sheet.cell(5, 2).getTextValue());
+        Assertions.assertEquals("Row10Col3", sheet.cell(10, 3).getTextValue());
+        Assertions.assertEquals("Row20Col1", sheet.cell(20, 1).getTextValue());
+        
+        // Not verifying format as on now
+        // verifying the data integrity
+        for (int i = 1; i <= 20; i++) {
+            for (int j = 1; j <= 3; j++) {
+                String expectedValue = "Row" + i + "Col" + j;
+                String actualValue = sheet.cell(i, j).getTextValue();
+                Assertions.assertEquals(expectedValue, actualValue, 
+                        "Cell value at row " + i + ", column " + j + " should match");
+            }
+        }
+        
+        xlApp.closeAllWorkBooks();
     }
+
     /**
      * Test edge cases and additional error handling
      */
     @Test
-    public void fTestEdgeCases() {
+    void fTestEdgeCases() {
         ExcelApplication xlApp = new ExcelApplication();
         ExcelWorkBook xlbook = xlApp.createWorkBook("./resources/testdata/rowEdgeCases.xlsx");
         ExcelWorkSheet sheet = xlbook.addSheet("EdgeCases");

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.List;
 
 
-@TestMethodOrder(MethodOrderer.Alphanumeric.class)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 class ExcelWorkBookTest {
 
     @Test

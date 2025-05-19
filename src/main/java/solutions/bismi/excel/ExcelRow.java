@@ -4,17 +4,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellUtil;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
+
 
 /**
  * Represents a row in an Excel worksheet.
@@ -22,6 +18,7 @@ import java.util.Map;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExcelRow {
+    private final Logger log = LogManager.getLogger(ExcelRow.class);
     @Getter
     @Setter
     FileInputStream inputStream = null;
@@ -37,7 +34,6 @@ public class ExcelRow {
     @Getter
     @Setter
     String xlFileExtension = null;
-    private final Logger log = LogManager.getLogger(ExcelRow.class);
     @Getter
     @Setter
     private Sheet sheet;
@@ -132,7 +128,7 @@ public class ExcelRow {
     /**
      * Gets or creates a cell in the given row.
      *
-     * @param row The row containing the cell
+     * @param row      The row containing the cell
      * @param colIndex The column index (0-based)
      * @return The cell object
      */
@@ -155,12 +151,11 @@ public class ExcelRow {
      * Applies a function to a range of cells in the row.
      *
      * @param startColNumber The starting column number (1-based)
-     * @param endColNumber The ending column number (exclusive)
-     * @param cellOperation The operation to apply to each cell
-     * @param errorMessage Error message to log if operation fails
+     * @param endColNumber   The ending column number (exclusive)
+     * @param cellOperation  The operation to apply to each cell
+     * @param errorMessage   Error message to log if operation fails
      */
-    private void applyCellOperation(int startColNumber, int endColNumber, 
-                                   CellOperation cellOperation, String errorMessage) {
+    private void applyCellOperation(int startColNumber, int endColNumber, CellOperation cellOperation, String errorMessage) {
         try {
             Row cRow = getOrCreateRow();
 
@@ -171,14 +166,6 @@ public class ExcelRow {
         } catch (Exception e) {
             log.error("{}: {}", errorMessage, e.getMessage());
         }
-    }
-
-    /**
-     * Functional interface for cell operations.
-     */
-    @FunctionalInterface
-    private interface CellOperation {
-        void apply(Cell cell);
     }
 
     /**
@@ -212,9 +199,9 @@ public class ExcelRow {
     public void setFontColor(String fontColor) {
         Row cRow = getOrCreateRow();
         int endColNumber = cRow.getLastCellNum();
-            if (endColNumber <= 0) {
-                endColNumber = 1; // If row is empty, assume at least one cell
-            }
+        if (endColNumber <= 0) {
+            endColNumber = 1; // If row is empty, assume at least one cell
+        }
         setFontColor(fontColor, 1, endColNumber + 1);
     }
 
@@ -303,7 +290,6 @@ public class ExcelRow {
         setFullBorder(borderColor, 1, endColNumber + 1);
     }
 
-
     /**
      * Saves the workbook to the specified file.
      * Delegates to Common utility method.
@@ -334,6 +320,14 @@ public class ExcelRow {
      */
     private boolean checkIfCellIsEmpty(Cell cell) {
         return Common.checkIfCellIsEmpty(cell);
+    }
+
+    /**
+     * Functional interface for cell operations.
+     */
+    @FunctionalInterface
+    private interface CellOperation {
+        void apply(Cell cell);
     }
 
 

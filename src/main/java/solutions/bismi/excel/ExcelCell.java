@@ -547,16 +547,6 @@ public class ExcelCell {
         return val;
     }
 
-    /**
-     * Saves the workbook to the specified file.
-     * Delegates to Common utility method.
-     *
-     * @param filePath The complete file path and name to save to
-     */
-    private void saveWorkBook(String filePath) {
-        Common.saveWorkBook(wb, filePath);
-    }
-
 
     /**
      * Checks if a row is empty or contains only blank cells.
