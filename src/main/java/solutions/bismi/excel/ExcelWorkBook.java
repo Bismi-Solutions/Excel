@@ -248,8 +248,17 @@ public class ExcelWorkBook {
                 inputStream = new FileInputStream(this.xlFile);
                 this.wb = WorkbookFactory.create(inputStream);
 
+                // Get the active sheet index before creating the ExcelWorkBook
+                int activeSheetIndex = this.wb.getActiveSheetIndex();
+
                 xlWbook = new ExcelWorkBook(this.wb, this.excelBookName, this.excelBookPath);
                 updateSheetList();
+
+                // Ensure the active sheet is properly set
+                if (activeSheetIndex >= 0 && activeSheetIndex < this.wb.getNumberOfSheets()) {
+                    this.wb.setActiveSheet(activeSheetIndex);
+                    log.info("Set active sheet to: " + this.wb.getSheetName(activeSheetIndex));
+                }
             }
 
         } catch (Exception e) {

@@ -1,43 +1,61 @@
-name: CI / Release
+name: CI & Release
 
 on:
   push:
-    branches: [ master, main ]
-    tags: ['v*']          # ↳ deploy only on version tags
+    branches: [ main, master ]
   pull_request:
-    branches: [ master, main ]
+    branches: [ main, master ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    # ➊ Make the pass-phrase available to every step
-    env:
-      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+    timeout-minutes: 45
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Temurin 17 and import GPG key
-        uses: actions/setup-java@v3
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
-          server-id: ossrh
-          server-username: ${{ secrets.OSSRH_USERNAME }}
-          server-password: ${{ secrets.OSSRH_PASSWORD }}
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg-passphrase:  ${{ secrets.GPG_PASSPHRASE }}
+          cache: maven
 
-      # ➋ Sign during verify (tests are skipped here to keep CI quick)
-      - name: Build & sign (skip tests)
-        run: mvn -B -DskipTests -Dgpg.passphrase="$GPG_PASSPHRASE" verify
+      - name: Configure Maven Settings
+        run: |
+          mkdir -p ~/.m2
+          cat <<EOF > ~/.m2/settings.xml
+          <settings>
+            <servers>
+              <server>
+                <id>central</id>
+                <username>${{ secrets.CENTRAL_USERNAME }}</username>
+                <password>${{ secrets.CENTRAL_PASSWORD }}</password>
+              </server>
+              <server>
+                <id>gpg.passphrase</id>
+                <passphrase>${{ secrets.GPG_PASSPHRASE }}</passphrase>
+              </server>
+            </servers>
+          </settings>
+          EOF
 
-      # ➌ Run the tests separately (not signed)
-      - name: Run unit tests
-        run: mvn test
+      - name: Import GPG Key
+        run: |
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
 
-      # ➍ Deploy only when a version tag is pushed
+      - name: Build, Test, Sign
+        run: mvn -B verify
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./target/site/jacoco/jacoco.xml
+          fail_ci_if_error: true
+          flags: jacoco
+
       - name: Deploy to Maven Central
-        if: startsWith(github.ref, 'refs/tags/')
-        run: mvn -B -Dgpg.passphrase="$GPG_PASSPHRASE" deploy
+        if: github.event_name == 'push'
+        run: mvn -B deploy

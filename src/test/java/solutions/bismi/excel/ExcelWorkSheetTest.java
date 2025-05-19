@@ -74,6 +74,7 @@ public class ExcelWorkSheetTest {
         Assertions.assertEquals(1,cnt);
         cnt=xlbook.getSheetCount();
         Assertions.assertEquals(2,cnt);
+        xlbook.getExcelSheet("Bismi1").activate();
         String sheetName=xlbook.getActiveSheetName();
         Assertions.assertEquals("Bismi1",sheetName);
         xlApp.closeAllWorkBooks();
