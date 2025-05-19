@@ -1,29 +1,3 @@
-/*
- * Copyright (c) 2019. Bismi Solutions
- *
- * https://bismi.solutions/
- * support@bismi.solutions
- * sulfikar.ali.nazar@gmail.com
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package solutions.bismi.excel;
 
 import org.apache.logging.log4j.LogManager;
@@ -34,13 +8,10 @@ import java.util.List;
 
 /**
  * Excel Application base class to hold all application level operations. This is the root class.
- *
- * @author Sulfikar Ali Nazar
  */
-public class ExcelApplication
-{
-    private Logger log=LogManager.getLogger(ExcelApplication.class);
-    List<ExcelWorkBook> exlWorkBooks = new ArrayList<>();
+public class ExcelApplication {
+    private final Logger log = LogManager.getLogger(ExcelApplication.class);
+    private final List<ExcelWorkBook> exlWorkBooks = new ArrayList<>();
 
     /**
      * Default constructor for ExcelApplication.
@@ -51,7 +22,7 @@ public class ExcelApplication
 
     /**
      * Gets all workbooks currently open in the application.
-     * 
+     *
      * @return List of ExcelWorkBook objects
      */
     public List<ExcelWorkBook> getWorkbooks() {
@@ -60,7 +31,7 @@ public class ExcelApplication
 
     /**
      * Gets the count of workbooks currently open in the application.
-     * 
+     *
      * @return The number of open workbooks
      */
     public int getOpenWorkbookCount() {
@@ -74,7 +45,7 @@ public class ExcelApplication
      * @return The newly created ExcelWorkBook object
      */
     public ExcelWorkBook createWorkBook(String sCompleteFileName) {
-        log.info("Creating excel workbook: " + sCompleteFileName);
+        log.info("Creating excel workbook: {}", sCompleteFileName);
         ExcelWorkBook exlWorkBook = new ExcelWorkBook();
         exlWorkBook.createWorkBook(sCompleteFileName);
         exlWorkBooks.add(exlWorkBook); // adding excel book to main application list
@@ -88,7 +59,7 @@ public class ExcelApplication
      * @return The opened ExcelWorkBook object
      */
     public ExcelWorkBook openWorkbook(String sCompleteFileName) {
-        log.info("Opening excel workbook: " + sCompleteFileName);
+        log.info("Opening excel workbook: {}", sCompleteFileName);
         ExcelWorkBook exlWorkBook = new ExcelWorkBook();
         exlWorkBook.openWorkbook(sCompleteFileName);
         exlWorkBooks.add(exlWorkBook);
@@ -106,11 +77,11 @@ public class ExcelApplication
 
         try {
             tempBook = this.exlWorkBooks.get(iIndex);
-            log.info("Retrieved workbook at index: " + iIndex);
+            log.debug("Retrieved workbook at index: {}", iIndex);
         } catch (IndexOutOfBoundsException e) {
-            log.error("Error during workbook retrieval - index out of bounds: " + iIndex + " - " + e.getMessage());
+            log.error("Error during workbook retrieval - index out of bounds: {} - {}", iIndex, e.getMessage());
         } catch (Exception e) {
-            log.error("Error during workbook retrieval: " + e.getMessage());
+            log.error("Error during workbook retrieval: {}", e.getMessage());
         }
 
         return tempBook;
@@ -136,16 +107,16 @@ public class ExcelApplication
                 if (excelWorkBook.getExcelBookName().equalsIgnoreCase(sWorkBookName)) {
                     fFound = true;
                     tempBook = excelWorkBook;
-                    log.info("Retrieved workbook: " + sWorkBookName);
+                    log.debug("Retrieved workbook: {}", sWorkBookName);
                     break;
                 }
             } catch (Exception e) {
-                log.error("Error during workbook retrieval for '" + sWorkBookName + "': " + e.getMessage());
+                log.error("Error during workbook retrieval for '{}': {}", sWorkBookName, e.getMessage());
             }
         }
 
         if (!fFound) {
-            log.info("Workbook not opened. Please open workbook: " + sWorkBookName);
+            log.debug("Workbook not opened. Please open workbook: {}", sWorkBookName);
         }
 
         return tempBook;
@@ -163,11 +134,11 @@ public class ExcelApplication
             String bookName = tempBook.getExcelBookName();
             tempBook.closeWorkBook();
             this.exlWorkBooks.remove(iIndex);
-            log.info("Closed workbook at index " + iIndex + ": " + bookName);
+            log.debug("Closed workbook at index {}: {}", iIndex, bookName);
         } catch (IndexOutOfBoundsException e) {
-            log.error("Error closing workbook - index out of bounds: " + iIndex + " - " + e.getMessage());
+            log.error("Error closing workbook - index out of bounds: {} - {}", iIndex, e.getMessage());
         } catch (Exception e) {
-            log.error("Error closing workbook at index " + iIndex + ": " + e.getMessage());
+            log.error("Error closing workbook at index {}: {}", iIndex, e.getMessage());
         }
     }
 
@@ -191,19 +162,19 @@ public class ExcelApplication
                 if (excelWorkBook.getExcelBookName().equalsIgnoreCase(sWorkBookName)) {
                     excelWorkBook.closeWorkBook();
                     fFound = true;
-                    log.info("Found and closed workbook: " + sWorkBookName);
+                    log.debug("Found and closed workbook: {}", sWorkBookName);
                     break;
                 }
             } catch (Exception e) {
-                log.error("Error while trying to close workbook '" + sWorkBookName + "': " + e.getMessage());
+                log.error("Error while trying to close workbook '{}': {}", sWorkBookName, e.getMessage());
             }
         }
 
         if (iIndex >= 0 && fFound) {
             this.exlWorkBooks.remove(iIndex);
-            log.info("Removed workbook from list: " + sWorkBookName);
+            log.debug("Removed workbook from list: {}", sWorkBookName);
         } else {
-            log.warn("Workbook '" + sWorkBookName + "' not available for close operation");
+            log.warn("Workbook '{}' not available for close operation", sWorkBookName);
         }
     }
 
@@ -214,21 +185,21 @@ public class ExcelApplication
     public void closeAllWorkBooks() {
         int closedCount = 0;
 
-        log.info("Closing all workbooks. Total count: " + exlWorkBooks.size());
+        log.info("Closing all workbooks. Total count: {}", exlWorkBooks.size());
 
         for (ExcelWorkBook excelWorkBook : this.exlWorkBooks) {
             try {
                 String bookName = excelWorkBook.getExcelBookName();
                 excelWorkBook.closeWorkBook();
                 closedCount++;
-                log.info("Closed workbook: " + bookName);
+                log.debug("Closed workbook: {}", bookName);
             } catch (Exception e) {
-                log.warn("Workbook " + excelWorkBook.excelBookName + " could not be closed: " + e.getMessage());
+                log.warn("Workbook {} could not be closed: {}", excelWorkBook.getExcelBookName(), e.getMessage());
             }
         }
 
         this.exlWorkBooks.clear();
-        log.info("All workbooks closed and list cleared. Successfully closed: " + closedCount);
+        log.info("All workbooks closed and list cleared. Successfully closed: {}", closedCount);
     }
 
 }

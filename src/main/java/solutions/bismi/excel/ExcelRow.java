@@ -39,7 +39,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellUtil;
 
 /**
- * @author Sulfikar Ali Nazar
+ * Represents a row in an Excel worksheet.
+ * Provides methods for manipulating row content, formatting, and styling.
  */
 public class ExcelRow {
     private Logger log = LogManager.getLogger(ExcelRow.class);
@@ -53,17 +54,17 @@ public class ExcelRow {
     Row ROW=null;
     String xlFileExtension=null;
     /**
-     * @author - Sulfikar Ali Nazar
-     * @param sheet
-     * @param wb
-     * @param row
-     * @param inputStream
-     * @param outputStream
-     * @param sCompleteFileName
+     * Creates a new ExcelRow with the specified parameters.
+     * 
+     * @param sheet The worksheet containing the row
+     * @param wb The workbook containing the sheet
+     * @param row The row number (1-based)
+     * @param inputStream The input stream for the workbook file
+     * @param outputStream The output stream for the workbook file
+     * @param sCompleteFileName The complete file path and name of the workbook
      */
     protected ExcelRow(Sheet sheet, Workbook wb, int row, FileInputStream inputStream,
                        FileOutputStream outputStream, String sCompleteFileName) {
-
         this.sheet = sheet;
         this.wb = wb;
         this.row = row;
@@ -71,65 +72,55 @@ public class ExcelRow {
         this.outputStream = outputStream;
         this.sCompleteFileName = sCompleteFileName;
         try {
-
-
-
-
-
-            //SaveWorkBook(inputStream, outputStream, sCompleteFileName);
+            // Initialize row if needed
         } catch (Exception e) {
-            log.info("Error in Cells constructor creation " + e.toString());
+            log.error("Error in row constructor creation: " + e.getMessage());
         }
-
-
-
     }
 
     /**
-     * @author - Sulfikar Ali Nazar
-     * @param sValues
-     * @param startColNumber
-     * @param autoSizeColoumns
+     * Sets values for multiple cells in the row.
+     * 
+     * @param sValues Array of string values to set in the row
+     * @param startColNumber The starting column number (0-based)
+     * @param autoSizeColumns Whether to auto-size the columns
      */
-    public void setRowValues(String[] sValues,int startColNumber,boolean autoSizeColoumns) {
-
+    public void setRowValues(String[] sValues, int startColNumber, boolean autoSizeColumns) {
         Row cRow = null;
 
         try {
-
             try {
                 cRow = sheet.getRow(this.row - 1);
-
             } catch (Exception e1) {
-
+                // Row doesn't exist
             }
+
             if (checkIfRowIsEmpty(cRow)) {
                 cRow = sheet.createRow(this.row - 1);
             }
-            int i=startColNumber;
-            for (String sValu : sValues) {
-                Cell cell1=null;
-                try{
-                    cell1=cRow.getCell(i);
-                }catch (Exception e){
 
+            int i = startColNumber;
+            for (String value : sValues) {
+                Cell cell1 = null;
+                try {
+                    cell1 = cRow.getCell(i);
+                } catch (Exception e) {
+                    // Cell doesn't exist
                 }
-                if(checkIfCellIsEmpty(cell1)){
+
+                if (checkIfCellIsEmpty(cell1)) {
                     cell1 = cRow.createCell(i);
                 }
-                cell1.setCellValue(sValu);
-                if(autoSizeColoumns) {
+
+                cell1.setCellValue(value);
+                if (autoSizeColumns) {
                     sheet.autoSizeColumn(i);
                 }
                 ++i;
-
             }
-            //SaveWorkBook(inputStream, outputStream, sCompleteFileName);
-
         } catch (Exception e) {
-            log.info("Error in writing record to excel" + e.toString());
+            log.error("Error in writing values to row: " + e.getMessage());
         }
-
     }
 
     public void setRowValues(String[] sValues,int startColNumber) {
@@ -143,221 +134,204 @@ public class ExcelRow {
     }
 
     /**
-     * @author - Sulfikar Ali Nazar
-     *
+     * Sets the font color for a range of cells in the row.
+     * 
+     * @param fontColor The color name to set for the font
+     * @param startColNumber The starting column number (1-based)
+     * @param endColNumber The ending column number (exclusive)
      */
-    public void setFontColor(String fontColor,int startColNumber, int endColNumber) {
-
+    public void setFontColor(String fontColor, int startColNumber, int endColNumber) {
         Row cRow = null;
 
         try {
-
             try {
                 cRow = sheet.getRow(this.row - 1);
             } catch (Exception e1) {
-
+                // Row doesn't exist
             }
+
             if (checkIfRowIsEmpty(cRow)) {
                 cRow = sheet.createRow(this.row - 1);
             }
 
-
-            for (int iCol=startColNumber;iCol<endColNumber;iCol++) {
-                Cell cell1=null;
-                try{
-                    cell1=cRow.getCell(iCol-1);
-                }catch (Exception e){
-
-                }
-                if(checkIfCellIsEmpty(cell1)){
-                    cell1 = cRow.createCell(iCol-1);
+            for (int iCol = startColNumber; iCol < endColNumber; iCol++) {
+                Cell cell1 = null;
+                try {
+                    cell1 = cRow.getCell(iCol - 1);
+                } catch (Exception e) {
+                    // Cell doesn't exist
                 }
 
-                Font font = null;//this.wb.findFont(false, )
-
-                if (font == null) { // Create new font
-                    font = cell1.getSheet().getWorkbook().createFont();
-
-                    font.setColor(Common.getColorCode(fontColor));
-
+                if (checkIfCellIsEmpty(cell1)) {
+                    cell1 = cRow.createCell(iCol - 1);
                 }
+
+                Font font = cell1.getSheet().getWorkbook().createFont();
+                font.setColor(Common.getColorCode(fontColor));
                 CellUtil.setFont(cell1, font);
-
-
-
             }
-            //SaveWorkBook(inputStream, outputStream, sCompleteFileName);
-
         } catch (Exception e) {
-            log.info("Error in setting font color record to excel" + e.toString());
+            log.error("Error in setting font color: " + e.getMessage());
         }
-
     }
 
-
-    public void setFontColor(String fontColor) {
-        Row cRow = null;
-
-
-
-            try {
-                cRow = sheet.getRow(this.row - 1);
-            } catch (Exception e1) {
-
-            }
-            if (checkIfRowIsEmpty(cRow)) {
-                cRow = sheet.createRow(this.row - 1);
-            }
-
-            int endColNumber=cRow.getLastCellNum();
-            setFontColor(fontColor, 1, endColNumber+1);
-
-    }
 
     /**
-     * @author - Sulfikar Ali Nazar
-     * @param fillColor
-     * @param startColNumber
-     * @param endColNumber
+     * Sets the font color for all cells in the row.
+     * 
+     * @param fontColor The color name to set for the font
      */
-    public void setFillColor(String fillColor,int startColNumber, int endColNumber) {
-
+    public void setFontColor(String fontColor) {
         Row cRow = null;
-
-        try {
-
-            try {
-                cRow = sheet.getRow(this.row - 1);
-            } catch (Exception e1) {
-
-            }
-            if (checkIfRowIsEmpty(cRow)) {
-                cRow = sheet.createRow(this.row - 1);
-            }
-
-
-            for (int iCol=startColNumber;iCol<endColNumber;iCol++) {
-                Cell cell1=null;
-                try{
-                    cell1=cRow.getCell(iCol-1);
-                }catch (Exception e){
-
-                }
-                if(checkIfCellIsEmpty(cell1)){
-                    cell1 = cRow.createCell(iCol-1);
-                }
-
-                Map<String, Object> properties = new HashMap<String, Object>();
-                properties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
-                properties.put(CellUtil.FILL_FOREGROUND_COLOR, Common.getColorCode(fillColor));
-                CellUtil.setCellStyleProperties(cell1, properties);
-
-
-
-            }
-            //SaveWorkBook(inputStream, outputStream, sCompleteFileName);
-
-        } catch (Exception e) {
-            log.info("Error in setting font color record to excel" + e.toString());
-        }
-
-    }
-
-
-
-    public void setFillColor(String fillColor) {
-        Row cRow = null;
-
-
-
         try {
             cRow = sheet.getRow(this.row - 1);
         } catch (Exception e1) {
-
+            // Row doesn't exist
         }
+
         if (checkIfRowIsEmpty(cRow)) {
             cRow = sheet.createRow(this.row - 1);
         }
 
-        int endColNumber=cRow.getLastCellNum();
-        setFillColor(fillColor, 1, endColNumber+1);
-
+        int endColNumber = cRow.getLastCellNum();
+        setFontColor(fontColor, 1, endColNumber + 1);
     }
 
     /**
-     * @author Sulfikar Ali Nazar
-     * @param fillColor
-     * @param startColNumber
-     * @param endColNumber
+     * Sets the background fill color for a range of cells in the row.
+     * 
+     * @param fillColor The color name to set for the cell background
+     * @param startColNumber The starting column number (1-based)
+     * @param endColNumber The ending column number (exclusive)
      */
-
-    public void setFullBorder(String fillColor,int startColNumber, int endColNumber) {
-
+    public void setFillColor(String fillColor, int startColNumber, int endColNumber) {
         Row cRow = null;
 
         try {
-
             try {
                 cRow = sheet.getRow(this.row - 1);
             } catch (Exception e1) {
-
+                // Row doesn't exist
             }
+
             if (checkIfRowIsEmpty(cRow)) {
                 cRow = sheet.createRow(this.row - 1);
             }
 
-
-            for (int iCol=startColNumber;iCol<endColNumber;iCol++) {
-                Cell cell1=null;
-                try{
-                    cell1=cRow.getCell(iCol-1);
-                }catch (Exception e){
-
-                }
-                if(checkIfCellIsEmpty(cell1)){
-                    cell1 = cRow.createCell(iCol-1);
+            for (int iCol = startColNumber; iCol < endColNumber; iCol++) {
+                Cell cell1 = null;
+                try {
+                    cell1 = cRow.getCell(iCol - 1);
+                } catch (Exception e) {
+                    // Cell doesn't exist
                 }
 
-                Map<String, Object> properties = new HashMap<String, Object>();
+                if (checkIfCellIsEmpty(cell1)) {
+                    cell1 = cRow.createCell(iCol - 1);
+                }
+
+                Map<String, Object> properties = new HashMap<>();
+                properties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
+                properties.put(CellUtil.FILL_FOREGROUND_COLOR, Common.getColorCode(fillColor));
+                CellUtil.setCellStyleProperties(cell1, properties);
+            }
+        } catch (Exception e) {
+            log.error("Error in setting fill color: " + e.getMessage());
+        }
+    }
+
+
+
+    /**
+     * Sets the background fill color for all cells in the row.
+     * 
+     * @param fillColor The color name to set for the cell background
+     */
+    public void setFillColor(String fillColor) {
+        Row cRow = null;
+        try {
+            cRow = sheet.getRow(this.row - 1);
+        } catch (Exception e1) {
+            // Row doesn't exist
+        }
+
+        if (checkIfRowIsEmpty(cRow)) {
+            cRow = sheet.createRow(this.row - 1);
+        }
+
+        int endColNumber = cRow.getLastCellNum();
+        setFillColor(fillColor, 1, endColNumber + 1);
+    }
+
+    /**
+     * Sets a full border around a range of cells in the row.
+     * 
+     * @param borderColor The color name to set for the border
+     * @param startColNumber The starting column number (1-based)
+     * @param endColNumber The ending column number (exclusive)
+     */
+    public void setFullBorder(String borderColor, int startColNumber, int endColNumber) {
+        Row cRow = null;
+
+        try {
+            try {
+                cRow = sheet.getRow(this.row - 1);
+            } catch (Exception e1) {
+                // Row doesn't exist
+            }
+
+            if (checkIfRowIsEmpty(cRow)) {
+                cRow = sheet.createRow(this.row - 1);
+            }
+
+            for (int iCol = startColNumber; iCol < endColNumber; iCol++) {
+                Cell cell1 = null;
+                try {
+                    cell1 = cRow.getCell(iCol - 1);
+                } catch (Exception e) {
+                    // Cell doesn't exist
+                }
+
+                if (checkIfCellIsEmpty(cell1)) {
+                    cell1 = cRow.createCell(iCol - 1);
+                }
+
+                Map<String, Object> properties = new HashMap<>();
                 properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
                 properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
                 properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
                 properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
-                properties.put(CellUtil.BOTTOM_BORDER_COLOR, Common.getColorCode(fillColor));
-                properties.put(CellUtil.LEFT_BORDER_COLOR, Common.getColorCode(fillColor));
-                properties.put(CellUtil.TOP_BORDER_COLOR, Common.getColorCode(fillColor));
-                properties.put(CellUtil.RIGHT_BORDER_COLOR, Common.getColorCode(fillColor));
+                properties.put(CellUtil.BOTTOM_BORDER_COLOR, Common.getColorCode(borderColor));
+                properties.put(CellUtil.LEFT_BORDER_COLOR, Common.getColorCode(borderColor));
+                properties.put(CellUtil.TOP_BORDER_COLOR, Common.getColorCode(borderColor));
+                properties.put(CellUtil.RIGHT_BORDER_COLOR, Common.getColorCode(borderColor));
 
                 CellUtil.setCellStyleProperties(cell1, properties);
-
-
-
             }
-            //SaveWorkBook(inputStream, outputStream, sCompleteFileName);
-
         } catch (Exception e) {
-            log.info("Error in setting font color record to excel" + e.toString());
+            log.error("Error in setting border: " + e.getMessage());
         }
-
     }
 
-    public void setFullBorder(String fillColor) {
+    /**
+     * Sets a full border around all cells in the row.
+     * 
+     * @param borderColor The color name to set for the border
+     */
+    public void setFullBorder(String borderColor) {
         Row cRow = null;
-
-
-
         try {
             cRow = sheet.getRow(this.row - 1);
         } catch (Exception e1) {
-
+            // Row doesn't exist
         }
+
         if (checkIfRowIsEmpty(cRow)) {
             cRow = sheet.createRow(this.row - 1);
         }
 
-        int endColNumber=cRow.getLastCellNum();
-        setFullBorder(fillColor, 1, endColNumber+1);
-
+        int endColNumber = cRow.getLastCellNum();
+        setFullBorder(borderColor, 1, endColNumber + 1);
     }
 
 
@@ -377,37 +351,44 @@ public class ExcelRow {
             wb.write(fileOut);
             // wb.close();
             fileOut.close();
-            log.info("Workbook saved successfully to: " + sCompleteFileName);
+            log.debug("Workbook saved successfully to: " + sCompleteFileName);
         } catch (Exception e) {
             log.error("Error in saving workbook: " + e.getMessage());
         }
     }
 
     /**
-     * @author - Sulfikar Ali Nazar
-     *
-     * @param ROW
-     * @return
+     * Checks if a row is empty or contains only blank cells.
+     * 
+     * @param row The row to check
+     * @return true if the row is empty or null, false otherwise
      */
-    private boolean checkIfRowIsEmpty(Row ROW) {
+    private boolean checkIfRowIsEmpty(Row row) {
         try {
-            if (ROW == null || ROW.getLastCellNum() <= 0) {
+            if (row == null || row.getLastCellNum() <= 0) {
                 return true;
             }
 
-            for (int cellNum = ROW.getFirstCellNum(); cellNum < ROW.getLastCellNum(); cellNum++) {
-                Cell cell = ROW.getCell(cellNum);
+            for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
+                Cell cell = row.getCell(cellNum);
                 if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
                     return false;
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return true;
         }
 
         return true;
     }
-    private boolean checkIfCellIsEmpty(Cell cell){
+
+    /**
+     * Checks if a cell is empty or blank.
+     * 
+     * @param cell The cell to check
+     * @return true if the cell is empty, null, or blank, false otherwise
+     */
+    private boolean checkIfCellIsEmpty(Cell cell) {
         if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
             return false;
         }

@@ -6,7 +6,7 @@
 
   [![CI & Release](https://github.com/Bismi-Solutions/Excel/actions/workflows/ci.yml/badge.svg)](https://github.com/Bismi-Solutions/Excel/actions/workflows/ci.yml)
   [![codecov](https://codecov.io/gh/Bismi-Solutions/Excel/branch/main/graph/badge.svg)](https://codecov.io/gh/Bismi-Solutions/Excel)
-  [![codecov](https://codecov.io/gh/Bismi-Solutions/Excel/branch/main/graph/badge.svg)](https://codecov.io/gh/Bismi-Solutions/Excel)
+  [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Bismi-Solutions_Excel&metric=alert_status)](https://sonarcloud.io/project/overview?id=Bismi-Solutions_Excel)
   [![Known Vulnerabilities](https://snyk.io/test/github/Bismi-Solutions/Excel/badge.svg?targetFile=pom.xml)](https://snyk.io/test/github/Bismi-Solutions/Excel?targetFile=pom.xml)
   [![Maven Central](https://img.shields.io/maven-central/v/solutions.bismi.excel/excel.svg)](https://search.maven.org/artifact/solutions.bismi.excel/excel)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

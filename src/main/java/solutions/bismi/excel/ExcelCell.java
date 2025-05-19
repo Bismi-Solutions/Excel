@@ -39,7 +39,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellUtil;
 
 /**
- * @author Sulfikar Ali Nazar
+ * Represents a cell in an Excel worksheet.
+ * Provides methods for manipulating cell content, formatting, and styling.
  */
 public class ExcelCell {
 
@@ -90,10 +91,11 @@ public class ExcelCell {
 
     }
     /**
-     * @author - Sulfikar Ali Nazar
-     * @param sText
-     * @param autoSizeColoumn
-     * @return
+     * Sets a text value in the cell.
+     * 
+     * @param sText The text value to set
+     * @param autoSizeColoumn Whether to auto-size the column
+     * @return true if successful, false otherwise
      */
     public boolean setCellValue(String sText, boolean autoSizeColoumn) {
         try {
@@ -101,7 +103,6 @@ public class ExcelCell {
             if (autoSizeColoumn) {
                 this.sheet.autoSizeColumn(col - 1);
             }
-            //SaveWorkBook(inputStream, outputStream, sCompleteFileName);
             return true;
         } catch (Exception e) {
             log.error("Error in setting cell value: " + e.getMessage());
@@ -199,22 +200,19 @@ public class ExcelCell {
         return setFormula(formula, false);
     }
     /**
-     * @author - Sulfikar Ali Nazar
-     * @param sText
-     * @param autoSizeColoumn
-     * @return
+     * Sets a text value in the cell with text formatting.
+     * 
+     * @param sText The text value to set
+     * @param autoSizeColoumn Whether to auto-size the column
+     * @return true if successful, false otherwise
      */
     public boolean setText(String sText, boolean autoSizeColoumn) {
-        Cell cCell=null;
-        String val="";
-        CellStyle cStyle=null;
-
+        Cell cCell = null;
 
         try {
             cCell = this.getCELL();
-           //
 
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put(CellUtil.DATA_FORMAT, BuiltinFormats.getBuiltinFormat("Text"));
             cCell.setCellValue(sText);
             CellUtil.setCellStyleProperties(cCell, properties);
@@ -223,57 +221,49 @@ public class ExcelCell {
                 this.sheet.autoSizeColumn(col - 1);
             }
 
-            //SaveWorkBook(inputStream, outputStream, sCompleteFileName);
-
+            return true;
         } catch (Exception e) {
-            log.info("Error in setting text value " + e.toString());
+            log.error("Error in setting text value: " + e.getMessage());
+            return false;
         }
-
-        return false;
-
     }
 
 
-    public void setFontColor(String fontColor){
-        Cell cCell=null;
-        String val="";
-        CellStyle cStyle=null;
-        try{
+    /**
+     * Sets the font color for the cell.
+     * 
+     * @param fontColor The color name to set for the font
+     */
+    public void setFontColor(String fontColor) {
+        Cell cCell = null;
+        try {
             cCell = this.getCELL();
-            val = cCell.getStringCellValue();
 
-            Font font = null;//this.wb.findFont(false, )
+            Font font = cCell.getSheet().getWorkbook().createFont();
+            font.setColor(Common.getColorCode(fontColor));
 
-            if (font == null) { // Create new font
-                font = cCell.getSheet().getWorkbook().createFont();
-
-                font.setColor(Common.getColorCode(fontColor));
-
-            }
             CellUtil.setFont(cCell, font);
-
-
-        }catch (Exception e){
-            log.info("Error in setting Font color " + e.toString());
+        } catch (Exception e) {
+            log.error("Error in setting font color: " + e.getMessage());
         }
-
-
     }
 
 
-    public void setFillColor(String fillColor){
-        Cell cCell=null;
-        String val="";
-        CellStyle cStyle=null;
-        try{
+    /**
+     * Sets the background fill color for the cell.
+     * 
+     * @param fillColor The color name to set for the cell background
+     */
+    public void setFillColor(String fillColor) {
+        Cell cCell = null;
+        try {
             cCell = this.getCELL();
 
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put(CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
             properties.put(CellUtil.FILL_FOREGROUND_COLOR, Common.getColorCode(fillColor));
             CellUtil.setCellStyleProperties(cCell, properties);
-
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error in setting fill color: " + e.getMessage());
         }
     }
@@ -404,42 +394,57 @@ public class ExcelCell {
             return false;
         }
     }
-    public void setFullBorder(String fillColor){
-        Cell cCell=null;
-        String val="";
-        CellStyle cStyle=null;
-        try{
+    /**
+     * Sets a full border around the cell with the specified color.
+     * 
+     * @param borderColor The color name to set for the border
+     */
+    public void setFullBorder(String borderColor) {
+        Cell cCell = null;
+        try {
             cCell = this.getCELL();
-            val = cCell.getStringCellValue();
 
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
             properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
             properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
             properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BOTTOM_BORDER_COLOR, Common.getColorCode(fillColor));
-            properties.put(CellUtil.LEFT_BORDER_COLOR, Common.getColorCode(fillColor));
-            properties.put(CellUtil.TOP_BORDER_COLOR, Common.getColorCode(fillColor));
-            properties.put(CellUtil.RIGHT_BORDER_COLOR, Common.getColorCode(fillColor));
+            properties.put(CellUtil.BOTTOM_BORDER_COLOR, Common.getColorCode(borderColor));
+            properties.put(CellUtil.LEFT_BORDER_COLOR, Common.getColorCode(borderColor));
+            properties.put(CellUtil.TOP_BORDER_COLOR, Common.getColorCode(borderColor));
+            properties.put(CellUtil.RIGHT_BORDER_COLOR, Common.getColorCode(borderColor));
 
             CellUtil.setCellStyleProperties(cCell, properties);
-
-        }catch (Exception e){
-            log.info("Error in setting Font color " + e.toString());
+        } catch (Exception e) {
+            log.error("Error in setting border: " + e.getMessage());
         }
-
-
     }
 
 
-    private CellStyle getCellStyle(CellStyle cStyle){
-            return cStyle;
+    /**
+     * Returns the cell style.
+     * 
+     * @param cStyle The cell style to return
+     * @return The provided cell style
+     */
+    private CellStyle getCellStyle(CellStyle cStyle) {
+        return cStyle;
     }
 
-    public String getValue(){
+    /**
+     * Gets the value of the cell as a string.
+     * 
+     * @return The cell value as a string
+     */
+    public String getValue() {
         return getTextValue();
     }
 
+    /**
+     * Gets the text value of the cell by reading from the workbook file.
+     * 
+     * @return The text value of the cell, or an empty string if not found or on error
+     */
     public String getTextValue() {
         String val = null;
         try {
@@ -447,7 +452,7 @@ public class ExcelCell {
             this.wb = WorkbookFactory.create(inputStream);
             String strSheetName = sheet.getSheetName();
             this.sheet = this.wb.getSheet(strSheetName);
-            // val = this.getCELL().getStringCellValue();//
+
             try {
                 val = this.sheet.getRow(this.row - 1).getCell(this.col - 1).getStringCellValue();
             } catch (Exception e) {
@@ -456,22 +461,34 @@ public class ExcelCell {
 
             inputStream.close();
             this.wb.close();
-            // SaveWorkBook(inputStream, outputStream, sCompleteFileName);
-
         } catch (Exception e) {
-            log.info("Error in setting text value " + e.toString());
+            log.error("Error in getting text value: " + e.getMessage());
         }
 
         return val;
-
     }
 
+    /**
+     * Private constructor for internal use.
+     */
     private ExcelCell() {
-
+        // Default constructor
     }
+
+    /**
+     * Creates a new ExcelCell with the specified parameters.
+     * This constructor initializes the cell and creates it if it doesn't exist.
+     * 
+     * @param sheet The worksheet containing the cell
+     * @param wb The workbook containing the sheet
+     * @param row The row number (1-based)
+     * @param col The column number (1-based)
+     * @param inputStream The input stream for the workbook file
+     * @param outputStream The output stream for the workbook file
+     * @param sCompleteFileName The complete file path and name of the workbook
+     */
     protected ExcelCell(Sheet sheet, Workbook wb, int row, int col, FileInputStream inputStream,
                         FileOutputStream outputStream, String sCompleteFileName) {
-
         this.sheet = sheet;
         this.wb = wb;
         this.row = row;
@@ -479,39 +496,37 @@ public class ExcelCell {
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.sCompleteFileName = sCompleteFileName;
-        this.xlFileExtension=getFileExtension(sCompleteFileName);
+        this.xlFileExtension = getFileExtension(sCompleteFileName);
+
         try {
             Row cRow = null;
             try {
                 cRow = sheet.getRow(this.row - 1);
-
             } catch (Exception e) {
-
+                // Row doesn't exist
             }
-            Row row1 = null;
+
+            Row row1;
             if (checkIfRowIsEmpty(cRow)) {
                 row1 = sheet.createRow(this.row - 1);
             } else {
                 row1 = cRow;
             }
 
-            Cell cell1=null;
-            try{
-                cell1=row1.getCell(this.col - 1);
-            }catch(Exception e){
-
+            Cell cell1 = null;
+            try {
+                cell1 = row1.getCell(this.col - 1);
+            } catch (Exception e) {
+                // Cell doesn't exist
             }
 
-
-            if(checkIfCellIsEmpty(cell1)){
+            if (checkIfCellIsEmpty(cell1)) {
                 cell1 = row1.createCell(this.col - 1);
             }
 
             this.setCELL(cell1);
-            // SaveWorkBook(inputStream, outputStream, sCompleteFileName);
-
         } catch (Exception e) {
-            log.info("Error in Cells constructor creation " + e.toString());
+            log.error("Error in cell constructor creation: " + e.getMessage());
         }
     }
 
@@ -531,7 +546,7 @@ public class ExcelCell {
             wb.write(fileOut);
             // wb.close();
             fileOut.close();
-            log.info("Workbook saved successfully to: " + sCompleteFileName);
+            log.debug("Workbook saved successfully to: " + sCompleteFileName);
         } catch (Exception e) {
             log.error("Error in saving workbook: " + e.getMessage());
         }
@@ -539,45 +554,58 @@ public class ExcelCell {
 
 
 
-    private boolean checkIfRowIsEmpty(Row ROW) {
+    /**
+     * Checks if a row is empty or contains only blank cells.
+     * 
+     * @param row The row to check
+     * @return true if the row is empty or null, false otherwise
+     */
+    private boolean checkIfRowIsEmpty(Row row) {
         try {
-            if (ROW == null || ROW.getLastCellNum() <= 0) {
+            if (row == null || row.getLastCellNum() <= 0) {
                 return true;
             }
 
-            for (int cellNum = ROW.getFirstCellNum(); cellNum < ROW.getLastCellNum(); cellNum++) {
-                Cell cell = ROW.getCell(cellNum);
+            for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
+                Cell cell = row.getCell(cellNum);
                 if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
                     return false;
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return true;
         }
 
         return true;
     }
 
-    private boolean checkIfCellIsEmpty(Cell cell){
+    /**
+     * Checks if a cell is empty or blank.
+     * 
+     * @param cell The cell to check
+     * @return true if the cell is empty, null, or blank, false otherwise
+     */
+    private boolean checkIfCellIsEmpty(Cell cell) {
         if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
             return false;
         }
         return true;
     }
 
-
+    /**
+     * Gets the file extension from a complete file path.
+     * 
+     * @param sCompleteFilePath The complete file path
+     * @return The file extension including the dot, or an empty string on error
+     */
     private String getFileExtension(String sCompleteFilePath) {
         try {
-
-                File file = new File(sCompleteFilePath);
-                return sCompleteFilePath.substring(sCompleteFilePath.lastIndexOf("."));
-
+            return sCompleteFilePath.substring(sCompleteFilePath.lastIndexOf("."));
         } catch (Exception e) {
-            log.info("Error in getting file name " + e.toString());
-
+            log.error("Error in getting file extension: " + e.getMessage());
         }
 
-        return "";// return null on error
+        return ""; // Return empty string on error
     }
 
 }
