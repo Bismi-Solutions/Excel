@@ -128,7 +128,7 @@ public class ExcelWorkSheet {
     public void saveWorkBook() {
         try (FileOutputStream fileOut = new FileOutputStream(this.sCompleteFileName)) {
             wb.write(fileOut);
-            fileOut.flush();
+//            fileOut.flush();
         } catch (Exception e) {
             log.debug("Error in saving record: {}", e.toString());
         }
