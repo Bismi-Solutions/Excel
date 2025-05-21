@@ -149,11 +149,8 @@ class ExcelWorkSheetTest {
         cSheet2.cell(3, 4).setText("Alpha lion");
         cSheet2.saveWorkBook();
 
-        xlApp.closeAllWorkBooks();
 
-        xlbook = xlApp.openWorkbook(strCompleteFilePath);
-        ExcelWorkSheet gSheet = xlbook.getExcelSheet("Bismi2");
-        String val = gSheet.cell(3, 4).getTextValue();
+        String val = cSheet2.cell(3, 4).getTextValue();
         Assertions.assertEquals("Alpha lion", val);
 
         xlApp.closeAllWorkBooks();

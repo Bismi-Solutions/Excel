@@ -23,7 +23,7 @@ class CommonTest {
         Files.createDirectories(Path.of(TEST_DATA_DIR));
     }
 
-    private String createTestFile(String prefix) throws IOException {
+    private String createTestFile(String prefix)  {
         String uniqueId = UUID.randomUUID().toString().substring(0, 8);
         String fileName = prefix + uniqueId + ".XLSX";
         return Path.of(TEST_DATA_DIR, fileName).toString();

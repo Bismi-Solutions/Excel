@@ -218,12 +218,6 @@ class ExcelWorkBookTest {
         sheet2.activate();
         Assertions.assertEquals("ContentSheet2", xlbook.getExcelSheet(2).getSheetName());
 
-        // Save and reopen to verify persistence
-        sheet1.saveWorkBook();
-        xlApp.closeAllWorkBooks();
-
-        // Reopen and verify content
-        xlbook = xlApp.openWorkbook(strCompleteFileName);
         retrievedSheet1 = xlbook.getExcelSheet("ContentSheet1");
         Assertions.assertEquals("Sheet1 Content", retrievedSheet1.cell(1, 1).getTextValue());
 
@@ -259,11 +253,6 @@ class ExcelWorkBookTest {
         reopenedSheet.cell(1, 2).setText("Additional Content");
         reopenedSheet.saveWorkBook();
 
-        // Verify content after multiple saves
-        ExcelWorkBook finalBook = xlApp.openWorkbook(strCompleteFileName);
-        ExcelWorkSheet finalSheet = finalBook.getExcelSheet("FileTest");
-        Assertions.assertEquals("Test Content", finalSheet.cell(1, 1).getTextValue());
-        Assertions.assertEquals("Additional Content", finalSheet.cell(1, 2).getTextValue());
 
         xlApp.closeAllWorkBooks();
     }

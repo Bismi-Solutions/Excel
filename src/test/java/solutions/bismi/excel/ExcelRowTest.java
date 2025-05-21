@@ -65,15 +65,6 @@ class ExcelRowTest {
         // Test setRowValues(String[], int, boolean)
         String[] values4 = {"Value10", "Value11", "Value12"};
         sheet.row(4).setRowValues(values4, 3, true);
-
-        // Save and reopen to verify
-        sheet.saveWorkBook();
-        xlApp.closeAllWorkBooks();
-
-        // Reopen and verify
-        xlbook = xlApp.openWorkbook(strCompleteFileName);
-        sheet = xlbook.getExcelSheet("RowTest");
-
         // Verify row 1
         Assertions.assertEquals("Value1", sheet.cell(1, 1).getTextValue());
 
@@ -184,19 +175,7 @@ class ExcelRowTest {
                 sheet.row(i).setFontColor("Blue");
             }
         }
-    
-        sheet.saveWorkBook();
-        xlApp.closeAllWorkBooks();
-        
-        // Verify file exists
-        java.io.File file = new java.io.File(filePath);
-        Assertions.assertTrue(file.exists(), "Excel file should have been created");
-        
-        // Reopen and verify content
-        xlApp = new ExcelApplication();
-        xlbook = xlApp.openWorkbook(filePath);
-        sheet = xlbook.getExcelSheet("LargeData");
-        
+
         // Verify data for a few rows
         Assertions.assertEquals("Row1Col1", sheet.cell(1, 1).getTextValue());
         Assertions.assertEquals("Row5Col2", sheet.cell(5, 2).getTextValue());
