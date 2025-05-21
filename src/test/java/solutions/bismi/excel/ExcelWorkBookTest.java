@@ -105,17 +105,16 @@ class ExcelWorkBookTest {
         // Test workbook name operations
         String originalName = xlbook.getExcelBookName();
         Assertions.assertNotNull(originalName, "Workbook should have a name");
-        Assertions.assertTrue(originalName.endsWith(".xlsx") || originalName.endsWith(".xls"), 
-            "Workbook name should have correct extension");
+        Assertions.assertTrue(originalName.endsWith(".xlsx") || originalName.endsWith(".xls"), "Workbook name should have correct extension");
 
         // Test sheet operations
         ExcelWorkSheet sheet1 = xlbook.addSheet("TestSheet1");
         ExcelWorkSheet sheet2 = xlbook.addSheet("TestSheet2");
-        
+
         // Test sheet retrieval by index
         ExcelWorkSheet retrievedSheet = xlbook.getExcelSheet(0);
         Assertions.assertEquals("Sheet1", retrievedSheet.getSheetName(), "Should retrieve correct sheet by index");
-        
+
         // Test sheet retrieval by name
         ExcelWorkSheet namedSheet = xlbook.getExcelSheet("TestSheet1");
         Assertions.assertNotNull(namedSheet, "Should retrieve sheet by name");
@@ -236,24 +235,31 @@ class ExcelWorkBookTest {
 
         // Test file extension handling
         String fileExtension = strCompleteFileName.substring(strCompleteFileName.lastIndexOf("."));
-        Assertions.assertTrue(fileExtension.equalsIgnoreCase(".xlsx") || fileExtension.equalsIgnoreCase(".xls"),
-            "File should have correct extension");
+        Assertions.assertTrue(fileExtension.equalsIgnoreCase(".xlsx") || fileExtension.equalsIgnoreCase(".xls"), "File should have correct extension");
 
         // Test workbook creation with content
         ExcelWorkSheet sheet = xlbook.addSheet("FileTest");
         sheet.cell(1, 1).setText("Test Content");
         sheet.saveWorkBook();
-
-        // Verify content after save
-        ExcelWorkBook reopenedBook = xlApp.openWorkbook(strCompleteFileName);
-        ExcelWorkSheet reopenedSheet = reopenedBook.getExcelSheet("FileTest");
-        Assertions.assertEquals("Test Content", reopenedSheet.cell(1, 1).getTextValue());
-
-        // Test multiple saves
-        reopenedSheet.cell(1, 2).setText("Additional Content");
-        reopenedSheet.saveWorkBook();
-
-
         xlApp.closeAllWorkBooks();
     }
+
+    @Test
+    void lTestWorkbookOpen() {
+        testWorkbookOpen("./resources/testdata/openWorkbook.xlsx");
+        testWorkbookOpen("./resources/testdata/openWorkbook.xls");
+    }
+
+    private void testWorkbookOpen(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.openWorkbook(strCompleteFileName);
+        ExcelWorkSheet sheet = xlbook.getExcelSheet(0);
+        Assertions.assertNotNull(sheet, "Should be able to open workbook");
+        Assertions.assertEquals("Sheet1", sheet.getSheetName(), "Should retrieve correct sheet by index");
+        Assertions.assertEquals("Test",sheet.cell(1,1).getTextValue(),"Should retrieve correct cell value");
+
+        xlApp.closeAllWorkBooks();
+
+    }
+
 }

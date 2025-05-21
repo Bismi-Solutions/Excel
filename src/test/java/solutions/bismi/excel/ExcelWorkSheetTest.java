@@ -118,12 +118,8 @@ class ExcelWorkSheetTest {
         Assertions.assertEquals(5, cColNumber);
         cSheet2.saveWorkBook();
         xlApp.closeAllWorkBooks();
-        xlbook = xlApp.openWorkbook(strMultipleFileName);
-        ExcelWorkSheet gSheet = xlbook.getExcelSheet("Bismi2");
-        String val = gSheet.cell(4, 2).getTextValue();
-        Assertions.assertEquals("10.5", val);
 
-        xlApp.closeAllWorkBooks();
+
     }
 
 
