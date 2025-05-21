@@ -268,4 +268,102 @@ class ExcelRowTest {
         sheet.saveWorkBook();
         xlApp.closeAllWorkBooks();
     }
+
+    @Test
+    void gTestRowFormattingCombinations() {
+        testRowFormattingCombinations("./resources/testdata/rowFormattingCombinations.xlsx");
+        testRowFormattingCombinations("./resources/testdata/rowFormattingCombinations.xls");
+    }
+
+    private void testRowFormattingCombinations(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
+        ExcelWorkSheet sheet = xlbook.addSheet("FormattingCombinations");
+
+        // Test various formatting combinations
+        String[] values = {"Value1", "Value2", "Value3", "Value4", "Value5"};
+        
+        // Test font color combinations
+        ExcelRow row1 = sheet.row(1);
+        row1.setRowValues(values);
+        row1.setFontColor("RED", 1, 3);
+        row1.setFontColor("BLUE", 3, 6);
+        row1.setFontColor("GREEN", 2, 4);
+
+        // Test fill color combinations
+        ExcelRow row2 = sheet.row(2);
+        row2.setRowValues(values);
+        row2.setFillColor("YELLOW", 1, 3);
+        row2.setFillColor("LIGHT_BLUE", 3, 6);
+        row2.setFillColor("LIGHT_GREEN", 2, 4);
+
+        // Test border combinations
+        ExcelRow row3 = sheet.row(3);
+        row3.setRowValues(values);
+        row3.setFullBorder("BLACK", 1, 3);
+        row3.setFullBorder("RED", 3, 6);
+        row3.setFullBorder("BLUE", 2, 4);
+
+        // Test mixed formatting
+        ExcelRow row4 = sheet.row(4);
+        row4.setRowValues(values);
+        row4.setFontColor("RED", 1, 3);
+        row4.setFillColor("YELLOW", 1, 3);
+        row4.setFullBorder("BLACK", 1, 3);
+        row4.setFontColor("BLUE", 3, 6);
+        row4.setFillColor("LIGHT_BLUE", 3, 6);
+        row4.setFullBorder("RED", 3, 6);
+
+        sheet.saveWorkBook();
+        xlApp.closeAllWorkBooks();
+    }
+
+    @Test
+    void hTestRowDataTypes() {
+        testRowDataTypes("./resources/testdata/rowDataTypes.xlsx");
+        testRowDataTypes("./resources/testdata/rowDataTypes.xls");
+    }
+
+    private void testRowDataTypes(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
+        ExcelWorkSheet sheet = xlbook.addSheet("DataTypes");
+
+        // Test different data types in a row
+        String[] textValues = {"Text1", "Text2", "Text3"};
+        String[] numericValues = {"123", "456.789", "0.001"};
+        String[] dateValues = {"2024-01-01", "2024-02-29", "2024-12-31"};
+        String[] mixedValues = {"Text", "123", "2024-01-01", "TRUE", "FALSE"};
+
+        // Test text values
+        ExcelRow textRow = sheet.row(1);
+        textRow.setRowValues(textValues);
+
+        // Test numeric values
+        ExcelRow numericRow = sheet.row(2);
+        numericRow.setRowValues(numericValues);
+
+        // Test date values
+        ExcelRow dateRow = sheet.row(3);
+        dateRow.setRowValues(dateValues);
+
+        // Test mixed values
+        ExcelRow mixedRow = sheet.row(4);
+        mixedRow.setRowValues(mixedValues);
+
+        // Test special characters
+        String[] specialChars = {"Line\nBreak", "Tab\tHere", "Quote\"Test", "Ampersand&Test"};
+        ExcelRow specialRow = sheet.row(5);
+        specialRow.setRowValues(specialChars);
+
+        // Test empty values
+        String[] emptyValues = {"", " ", "  ", "\t", "\n"};
+        ExcelRow emptyRow = sheet.row(6);
+        emptyRow.setRowValues(emptyValues);
+
+        sheet.saveWorkBook();
+        xlApp.closeAllWorkBooks();
+    }
+
+
 }

@@ -27,7 +27,6 @@ class ExcelWorkBookTest {
         cnt = xlbook.getSheetCount();
         xlApp.closeAllWorkBooks();
         Assertions.assertEquals(2, cnt);
-
     }
 
     @Test
@@ -52,7 +51,6 @@ class ExcelWorkBookTest {
 
     @Test
     void eGetXLSXWorkSheet() {
-
         getXLSWorkSheet("./resources/testdata/getSheet.xls");
         getXLSWorkSheet("./resources/testdata/getSheet.xlsx");
     }
@@ -94,5 +92,179 @@ class ExcelWorkBookTest {
         gGetXLSXWorkSheets("./resources/testdata/getSheets.xls");
     }
 
+    @Test
+    void iTestWorkbookOperations() {
+        testWorkbookOperations("./resources/testdata/workbookOperations.xlsx");
+        testWorkbookOperations("./resources/testdata/workbookOperations.xls");
+    }
 
+    private void testWorkbookOperations(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
+
+        // Test workbook name operations
+        String originalName = xlbook.getExcelBookName();
+        Assertions.assertNotNull(originalName, "Workbook should have a name");
+        Assertions.assertTrue(originalName.endsWith(".xlsx") || originalName.endsWith(".xls"), 
+            "Workbook name should have correct extension");
+
+        // Test sheet operations
+        ExcelWorkSheet sheet1 = xlbook.addSheet("TestSheet1");
+        ExcelWorkSheet sheet2 = xlbook.addSheet("TestSheet2");
+        
+        // Test sheet retrieval by index
+        ExcelWorkSheet retrievedSheet = xlbook.getExcelSheet(0);
+        Assertions.assertEquals("Sheet1", retrievedSheet.getSheetName(), "Should retrieve correct sheet by index");
+        
+        // Test sheet retrieval by name
+        ExcelWorkSheet namedSheet = xlbook.getExcelSheet("TestSheet1");
+        Assertions.assertNotNull(namedSheet, "Should retrieve sheet by name");
+        Assertions.assertEquals("TestSheet1", namedSheet.getSheetName(), "Should retrieve correct sheet by name");
+
+        // Test sheet count
+        int sheetCount = xlbook.getSheetCount();
+        Assertions.assertEquals(3, sheetCount, "Should have correct number of sheets");
+
+        // Test sheet list retrieval
+        List<ExcelWorkSheet> sheets = xlbook.getExcelSheets();
+        Assertions.assertEquals(3, sheets.size(), "Should retrieve correct number of sheets");
+        Assertions.assertEquals("Sheet1", sheets.get(0).getSheetName(), "First sheet should be Sheet1");
+        Assertions.assertEquals("TestSheet1", sheets.get(1).getSheetName(), "Second sheet should be TestSheet1");
+        Assertions.assertEquals("TestSheet2", sheets.get(2).getSheetName(), "Third sheet should be TestSheet2");
+
+        xlApp.closeAllWorkBooks();
+    }
+
+    @Test
+    void jTestWorkbookErrorHandling() {
+        testWorkbookErrorHandling("./resources/testdata/workbookErrorHandling.xlsx");
+        testWorkbookErrorHandling("./resources/testdata/workbookErrorHandling.xls");
+    }
+
+    private void testWorkbookErrorHandling(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
+
+        // Test invalid sheet index
+        ExcelWorkSheet invalidSheet = xlbook.getExcelSheet(-1);
+        Assertions.assertNull(invalidSheet, "Should return null for negative sheet index");
+
+        invalidSheet = xlbook.getExcelSheet(999);
+        Assertions.assertNull(invalidSheet, "Should return null for out-of-bounds sheet index");
+
+        // Test invalid sheet name
+        invalidSheet = xlbook.getExcelSheet("NonExistentSheet");
+        Assertions.assertNull(invalidSheet, "Should return null for non-existent sheet name");
+
+        // Test adding sheet with null name
+        ExcelWorkSheet nullSheet = xlbook.addSheet(null);
+        Assertions.assertNull(nullSheet, "Should return null when adding sheet with null name");
+
+        // Test adding sheet with empty name
+        ExcelWorkSheet emptySheet = xlbook.addSheet("");
+        Assertions.assertNull(emptySheet, "Should return null when adding sheet with empty name");
+
+        // Test adding multiple sheets with invalid names
+        String[] invalidSheetNames = {null, "", "ValidSheet", null, ""};
+        xlbook.addSheets(invalidSheetNames);
+        xlbook.getExcelSheet(0).saveWorkBook(); // Save to ensure changes are persisted
+        int sheetCount = xlbook.getSheetCount();
+        Assertions.assertEquals(2, sheetCount, "Should only add valid sheet names");
+
+        xlApp.closeAllWorkBooks();
+    }
+
+    @Test
+    void kTestWorkbookContentOperations() {
+        testWorkbookContentOperations("./resources/testdata/workbookContent.xlsx");
+        testWorkbookContentOperations("./resources/testdata/workbookContent.xls");
+    }
+
+    private void testWorkbookContentOperations(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
+
+        // Create test sheets with content
+        ExcelWorkSheet sheet1 = xlbook.addSheet("ContentSheet1");
+        ExcelWorkSheet sheet2 = xlbook.addSheet("ContentSheet2");
+
+        // Add content to first sheet
+        sheet1.cell(1, 1).setText("Sheet1 Content");
+        sheet1.cell(1, 2).setNumericValue(123.45);
+        sheet1.cell(2, 1).setDateValue(new java.util.Date());
+
+        // Add content to second sheet
+        sheet2.cell(1, 1).setText("Sheet2 Content");
+        sheet2.cell(1, 2).setFormula("SUM(A1:A10)");
+
+        // Save to ensure content is persisted
+        sheet1.saveWorkBook();
+
+        // Verify content in first sheet
+        ExcelWorkSheet retrievedSheet1 = xlbook.getExcelSheet("ContentSheet1");
+        Assertions.assertEquals("Sheet1 Content", retrievedSheet1.cell(1, 1).getTextValue());
+        Assertions.assertEquals("123.45", retrievedSheet1.cell(1, 2).getValue());
+        Assertions.assertNotNull(retrievedSheet1.cell(2, 1).getValue());
+
+        // Verify content in second sheet
+        ExcelWorkSheet retrievedSheet2 = xlbook.getExcelSheet("ContentSheet2");
+        Assertions.assertEquals("Sheet2 Content", retrievedSheet2.cell(1, 1).getTextValue());
+        Assertions.assertEquals("SUM(A1:A10)", retrievedSheet2.cell(1, 2).getValue());
+
+        // Test sheet activation
+        sheet1.activate();
+        Assertions.assertEquals("ContentSheet1", xlbook.getExcelSheet(1).getSheetName());
+
+        sheet2.activate();
+        Assertions.assertEquals("ContentSheet2", xlbook.getExcelSheet(2).getSheetName());
+
+        // Save and reopen to verify persistence
+        sheet1.saveWorkBook();
+        xlApp.closeAllWorkBooks();
+
+        // Reopen and verify content
+        xlbook = xlApp.openWorkbook(strCompleteFileName);
+        retrievedSheet1 = xlbook.getExcelSheet("ContentSheet1");
+        Assertions.assertEquals("Sheet1 Content", retrievedSheet1.cell(1, 1).getTextValue());
+
+        xlApp.closeAllWorkBooks();
+    }
+
+    @Test
+    void lTestWorkbookFileOperations() {
+        testWorkbookFileOperations("./resources/testdata/workbookFile.xlsx");
+        testWorkbookFileOperations("./resources/testdata/workbookFile.xls");
+    }
+
+    private void testWorkbookFileOperations(String strCompleteFileName) {
+        ExcelApplication xlApp = new ExcelApplication();
+        ExcelWorkBook xlbook = xlApp.createWorkBook(strCompleteFileName);
+
+        // Test file extension handling
+        String fileExtension = strCompleteFileName.substring(strCompleteFileName.lastIndexOf("."));
+        Assertions.assertTrue(fileExtension.equalsIgnoreCase(".xlsx") || fileExtension.equalsIgnoreCase(".xls"),
+            "File should have correct extension");
+
+        // Test workbook creation with content
+        ExcelWorkSheet sheet = xlbook.addSheet("FileTest");
+        sheet.cell(1, 1).setText("Test Content");
+        sheet.saveWorkBook();
+
+        // Verify content after save
+        ExcelWorkBook reopenedBook = xlApp.openWorkbook(strCompleteFileName);
+        ExcelWorkSheet reopenedSheet = reopenedBook.getExcelSheet("FileTest");
+        Assertions.assertEquals("Test Content", reopenedSheet.cell(1, 1).getTextValue());
+
+        // Test multiple saves
+        reopenedSheet.cell(1, 2).setText("Additional Content");
+        reopenedSheet.saveWorkBook();
+
+        // Verify content after multiple saves
+        ExcelWorkBook finalBook = xlApp.openWorkbook(strCompleteFileName);
+        ExcelWorkSheet finalSheet = finalBook.getExcelSheet("FileTest");
+        Assertions.assertEquals("Test Content", finalSheet.cell(1, 1).getTextValue());
+        Assertions.assertEquals("Additional Content", finalSheet.cell(1, 2).getTextValue());
+
+        xlApp.closeAllWorkBooks();
+    }
 }

@@ -214,6 +214,10 @@ public class ExcelCell {
      */
     public boolean setFormula(String formula, boolean autoSizeColumn) {
         try {
+            // Remove leading equals sign if present
+            if (formula != null && formula.startsWith("=")) {
+                formula = formula.substring(1);
+            }
             this.getCELL().setCellFormula(formula);
             if (autoSizeColumn) {
                 this.sheet.autoSizeColumn(col - 1);
@@ -258,7 +262,14 @@ public class ExcelCell {
             DataFormat format = workbook.createDataFormat();
             newStyle.setDataFormat(format.getFormat("@"));  // "@" is the format code for Text
 
-            cCell.setCellValue(sText);
+            // Use RichTextString for long text to ensure proper handling
+            if (sText != null && sText.length() > 0) {
+                RichTextString richText = workbook.getCreationHelper().createRichTextString(sText);
+                cCell.setCellValue(richText);
+            } else {
+                cCell.setCellValue("");
+            }
+
             cCell.setCellStyle(newStyle);
 
             if (autoSizeColoumn) {
@@ -274,8 +285,16 @@ public class ExcelCell {
 
     /**
      * Sets the font color for the cell while preserving existing formatting.
-     *
-     * @param fontColor The color name to set for the font
+     * <p>
+     * Supported values:
+     * <ul>
+     *   <li>Named colors (see {@link NamedColor}) for both XLS and XLSX</li>
+     *   <li>Hex color codes (e.g., "#FF0000") for XLSX only</li>
+     * </ul>
+     * <b>Note:</b> Hex color codes are ignored for XLS files due to format limitations.<br>
+     * <b>Named colors supported:</b> See {@link NamedColor}
+     * </p>
+     * @param fontColor Named color (see NamedColor enum) or hex color (XLSX only)
      * @return this ExcelCell instance for method chaining
      */
     public ExcelCell setFontColor(String fontColor) {
@@ -288,7 +307,42 @@ public class ExcelCell {
             Font existingFont = workbook.getFontAt(originalStyle.getFontIndex());
             Font newFont = workbook.createFont();
             Common.copyFontProperties(existingFont, newFont);
-            newFont.setColor(Common.getColorCode(fontColor));
+
+            if (fontColor != null && fontColor.startsWith("#")) {
+                if (workbook instanceof org.apache.poi.xssf.usermodel.XSSFWorkbook) {
+                    // XLSX: true hex color
+                    try {
+                        String hexColor = fontColor.substring(1);
+                        byte[] rgb = new byte[] {
+                            (byte) Integer.parseInt(hexColor.substring(0, 2), 16),
+                            (byte) Integer.parseInt(hexColor.substring(2, 4), 16),
+                            (byte) Integer.parseInt(hexColor.substring(4, 6), 16)
+                        };
+                        org.apache.poi.xssf.usermodel.XSSFFont xssfFont = (org.apache.poi.xssf.usermodel.XSSFFont) newFont;
+                        xssfFont.setColor(new org.apache.poi.xssf.usermodel.XSSFColor(rgb, null));
+                    } catch (Exception e) {
+                        log.error("Error parsing hex color: {}", e.getMessage());
+                        newFont.setColor(org.apache.poi.ss.usermodel.IndexedColors.BLACK.getIndex());
+                    }
+                } else {
+                    // HSSF: fallback to closest IndexedColors
+                    try {
+                        String hexColor = fontColor.substring(1);
+                        int r = Integer.parseInt(hexColor.substring(0, 2), 16);
+                        int g = Integer.parseInt(hexColor.substring(2, 4), 16);
+                        int b = Integer.parseInt(hexColor.substring(4, 6), 16);
+                        short closestIndex = getClosestIndexedColor(r, g, b);
+                        newFont.setColor(closestIndex);
+                    } catch (Exception e) {
+                        log.error("Error parsing hex color for HSSF: {}", e.getMessage());
+                        newFont.setColor(org.apache.poi.ss.usermodel.IndexedColors.BLACK.getIndex());
+                    }
+                }
+            } else {
+                // Use the existing color mapping for named colors
+                newFont.setColor(Common.getColorCode(fontColor));
+            }
+
             newStyle.setFont(newFont);
             cCell.setCellStyle(newStyle);
 
@@ -297,6 +351,37 @@ public class ExcelCell {
             log.error("Error in setting font color: {}", e.getMessage());
             return this;
         }
+    }
+
+    // Helper: Find closest IndexedColors for HSSF hex fallback
+    private short getClosestIndexedColor(int r, int g, int b) {
+        short closestIndex = org.apache.poi.ss.usermodel.IndexedColors.BLACK.getIndex();
+        double minDistance = Double.MAX_VALUE;
+        for (org.apache.poi.ss.usermodel.IndexedColors color : org.apache.poi.ss.usermodel.IndexedColors.values()) {
+            short idx = color.getIndex();
+            int[] rgb = getIndexedColorRGB(idx);
+            double distance = Math.pow(r - rgb[0], 2) + Math.pow(g - rgb[1], 2) + Math.pow(b - rgb[2], 2);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestIndex = idx;
+            }
+        }
+        return closestIndex;
+    }
+
+    // Helper: Get RGB for IndexedColors (HSSF)
+    private int[] getIndexedColorRGB(short idx) {
+        try {
+            java.util.Map<Integer, org.apache.poi.hssf.util.HSSFColor> colorMap = org.apache.poi.hssf.util.HSSFColor.getIndexHash();
+            org.apache.poi.hssf.util.HSSFColor hssfColor = colorMap.get((int) idx);
+            if (hssfColor != null) {
+                short[] triplet = hssfColor.getTriplet();
+                return new int[] { triplet[0], triplet[1], triplet[2] };
+            }
+        } catch (Exception e) {
+            // fallback
+        }
+        return new int[] {0, 0, 0};
     }
 
     /**
@@ -529,21 +614,40 @@ public class ExcelCell {
      */
     public String getTextValue() {
         String val = "";
-        try (FileInputStream fis = new FileInputStream(this.sCompleteFileName);
-             Workbook workbook = WorkbookFactory.create(fis)) {
-
-            String strSheetName = sheet.getSheetName();
-            Sheet currentSheet = workbook.getSheet(strSheetName);
-
-            try {
-                val = currentSheet.getRow(this.row - 1).getCell(this.col - 1).getStringCellValue();
-            } catch (Exception e) {
-                // If cell value can't be retrieved, return empty string
+        try {
+            Cell cell = this.getCELL();
+            if (cell != null) {
+                switch (cell.getCellType()) {
+                    case STRING:
+                        if (cell.getRichStringCellValue() != null) {
+                            val = cell.getRichStringCellValue().getString();
+                        } else {
+                            val = cell.getStringCellValue();
+                        }
+                        break;
+                    case NUMERIC:
+                        if (DateUtil.isCellDateFormatted(cell)) {
+                            val = cell.getDateCellValue().toString();
+                        } else {
+                            val = String.valueOf(cell.getNumericCellValue());
+                        }
+                        break;
+                    case BOOLEAN:
+                        val = String.valueOf(cell.getBooleanCellValue());
+                        break;
+                    case FORMULA:
+                        val = cell.getCellFormula();
+                        break;
+                    case BLANK:
+                        val = "";
+                        break;
+                    default:
+                        val = cell.toString();
+                }
             }
         } catch (Exception e) {
             log.error("Error in getting text value: {}", e.getMessage());
         }
-
         return val;
     }
 
@@ -584,6 +688,18 @@ public class ExcelCell {
         }
 
         return ""; // Return empty string on error
+    }
+
+    /**
+     * Enum for supported named colors for intellisense and documentation.
+     * These correspond to org.apache.poi.ss.usermodel.IndexedColors.
+     */
+    public enum NamedColor {
+        AQUA, AUTOMATIC, BLACK, BLACK1, BLUE, BLUE1, BLUE_GREY, BRIGHT_GREEN, BRIGHT_GREEN1, BROWN, CORAL, CORNFLOWER_BLUE,
+        DARK_BLUE, DARK_GREEN, DARK_RED, DARK_TEAL, DARK_YELLOW, GOLD, GREEN, GREY_25_PERCENT, GREY_40_PERCENT, GREY_50_PERCENT, GREY_80_PERCENT,
+        INDIGO, LAVENDER, LEMON_CHIFFON, LIGHT_BLUE, LIGHT_CORNFLOWER_BLUE, LIGHT_GREEN, LIGHT_ORANGE, LIGHT_TURQUOISE, LIGHT_TURQUOISE1,
+        LIGHT_YELLOW, LIME, MAROON, OLIVE_GREEN, ORANGE, ORCHID, PALE_BLUE, PINK, PINK1, PLUM, RED, RED1, ROSE, ROYAL_BLUE, SEA_GREEN, SKY_BLUE,
+        TAN, TEAL, TURQUOISE, TURQUOISE1, VIOLET, WHITE, WHITE1, YELLOW, YELLOW1
     }
 
 }

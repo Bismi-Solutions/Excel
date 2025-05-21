@@ -70,12 +70,9 @@ public class ExcelWorkSheet {
      * Function to activate excel sheet
      */
     public void activate() {
-
         this.wb.setActiveSheet(this.wb.getSheetIndex(this.sheet.getSheetName()));
         this.wb.setSelectedTab(this.wb.getSheetIndex(this.sheet.getSheetName()));
-
-        saveWorkBook(inputStream, outputStream, sCompleteFileName);
-
+        saveWorkBook();
     }
 
     /**
@@ -129,8 +126,12 @@ public class ExcelWorkSheet {
     }
 
     public void saveWorkBook() {
-        saveWorkBook(this.inputStream, this.outputStream, this.sCompleteFileName);
-
+        try (FileOutputStream fileOut = new FileOutputStream(this.sCompleteFileName)) {
+            wb.write(fileOut);
+            fileOut.flush();
+        } catch (Exception e) {
+            log.debug("Error in saving record: {}", e.toString());
+        }
     }
 
 
@@ -139,22 +140,17 @@ public class ExcelWorkSheet {
      * @return
      */
     protected void addSheets(String[] strArrSheets) {
-
-        String eShName = null;
         try {
             for (String sSheetName : strArrSheets) {
-                sheet = this.wb.createSheet(sSheetName);
-                this.sheetName = sSheetName;
-                log.debug("Created sheet {}", sSheetName);
-
+                if (sSheetName != null && !sSheetName.trim().isEmpty()) {
+                    sheet = this.wb.createSheet(sSheetName);
+                    this.sheetName = sSheetName;
+                    log.debug("Created sheet {}", sSheetName);
+                }
             }
-
         } catch (Exception e) {
-            log.debug("Error in creating sheet {}: {}", eShName, e.toString());
-
+            log.debug("Error in creating sheet: {}", e.toString());
         }
-
-
     }
 
     /**
@@ -178,7 +174,7 @@ public class ExcelWorkSheet {
             for (int i = this.sheet.getLastRowNum(); i >= 0; i--) {
                 removeRow(i);
             }
-            saveWorkBook(inputStream, outputStream, sCompleteFileName);
+            saveWorkBook();
             log.debug("Cleared sheet contents successfully");
             return true;
 
@@ -330,7 +326,7 @@ public class ExcelWorkSheet {
             }
 
             if (removed) {
-                saveWorkBook(inputStream, outputStream, sCompleteFileName);
+                saveWorkBook();
                 return true;
             }
 

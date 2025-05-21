@@ -16,6 +16,7 @@
 ## Table of Contents
 - [Overview](#overview)
 - [Features](#features)
+- [Benefits](#benefits)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
@@ -33,7 +34,7 @@
 
 ## Overview
 
-This library provides a simplified API similar to Microsoft Excel COM model, making it easy to create, read, and modify Excel files. It internally uses Apache POI for file processing but offers a much more intuitive interface.
+This library provides a simplified API similar to Microsoft Excel COM model, making it easy to create, read, and modify Excel files. It internally uses Apache POI for file processing but offers a much more intuitive interface. Whether you're building reports, data processing applications, or need to automate Excel operations, this library provides a robust solution with minimal learning curve.
 
 ## Features
 
@@ -52,6 +53,58 @@ This library provides a simplified API similar to Microsoft Excel COM model, mak
   </table>
 </div>
 
+### Key Features in Detail
+
+- **Workbook Management**
+  - Create new workbooks
+  - Open existing Excel files
+  - Save workbooks in multiple formats
+  - Handle multiple workbooks simultaneously
+
+- **Worksheet Operations**
+  - Add, rename, and delete sheets
+  - Navigate between sheets
+  - Copy and move sheets
+  - Sheet protection and visibility control
+
+- **Cell Manipulation**
+  - Set various data types (text, numbers, dates, formulas)
+  - Apply rich formatting (fonts, colors, borders)
+  - Cell merging and splitting
+  - Conditional formatting support
+
+- **Row and Column Operations**
+  - Insert and delete rows/columns
+  - Set row heights and column widths
+  - Apply formatting to entire rows/columns
+  - Auto-fit functionality
+
+## Benefits
+
+1. **Developer-Friendly API**
+   - Intuitive method names and parameters
+   - Fluent interface design
+   - Comprehensive error handling
+   - Extensive documentation
+
+2. **Performance Optimized**
+   - Efficient memory management
+   - Batch operations support
+   - Optimized for large datasets
+   - Minimal overhead
+
+3. **Enterprise Ready**
+   - Thread-safe operations
+   - Robust error handling
+   - Comprehensive logging
+   - Production-grade reliability
+
+4. **Maintenance Benefits**
+   - Clean, maintainable code
+   - Regular updates and bug fixes
+   - Active community support
+   - Extensive test coverage
+
 ## Requirements
 
 - Java 17 or higher
@@ -65,7 +118,7 @@ Add the following Maven dependency to your project:
 <dependency>
     <groupId>solutions.bismi.excel</groupId>
     <artifactId>excel</artifactId>
-    <version>1.1.9</version>
+    <version>1.1.10</version>
 </dependency>
 ```
 
@@ -125,6 +178,10 @@ int sheetCount = xlbook.getSheetCount();
 // Add a new sheet
 ExcelWorkSheet sheet = xlbook.addSheet("MySheet");
 
+// Add multiple sheets at once
+String[] sheetNames = {"Sheet1", "Sheet2", "Sheet3"};
+xlbook.addSheets(sheetNames);
+
 // Activate the sheet
 sheet.activate();
 
@@ -138,7 +195,7 @@ xlApp.closeAllWorkBooks();
 ### Cell Operations
 
 ```java
-// Set cell values
+// Set cell values with different data types
 sheet.cell(1, 1).setCellValue("Hello World");
 sheet.cell(2, 1).setNumericValue(123.45);
 sheet.cell(3, 1).setDateValue(new java.util.Date());
@@ -160,6 +217,10 @@ sheet.cell(2, 1).setNumberFormat("#,##0.00");
 
 // Set font style (bold, italic, underline)
 sheet.cell(1, 1).setFontStyle(true, false, false);
+
+// Use hex color codes
+sheet.cell(5, 5).setFontColor("#FF0000");  // Red
+sheet.cell(6, 6).setFillColor("#00FF00");  // Green
 ```
 
 ### Row Operations
@@ -169,10 +230,19 @@ sheet.cell(1, 1).setFontStyle(true, false, false);
 String[] rowData = {"A", "B", "C", "D", "E"};
 sheet.row(5).setRowValues(rowData);
 
+// Set row values with column offset
+sheet.row(6).setRowValues(rowData, 2);  // Start from column 2
+
+// Set row values with auto-size
+sheet.row(7).setRowValues(rowData, true);
+
 // Apply formatting to row
 sheet.row(5).setFontColor("RED", 1, 3);  // Apply to columns 1-3
 sheet.row(5).setFillColor("GREEN");      // Apply to entire row
 sheet.row(5).setFullBorder("BLUE");      // Apply to entire row
+
+// Format specific columns in a row
+sheet.row(8).setFillColor("YELLOW", 2, 4);  // Fill columns 2-4
 ```
 
 ### Cell Merging
@@ -188,7 +258,7 @@ boolean isMerged = sheet.isCellMerged(2, 3);
 sheet.unmergeCells(1, 3, 1, 5);
 ```
 
-## Advanced Example: Creating a Sales Report
+### Advanced Example: Creating a Sales Report with Formulas
 
 ```java
 ExcelApplication xlApp = new ExcelApplication();
@@ -210,7 +280,7 @@ for (int i = 0; i < headers.length; i++) {
     sheet.cell(3, i+1).setFillColor("GREY_25_PERCENT");
 }
 
-// Add data
+// Add data with formulas
 sheet.cell(4, 1).setCellValue("Product A");
 sheet.cell(4, 2).setNumericValue(10);
 sheet.cell(4, 3).setNumericValue(25.50);
@@ -221,7 +291,7 @@ sheet.cell(5, 2).setNumericValue(5);
 sheet.cell(5, 3).setNumericValue(34.99);
 sheet.cell(5, 4).setFormula("B5*C5");
 
-// Add total
+// Add total with formula
 sheet.cell(6, 1).setCellValue("Total");
 sheet.cell(6, 4).setFormula("SUM(D4:D5)");
 sheet.cell(6, 4).setFontStyle(true, false, false);
@@ -236,6 +306,36 @@ sheet.saveWorkBook();
 xlApp.closeAllWorkBooks();
 ```
 
+### Error Handling Example
+
+```java
+ExcelApplication xlApp = new ExcelApplication();
+ExcelWorkBook xlbook = xlApp.createWorkBook("ErrorHandling.xlsx");
+ExcelWorkSheet sheet = xlbook.addSheet("ErrorTest");
+
+try {
+    // Test with invalid formula
+    sheet.cell(1, 1).setFormula("INVALID_FORMULA(A1)");
+    
+    // Test with invalid color name
+    sheet.cell(2, 1).setFontColor("NONEXISTENT_COLOR");
+    
+    // Test with invalid cell indices
+    sheet.mergeCells(-1, 1, 1, 2);
+    
+    // Test with empty cell
+    String value = sheet.cell(3, 3).getValue();
+    // Empty cell returns empty string
+    
+} catch (Exception e) {
+    // Handle exceptions appropriately
+    System.err.println("Error: " + e.getMessage());
+} finally {
+    sheet.saveWorkBook();
+    xlApp.closeAllWorkBooks();
+}
+```
+
 ## Comparison with Other Libraries
 
 | Feature | Excel Library | Apache POI | JExcel |
@@ -245,6 +345,9 @@ xlApp.closeAllWorkBooks();
 | Performance | ★★★★ | ★★★★ | ★★★★ |
 | Learning Curve | Easy | Steep | Moderate |
 | Active Development | Yes | Yes | Limited |
+| Memory Efficiency | ★★★★ | ★★★ | ★★★★ |
+| Documentation | ★★★★★ | ★★★ | ★★★ |
+| Community Support | ★★★★ | ★★★★★ | ★★★ |
 
 ## Library Architecture
 
