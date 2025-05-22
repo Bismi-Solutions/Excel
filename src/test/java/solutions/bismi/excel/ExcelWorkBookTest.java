@@ -108,8 +108,8 @@ class ExcelWorkBookTest {
         Assertions.assertTrue(originalName.endsWith(".xlsx") || originalName.endsWith(".xls"), "Workbook name should have correct extension");
 
         // Test sheet operations
-        ExcelWorkSheet sheet1 = xlbook.addSheet("TestSheet1");
-        ExcelWorkSheet sheet2 = xlbook.addSheet("TestSheet2");
+        xlbook.addSheet("TestSheet1");
+        xlbook.addSheet("TestSheet2");
 
         // Test sheet retrieval by index
         ExcelWorkSheet retrievedSheet = xlbook.getExcelSheet(0);
@@ -260,6 +260,34 @@ class ExcelWorkBookTest {
 
         xlApp.closeAllWorkBooks();
 
+    }
+
+    @Test
+    void zCoverageGettersSettersAndConstructors() {
+        ExcelWorkBook wb = new ExcelWorkBook();
+        wb.setExcelSheets(null);
+        wb.setWb(null);
+        wb.setExcelBookName("testbook");
+        wb.setExcelBookPath("/tmp");
+        wb.setInputStream(null);
+        wb.setOutputStream(null);
+        wb.setXlFile(null);
+        wb.setXlFileExtension(".xlsx");
+        wb.setLog(org.apache.logging.log4j.LogManager.getLogger(ExcelWorkBook.class));
+
+        // Call all getters
+        wb.getExcelSheets();
+        wb.getWb();
+        wb.getExcelBookName();
+        wb.getExcelBookPath();
+        wb.getInputStream();
+        wb.getOutputStream();
+        wb.getXlFile();
+        wb.getXlFileExtension();
+        wb.getLog();
+
+        // Test constructors
+        new ExcelWorkBook(null, "testbook", "/tmp");
     }
 
 }

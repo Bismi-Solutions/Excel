@@ -344,5 +344,4 @@ class ExcelRowTest {
         xlApp.closeAllWorkBooks();
     }
 
-
 }

@@ -102,7 +102,7 @@ public class ExcelWorkBook {
      * @return The newly created ExcelWorkBook object
      */
     protected ExcelWorkBook createWorkBook(String sCompleteFileName) {
-        ExcelWorkBook xlWbook = new ExcelWorkBook();
+        ExcelWorkBook xlWbook;
         try {
             if (isValidPath(sCompleteFileName)) {
                 this.xlFile = new File(sCompleteFileName);
@@ -142,7 +142,7 @@ public class ExcelWorkBook {
      */
     private void createInitialSheet(String fileName, String fileType) throws IOException {
         try (OutputStream fileOut = new FileOutputStream(fileName)) {
-            Sheet sheet1 = wb.createSheet("Sheet1");
+            wb.createSheet("Sheet1");
             wb.write(fileOut);
             updateSheetList();
             log.info("Created {} file: {}", fileType, this.excelBookName);
@@ -248,35 +248,35 @@ public class ExcelWorkBook {
     protected ExcelWorkBook openWorkbook(String sCompleteFileName) {
         ExcelWorkBook xlWbook = null;
         log.debug("Opening Excel workbook: {}", sCompleteFileName);
-
         try {
             if (isValidPath(sCompleteFileName)) {
                 this.xlFile = new File(sCompleteFileName);
                 this.excelBookName = getFileName(sCompleteFileName);
-
-                try (FileInputStream fileIn = new FileInputStream(this.xlFile)) {
-                    this.wb = WorkbookFactory.create(fileIn);
-                    this.inputStream = null; // We don't need to store the input stream anymore
-
-                    // Get the active sheet index before creating the ExcelWorkBook
-                    int activeSheetIndex = this.wb.getActiveSheetIndex();
-
-                    xlWbook = new ExcelWorkBook(this.wb, this.excelBookName, this.excelBookPath);
-                    updateSheetList();
-
-                    // Ensure the active sheet is properly set
-                    if (activeSheetIndex >= 0 && activeSheetIndex < this.wb.getNumberOfSheets()) {
-                        this.wb.setActiveSheet(activeSheetIndex);
-                        log.debug("Set active sheet to: {}", this.wb.getSheetName(activeSheetIndex));
-                    }
-                }
+                xlWbook = openWorkbookFromFile();
             }
         } catch (IOException e) {
             log.error("IO error opening workbook: {}", e.getMessage());
         } catch (Exception e) {
             log.error("Error opening workbook: {}", e.getMessage());
         }
+        return xlWbook;
+    }
 
+    private ExcelWorkBook openWorkbookFromFile() throws IOException {
+        ExcelWorkBook xlWbook = null;
+        try (FileInputStream fileIn = new FileInputStream(this.xlFile)) {
+            this.wb = WorkbookFactory.create(fileIn);
+            this.inputStream = null; // We don't need to store the input stream anymore
+            // Get the active sheet index before creating the ExcelWorkBook
+            int activeSheetIndex = this.wb.getActiveSheetIndex();
+            xlWbook = new ExcelWorkBook(this.wb, this.excelBookName, this.excelBookPath);
+            updateSheetList();
+            // Ensure the active sheet is properly set
+            if (activeSheetIndex >= 0 && activeSheetIndex < this.wb.getNumberOfSheets()) {
+                this.wb.setActiveSheet(activeSheetIndex);
+                log.debug("Set active sheet to: {}", this.wb.getSheetName(activeSheetIndex));
+            }
+        }
         return xlWbook;
     }
 
@@ -299,10 +299,12 @@ public class ExcelWorkBook {
             }
 
             // Use try-with-resources for output stream
-            try (FileOutputStream fileOut = new FileOutputStream(this.xlFile)) {
-                this.wb.write(fileOut);
-                log.debug(logMessage);
-                return true;
+            if (this.xlFile != null && this.wb != null) {
+                try (FileOutputStream fileOut = new FileOutputStream(this.xlFile)) {
+                    this.wb.write(fileOut);
+                    log.debug(logMessage);
+                    return true;
+                }
             }
         } catch (IOException e) {
             log.error("IO error saving workbook: {}", e.getMessage());
@@ -311,6 +313,7 @@ public class ExcelWorkBook {
             log.error("Error saving workbook: {}", e.getMessage());
             return false;
         }
+        return false;
     }
 
     /**
@@ -324,9 +327,12 @@ public class ExcelWorkBook {
         wSheet.wb = this.wb;
         ExcelWorkSheet tempSheet = wSheet.addSheet(sSheetName);
 
-        saveWorkbookToFile("Added new sheet: " + sSheetName);
-        excelSheets.add(tempSheet);
-        return getExcelSheet(sSheetName);
+        if (tempSheet != null) {
+            saveWorkbookToFile("Added new sheet: " + sSheetName);
+            excelSheets.add(tempSheet);
+            return getExcelSheet(sSheetName);
+        }
+        return null;
     }
 
     /**

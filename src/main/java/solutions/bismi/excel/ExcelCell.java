@@ -49,7 +49,7 @@ public class ExcelCell {
     String sCompleteFileName = null;
 
     @Getter(AccessLevel.PRIVATE) @Setter(AccessLevel.PRIVATE)
-    Cell CELL = null;
+    Cell cell = null;
 
     @Getter(AccessLevel.PRIVATE) @Setter(AccessLevel.PRIVATE)
     String xlFileExtension = null;
@@ -79,37 +79,39 @@ public class ExcelCell {
         this.xlFileExtension = getFileExtension(sCompleteFileName);
 
         try {
-            Row cRow = null;
-            try {
-                cRow = sheet.getRow(this.row - 1);
-            } catch (Exception e) {
-                // Row doesn't exist
-            }
-
-            Row row1;
-            if (checkIfRowIsEmpty(cRow)) {
-                row1 = sheet.createRow(this.row - 1);
-            } else {
-                row1 = cRow;
-            }
-
-            Cell cell1 = null;
-            try {
-                cell1 = row1.getCell(this.col - 1);
-            } catch (Exception e) {
-                // Cell doesn't exist
-            }
-
-            if (checkIfCellIsEmpty(cell1)) {
-                cell1 = row1.createCell(this.col - 1);
-            }
-
-            this.setCELL(cell1);
+            Row cRow = getOrCreateRow(sheet, this.row - 1);
+            Cell cell1 = getOrCreateCell(cRow, this.col - 1);
+            this.setCell(cell1);
         } catch (Exception e) {
             log.error("Error in cell constructor creation: {}", e.getMessage());
         }
     }
 
+    private Row getOrCreateRow(Sheet sheet, int rowIndex) {
+        Row cRow = null;
+        try {
+            cRow = sheet.getRow(rowIndex);
+        } catch (Exception e) {
+            // Row doesn't exist
+        }
+        if (checkIfRowIsEmpty(cRow)) {
+            cRow = sheet.createRow(rowIndex);
+        }
+        return cRow;
+    }
+
+    private Cell getOrCreateCell(Row row, int colIndex) {
+        Cell localCell = null;
+        try {
+            localCell = row.getCell(colIndex);
+        } catch (Exception e) {
+            // Cell doesn't exist
+        }
+        if (checkIfCellIsEmpty(localCell)) {
+            localCell = row.createCell(colIndex);
+        }
+        return localCell;
+    }
 
     public boolean setText(String sText) {
 
@@ -134,7 +136,7 @@ public class ExcelCell {
      */
     public boolean setCellValue(String sText, boolean autoSizeColoumn) {
         try {
-            this.getCELL().setCellValue(sText);
+            this.getCell().setCellValue(sText);
             if (autoSizeColoumn) {
                 this.sheet.autoSizeColumn(col - 1);
             }
@@ -154,7 +156,7 @@ public class ExcelCell {
      */
     public boolean setNumericValue(double value, boolean autoSizeColumn) {
         try {
-            this.getCELL().setCellValue(value);
+            this.getCell().setCellValue(value);
             if (autoSizeColumn) {
                 this.sheet.autoSizeColumn(col - 1);
             }
@@ -184,7 +186,7 @@ public class ExcelCell {
      */
     public boolean setDateValue(java.util.Date date, boolean autoSizeColumn) {
         try {
-            this.getCELL().setCellValue(date);
+            this.getCell().setCellValue(date);
             if (autoSizeColumn) {
                 this.sheet.autoSizeColumn(col - 1);
             }
@@ -218,7 +220,7 @@ public class ExcelCell {
             if (formula != null && formula.startsWith("=")) {
                 formula = formula.substring(1);
             }
-            this.getCELL().setCellFormula(formula);
+            this.getCell().setCellFormula(formula);
             if (autoSizeColumn) {
                 this.sheet.autoSizeColumn(col - 1);
             }
@@ -250,7 +252,7 @@ public class ExcelCell {
         Cell cCell = null;
 
         try {
-            cCell = this.getCELL();
+            cCell = this.getCell();
 
             // Get the current cell style
             Workbook workbook = cCell.getSheet().getWorkbook();
@@ -263,7 +265,7 @@ public class ExcelCell {
             newStyle.setDataFormat(format.getFormat("@"));  // "@" is the format code for Text
 
             // Use RichTextString for long text to ensure proper handling
-            if (sText != null && sText.length() > 0) {
+            if (sText != null && !sText.isEmpty()) {
                 RichTextString richText = workbook.getCreationHelper().createRichTextString(sText);
                 cCell.setCellValue(richText);
             } else {
@@ -283,6 +285,34 @@ public class ExcelCell {
         }
     }
 
+    private void setHexColor(String hexColor, Font newFont) {
+        try {
+            byte[] rgb = new byte[] {
+                (byte) Integer.parseInt(hexColor.substring(0, 2), 16),
+                (byte) Integer.parseInt(hexColor.substring(2, 4), 16),
+                (byte) Integer.parseInt(hexColor.substring(4, 6), 16)
+            };
+            org.apache.poi.xssf.usermodel.XSSFFont xssfFont = (org.apache.poi.xssf.usermodel.XSSFFont) newFont;
+            xssfFont.setColor(new org.apache.poi.xssf.usermodel.XSSFColor(rgb, null));
+        } catch (Exception e) {
+            log.error("Error parsing hex color: {}", e.getMessage());
+            newFont.setColor(org.apache.poi.ss.usermodel.IndexedColors.BLACK.getIndex());
+        }
+    }
+
+    private void setHSSFHexColor(String hexColor, Font newFont) {
+        try {
+            int r = Integer.parseInt(hexColor.substring(0, 2), 16);
+            int g = Integer.parseInt(hexColor.substring(2, 4), 16);
+            int b = Integer.parseInt(hexColor.substring(4, 6), 16);
+            short closestIndex = getClosestIndexedColor(r, g, b);
+            newFont.setColor(closestIndex);
+        } catch (Exception e) {
+            log.error("Error parsing hex color for HSSF: {}", e.getMessage());
+            newFont.setColor(org.apache.poi.ss.usermodel.IndexedColors.BLACK.getIndex());
+        }
+    }
+
     /**
      * Sets the font color for the cell while preserving existing formatting.
      * <p>
@@ -299,7 +329,7 @@ public class ExcelCell {
      */
     public ExcelCell setFontColor(String fontColor) {
         try {
-            Cell cCell = this.getCELL();
+            Cell cCell = this.getCell();
             Workbook workbook = cCell.getSheet().getWorkbook();
             CellStyle originalStyle = cCell.getCellStyle();
             CellStyle newStyle = workbook.createCellStyle();
@@ -309,34 +339,13 @@ public class ExcelCell {
             Common.copyFontProperties(existingFont, newFont);
 
             if (fontColor != null && fontColor.startsWith("#")) {
+                String hexColor = fontColor.substring(1);
                 if (workbook instanceof org.apache.poi.xssf.usermodel.XSSFWorkbook) {
                     // XLSX: true hex color
-                    try {
-                        String hexColor = fontColor.substring(1);
-                        byte[] rgb = new byte[] {
-                            (byte) Integer.parseInt(hexColor.substring(0, 2), 16),
-                            (byte) Integer.parseInt(hexColor.substring(2, 4), 16),
-                            (byte) Integer.parseInt(hexColor.substring(4, 6), 16)
-                        };
-                        org.apache.poi.xssf.usermodel.XSSFFont xssfFont = (org.apache.poi.xssf.usermodel.XSSFFont) newFont;
-                        xssfFont.setColor(new org.apache.poi.xssf.usermodel.XSSFColor(rgb, null));
-                    } catch (Exception e) {
-                        log.error("Error parsing hex color: {}", e.getMessage());
-                        newFont.setColor(org.apache.poi.ss.usermodel.IndexedColors.BLACK.getIndex());
-                    }
+                    setHexColor(hexColor, newFont);
                 } else {
                     // HSSF: fallback to closest IndexedColors
-                    try {
-                        String hexColor = fontColor.substring(1);
-                        int r = Integer.parseInt(hexColor.substring(0, 2), 16);
-                        int g = Integer.parseInt(hexColor.substring(2, 4), 16);
-                        int b = Integer.parseInt(hexColor.substring(4, 6), 16);
-                        short closestIndex = getClosestIndexedColor(r, g, b);
-                        newFont.setColor(closestIndex);
-                    } catch (Exception e) {
-                        log.error("Error parsing hex color for HSSF: {}", e.getMessage());
-                        newFont.setColor(org.apache.poi.ss.usermodel.IndexedColors.BLACK.getIndex());
-                    }
+                    setHSSFHexColor(hexColor, newFont);
                 }
             } else {
                 // Use the existing color mapping for named colors
@@ -360,7 +369,7 @@ public class ExcelCell {
         for (org.apache.poi.ss.usermodel.IndexedColors color : org.apache.poi.ss.usermodel.IndexedColors.values()) {
             short idx = color.getIndex();
             int[] rgb = getIndexedColorRGB(idx);
-            double distance = Math.pow(r - rgb[0], 2) + Math.pow(g - rgb[1], 2) + Math.pow(b - rgb[2], 2);
+            double distance = Math.pow((double)r - rgb[0], 2) + Math.pow((double)g - rgb[1], 2) + Math.pow((double)b - rgb[2], 2);
             if (distance < minDistance) {
                 minDistance = distance;
                 closestIndex = idx;
@@ -391,7 +400,7 @@ public class ExcelCell {
      */
     public void setFillColor(String fillColor) {
         try {
-            Cell cCell = this.getCELL();
+            Cell cCell = this.getCell();
 
             // Get the current cell style
             Workbook workbook = cCell.getSheet().getWorkbook();
@@ -418,7 +427,7 @@ public class ExcelCell {
      */
     public boolean setHorizontalAlignment(String alignment) {
         try {
-            Cell cCell = this.getCELL();
+            Cell cCell = this.getCell();
 
             // Get the current cell style
             Workbook workbook = cCell.getSheet().getWorkbook();
@@ -467,7 +476,7 @@ public class ExcelCell {
      */
     public boolean setVerticalAlignment(String alignment) {
         try {
-            Cell cCell = this.getCELL();
+            Cell cCell = this.getCell();
 
             // Get the current cell style
             Workbook workbook = cCell.getSheet().getWorkbook();
@@ -516,7 +525,7 @@ public class ExcelCell {
      */
     public boolean setNumberFormat(String formatPattern) {
         try {
-            Cell cCell = this.getCELL();
+            Cell cCell = this.getCell();
 
             // Get the current cell style
             Workbook workbook = cCell.getSheet().getWorkbook();
@@ -547,7 +556,7 @@ public class ExcelCell {
      */
     public boolean setFontStyle(boolean bold, boolean italic, boolean underline) {
         try {
-            Cell cCell = this.getCELL();
+            Cell cCell = this.getCell();
             Font font = wb.createFont();
             font.setBold(bold);
             font.setItalic(italic);
@@ -569,7 +578,7 @@ public class ExcelCell {
      */
     public void setFullBorder(String borderColor) {
         try {
-            Cell cCell = this.getCELL();
+            Cell cCell = this.getCell();
 
             // Get the current cell style
             Workbook workbook = cCell.getSheet().getWorkbook();
@@ -615,7 +624,7 @@ public class ExcelCell {
     public String getTextValue() {
         String val = "";
         try {
-            Cell cell = this.getCELL();
+            Cell cell = this.getCell();
             if (cell != null) {
                 switch (cell.getCellType()) {
                     case STRING:

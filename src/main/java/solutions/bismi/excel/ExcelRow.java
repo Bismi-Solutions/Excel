@@ -30,7 +30,7 @@ public class ExcelRow {
     String sCompleteFileName = null;
     @Getter
     @Setter
-    Row ROW = null;
+    Row row = null;
     @Getter
     @Setter
     String xlFileExtension = null;
@@ -77,10 +77,12 @@ public class ExcelRow {
             }
 
             Row cRow = getOrCreateRow();
+            if (cRow == null) return;
 
             int i = startColNumber;
             for (String value : sValues) {
                 Cell cell = getOrCreateCell(cRow, i);
+                if (cell == null) continue;
                 cell.setCellValue(value);
 
                 if (autoSizeColumns) {
@@ -133,6 +135,7 @@ public class ExcelRow {
      * @return The cell object
      */
     private Cell getOrCreateCell(Row row, int colIndex) {
+        if (row == null) return null;
         Cell cell = null;
         try {
             cell = row.getCell(colIndex);
@@ -158,9 +161,10 @@ public class ExcelRow {
     private void applyCellOperation(int startColNumber, int endColNumber, CellOperation cellOperation, String errorMessage) {
         try {
             Row cRow = getOrCreateRow();
-
+            if (cRow == null) return;
             for (int iCol = startColNumber; iCol < endColNumber; iCol++) {
                 Cell cell = getOrCreateCell(cRow, iCol - 1);
+                if (cell == null) continue;
                 cellOperation.apply(cell);
             }
         } catch (Exception e) {
@@ -288,16 +292,6 @@ public class ExcelRow {
         Row cRow = getOrCreateRow();
         int endColNumber = cRow.getLastCellNum();
         setFullBorder(borderColor, 1, endColNumber + 1);
-    }
-
-    /**
-     * Saves the workbook to the specified file.
-     * Delegates to Common utility method.
-     *
-     * @param filePath The complete file path and name to save to
-     */
-    private void saveWorkBook(String filePath) {
-        Common.saveWorkBook(wb, filePath);
     }
 
     /**

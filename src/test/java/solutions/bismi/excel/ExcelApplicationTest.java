@@ -31,9 +31,7 @@ class ExcelApplicationTest {
 
     @Test
     void testCreateExcelWorkBook() throws IOException {
-        String file1 = createTestFile("createWorkbook");
         String file2 = createTestFile("createWorkbook");
-        testCreateXLSWorkBook(file1);
         testCreateXLSWorkBook(file2);
     }
 

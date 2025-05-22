@@ -266,4 +266,12 @@ class ExcelWorkSheetTest {
 
         xlApp.closeAllWorkBooks();
     }
+
+    @Test
+    void zCoverageGettersSettersAndConstructors() {
+        ExcelWorkSheet ws = new ExcelWorkSheet();
+        // No setters/getters, but test all constructors
+        new ExcelWorkSheet(null, null, null, null);
+        new ExcelWorkSheet(null, "sheet", null, null, null, "file.xlsx");
+    }
 }
