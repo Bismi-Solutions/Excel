@@ -78,6 +78,7 @@ This library provides a simplified API similar to Microsoft Excel COM model, mak
   - Set row heights and column widths
   - Apply formatting to entire rows/columns
   - Auto-fit functionality
+  - Streaming APIs for efficient processing of very large datasets
 
 ## Benefits
 
