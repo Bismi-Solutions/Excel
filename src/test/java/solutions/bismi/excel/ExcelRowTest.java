@@ -6,13 +6,42 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.UUID;
+
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class ExcelRowTest {
 
+    private static final String TEST_DATA_DIR = "./resources/testdata";
+
+    // Helper to get a unique file path and ensure directory exists
+    private String getTestFilePath(String baseName, String extension) throws IOException {
+        Files.createDirectories(Path.of(TEST_DATA_DIR));
+        String uniqueId = UUID.randomUUID().toString().substring(0, 8);
+        String fileName = baseName + "_" + uniqueId + "." + extension;
+        return Path.of(TEST_DATA_DIR, fileName).toString();
+    }
+
+    // Helper for cleanup
+    private void cleanupTestFile(String filePath) {
+        try {
+            Files.deleteIfExists(Path.of(filePath));
+        } catch (IOException e) {
+            System.err.println("Could not delete test file: " + filePath + " : " + e.getMessage());
+        }
+    }
+
     @Test
-    void aSetfontcolor() {
-        setColor2("./resources/testdata/cellFormatCheckrow1.XLSX");
-        setColor2("./resources/testdata/cellFormatCheckrow1.XLS");
+    void aSetfontcolor() throws IOException {
+        String xlsxFile = getTestFilePath("rowFontColor", "xlsx");
+        setColor2(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("rowFontColor", "xls");
+        setColor2(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void setColor2(String strCompleteFileName) {
@@ -36,13 +65,60 @@ class ExcelRowTest {
         sh1.row(5).setFullBorder("blue", 1, 10);
         sh1.saveWorkBook();
         xlApp.closeAllWorkBooks();
+
+        // Reopen and Assert
+        ExcelApplication assertApp = new ExcelApplication();
+        ExcelWorkBook assertBook = assertApp.openWorkbook(strCompleteFileName);
+        Assertions.assertNotNull(assertBook, "Failed to reopen workbook for row formatting assertions.");
+        ExcelWorkSheet assertSheet = assertBook.getExcelSheet("Bismi1");
+        Assertions.assertNotNull(assertSheet, "Failed to get sheet Bismi1 for row formatting assertions.");
+
+        // Assertions for row 11
+        // Cell (11,1) - Font Red
+        org.apache.poi.ss.usermodel.Cell poiCell11_1 = assertSheet.cell(11,1).getCell();
+        org.apache.poi.ss.usermodel.CellStyle style11_1 = poiCell11_1.getCellStyle();
+        org.apache.poi.ss.usermodel.Font font11_1 = assertBook.getWb().getFontAt(style11_1.getFontIndexAsInt());
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.RED.getIndex(), font11_1.getColor(), "Font color for (11,1) should be RED");
+
+        // Cell (11,3) - Font Green (overwrote Red)
+        org.apache.poi.ss.usermodel.Cell poiCell11_3 = assertSheet.cell(11,3).getCell();
+        org.apache.poi.ss.usermodel.CellStyle style11_3 = poiCell11_3.getCellStyle();
+        org.apache.poi.ss.usermodel.Font font11_3 = assertBook.getWb().getFontAt(style11_3.getFontIndexAsInt());
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.GREEN.getIndex(), font11_3.getColor(), "Font color for (11,3) should be GREEN");
+
+        // Cell (11,7) - Font Green
+        org.apache.poi.ss.usermodel.Cell poiCell11_7 = assertSheet.cell(11,7).getCell();
+        org.apache.poi.ss.usermodel.CellStyle style11_7 = poiCell11_7.getCellStyle();
+        org.apache.poi.ss.usermodel.Font font11_7 = assertBook.getWb().getFontAt(style11_7.getFontIndexAsInt());
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.GREEN.getIndex(), font11_7.getColor(), "Font color for (11,7) should be GREEN");
+
+
+        // Assertions for row 2
+        // Cell (2,1) - Font White, Fill Green
+        org.apache.poi.ss.usermodel.Cell poiCell2_1 = assertSheet.cell(2,1).getCell();
+        org.apache.poi.ss.usermodel.CellStyle style2_1 = poiCell2_1.getCellStyle();
+        org.apache.poi.ss.usermodel.Font font2_1 = assertBook.getWb().getFontAt(style2_1.getFontIndexAsInt());
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.WHITE.getIndex(), font2_1.getColor(), "Font color for (2,1) should be WHITE");
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.GREEN.getIndex(), style2_1.getFillForegroundColor(), "Fill color for (2,1) should be GREEN");
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND, style2_1.getFillPattern());
+        // Border check (e.g., bottom border)
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.RED.getIndex(), style2_1.getBottomBorderColor(), "Bottom border for (2,1) should be RED");
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.BorderStyle.MEDIUM, style2_1.getBorderBottom(), "Bottom border style for (2,1) should be MEDIUM");
+
+
+        assertApp.closeAllWorkBooks();
     }
 
 
     @Test
-    void bTestSetRowValuesVariants() {
-        testSetRowValuesVariants("./resources/testdata/rowValuesVariants.xlsx");
-        testSetRowValuesVariants("./resources/testdata/rowValuesVariants.xls");
+    void bTestSetRowValuesVariants() throws IOException {
+        String xlsxFile = getTestFilePath("rowValuesVariants", "xlsx");
+        testSetRowValuesVariants(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("rowValuesVariants", "xls");
+        testSetRowValuesVariants(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void testSetRowValuesVariants(String strCompleteFileName) {
@@ -84,9 +160,14 @@ class ExcelRowTest {
      * Test setFillColor with start and end column
      */
     @Test
-    void cTestSetFillColorWithRange() {
-        testSetFillColorWithRange("./resources/testdata/fillColorRange.xlsx");
-        testSetFillColorWithRange("./resources/testdata/fillColorRange.xls");
+    void cTestSetFillColorWithRange() throws IOException {
+        String xlsxFile = getTestFilePath("fillColorRange", "xlsx");
+        testSetFillColorWithRange(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("fillColorRange", "xls");
+        testSetFillColorWithRange(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void testSetFillColorWithRange(String strCompleteFileName) {
@@ -109,9 +190,10 @@ class ExcelRowTest {
      * Test error handling and edge cases
      */
     @Test
-    void dTestErrorHandling() {
+    void dTestErrorHandling() throws IOException {
+        String testFile = getTestFilePath("rowErrorHandling", "xlsx");
         ExcelApplication xlApp = new ExcelApplication();
-        ExcelWorkBook xlbook = xlApp.createWorkBook("./resources/testdata/rowErrorHandling.xlsx");
+        ExcelWorkBook xlbook = xlApp.createWorkBook(testFile);
         ExcelWorkSheet sheet = xlbook.addSheet("ErrorTest");
 
         // Test with empty array
@@ -149,60 +231,104 @@ class ExcelRowTest {
             Assertions.fail("Should not throw exception with invalid column range");
         }
 
-        sheet.saveWorkBook();
+        sheet.saveWorkBook(); // Ensure sheet is saved before closing
         xlApp.closeAllWorkBooks();
+        cleanupTestFile(testFile);
     }
 
     /**
      * Test with large data set to verify performance
      */
     @Test
-    void eTestLargeDataSet() {
-        String filePath = "./resources/testdata/largeDataSet.xlsx";
+    void eTestLargeDataSet() throws java.io.IOException {
+        // Using a single unique file for this test as it's more about data volume.
+        String filePath = getTestFilePath("largeDataSet", "xlsx");
+        // No need to deleteIfExists here as getTestFilePath ensures uniqueness,
+        // and cleanupTestFile will handle it at the end.
+
         ExcelApplication xlApp = new ExcelApplication();
         ExcelWorkBook xlbook = xlApp.createWorkBook(filePath);
         ExcelWorkSheet sheet = xlbook.addSheet("LargeData");
+        Assertions.assertNotNull(sheet, "Sheet 'LargeData' should be created.");
     
-        // Create a large data set (100 rows)
-        for (int i = 1; i <= 20; i++) {
-            String[] rowData = {"Row" + i + "Col1", "Row" + i + "Col2", "Row" + i + "Col3"};
+        int numRows = 100; // Increased from 20, can be set higher for true perf testing
+        int numCols = 3;
+
+        for (int i = 1; i <= numRows; i++) {
+            String[] rowData = new String[numCols];
+            for (int j = 0; j < numCols; j++) {
+                rowData[j] = "Row" + i + "Col" + (j + 1);
+            }
             sheet.row(i).setRowValues(rowData);
     
-            // Apply different formatting to even and odd rows
             if (i % 2 == 0) {
-                sheet.row(i).setFillColor("LightGray");
+                sheet.row(i).setFillColor("LIGHT_GREY"); // LIGHT_GREY is a valid color name
             } else {
-                sheet.row(i).setFontColor("Blue");
+                sheet.row(i).setFontColor("BLUE");
             }
         }
 
-        // Verify data for a few rows
+        // Verify data integrity before saving
         Assertions.assertEquals("Row1Col1", sheet.cell(1, 1).getTextValue());
-        Assertions.assertEquals("Row5Col2", sheet.cell(5, 2).getTextValue());
-        Assertions.assertEquals("Row10Col3", sheet.cell(10, 3).getTextValue());
-        Assertions.assertEquals("Row20Col1", sheet.cell(20, 1).getTextValue());
+        Assertions.assertEquals("Row" + (numRows / 2) + "Col2", sheet.cell(numRows / 2, 2).getTextValue());
+        Assertions.assertEquals("Row" + numRows + "Col3", sheet.cell(numRows, numCols).getTextValue());
+
+        boolean saveResult = sheet.saveWorkBook();
+        Assertions.assertTrue(saveResult, "Saving large dataset workbook should succeed.");
+        xlApp.closeAllWorkBooks();
+
+        // Reopen and Assert
+        ExcelApplication assertApp = new ExcelApplication();
+        ExcelWorkBook assertBook = assertApp.openWorkbook(filePath);
+        Assertions.assertNotNull(assertBook, "Failed to reopen workbook for large dataset assertions.");
+        ExcelWorkSheet assertSheet = assertBook.getExcelSheet("LargeData");
+        Assertions.assertNotNull(assertSheet, "Failed to get sheet LargeData for assertions.");
+
+        // Verify data for a few key cells after reopening
+        Assertions.assertEquals("Row1Col1", assertSheet.cell(1, 1).getTextValue(), "Value at (1,1) after reopen");
+
+        org.apache.poi.ss.usermodel.Cell poiCell1_1 = assertSheet.cell(1,1).getCell();
+        org.apache.poi.ss.usermodel.CellStyle style1_1 = poiCell1_1.getCellStyle();
+        org.apache.poi.ss.usermodel.Font font1_1 = assertBook.getWb().getFontAt(style1_1.getFontIndexAsInt());
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.BLUE.getIndex(), font1_1.getColor(), "Font color for (1,1) should be BLUE");
+
+        Assertions.assertEquals("Row" + (numRows/2) + "Col2", assertSheet.cell(numRows/2, 2).getTextValue(), "Value at (numRows/2,2) after reopen");
         
-        // Not verifying format as on now
-        // verifying the data integrity
-        for (int i = 1; i <= 20; i++) {
-            for (int j = 1; j <= 3; j++) {
+        org.apache.poi.ss.usermodel.Cell poiCellEvenRow = assertSheet.cell(2,1).getCell(); // An even row
+        org.apache.poi.ss.usermodel.CellStyle styleEvenRow = poiCellEvenRow.getCellStyle();
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.GREY_25_PERCENT.getIndex(), styleEvenRow.getFillForegroundColor(), "Fill color for an even row (2,1) should be LIGHT_GREY (GREY_25_PERCENT)");
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND, styleEvenRow.getFillPattern());
+
+        Assertions.assertEquals("Row" + numRows + "Col3", assertSheet.cell(numRows, numCols).getTextValue(), "Value at (numRows,numCols) after reopen");
+
+        // Verify data integrity for all cells after reopening
+        for (int i = 1; i <= numRows; i++) {
+            for (int j = 1; j <= numCols; j++) {
                 String expectedValue = "Row" + i + "Col" + j;
-                String actualValue = sheet.cell(i, j).getTextValue();
+                String actualValue = assertSheet.cell(i, j).getTextValue();
                 Assertions.assertEquals(expectedValue, actualValue, 
-                        "Cell value at row " + i + ", column " + j + " should match");
+                        "Cell value at row " + i + ", column " + j + " should match after reopen");
             }
         }
         
-        xlApp.closeAllWorkBooks();
+        assertApp.closeAllWorkBooks();
+        // Clean up the large file
+        try {
+            java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(filePath));
+        } catch (java.io.IOException e) {
+            System.err.println("Could not delete test file: " + filePath + " : " + e.getMessage());
+        }
+        cleanupTestFile(filePath); // Ensure cleanup even if assertions fail mid-way (though JUnit structure is better for this)
     }
 
     /**
      * Test edge cases and additional error handling
      */
     @Test
-    void fTestEdgeCases() {
+    void fTestEdgeCases() throws IOException {
+        String testFile = getTestFilePath("rowEdgeCases", "xlsx");
         ExcelApplication xlApp = new ExcelApplication();
-        ExcelWorkBook xlbook = xlApp.createWorkBook("./resources/testdata/rowEdgeCases.xlsx");
+        ExcelWorkBook xlbook = xlApp.createWorkBook(testFile);
         ExcelWorkSheet sheet = xlbook.addSheet("EdgeCases");
 
         // Test with very large column index
@@ -244,14 +370,20 @@ class ExcelRowTest {
             Assertions.fail("Should not throw exception with invalid color");
         }
 
-        sheet.saveWorkBook();
+        sheet.saveWorkBook(); // Ensure sheet is saved before closing
         xlApp.closeAllWorkBooks();
+        cleanupTestFile(testFile);
     }
 
     @Test
-    void gTestRowFormattingCombinations() {
-        testRowFormattingCombinations("./resources/testdata/rowFormattingCombinations.xlsx");
-        testRowFormattingCombinations("./resources/testdata/rowFormattingCombinations.xls");
+    void gTestRowFormattingCombinations() throws IOException {
+        String xlsxFile = getTestFilePath("rowFormattingCombinations", "xlsx");
+        testRowFormattingCombinations(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("rowFormattingCombinations", "xls");
+        testRowFormattingCombinations(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void testRowFormattingCombinations(String strCompleteFileName) {
@@ -298,9 +430,14 @@ class ExcelRowTest {
     }
 
     @Test
-    void hTestRowDataTypes() {
-        testRowDataTypes("./resources/testdata/rowDataTypes.xlsx");
-        testRowDataTypes("./resources/testdata/rowDataTypes.xls");
+    void hTestRowDataTypes() throws IOException {
+        String xlsxFile = getTestFilePath("rowDataTypes", "xlsx");
+        testRowDataTypes(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("rowDataTypes", "xls");
+        testRowDataTypes(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void testRowDataTypes(String strCompleteFileName) {

@@ -147,4 +147,29 @@ class CommonTest {
             }
         }
     }
+
+    @Test
+    void testSaveWorkBook_NullInputs() {
+        // Test with null workbook
+        String filePath = createTestFile("testSaveWorkbookNullWB");
+        boolean resultNullWb = Common.saveWorkBook(null, filePath);
+        assertFalse(resultNullWb, "saveWorkBook should return false for null workbook input.");
+        // (Error logging is internal to Common.saveWorkBook, difficult to assert here without log capture)
+
+        // Test with null filePath
+        try (Workbook workbook = new XSSFWorkbook()) {
+            boolean resultNullPath = Common.saveWorkBook(workbook, null);
+            assertFalse(resultNullPath, "saveWorkBook should return false for null filePath input.");
+        } catch (IOException e) {
+            fail("Test setup for null filePath failed: " + e.getMessage());
+        }
+
+        // Test with empty filePath
+        try (Workbook workbook = new XSSFWorkbook()) {
+            boolean resultEmptyPath = Common.saveWorkBook(workbook, "");
+            assertFalse(resultEmptyPath, "saveWorkBook should return false for empty filePath input.");
+        } catch (IOException e) {
+            fail("Test setup for empty filePath failed: " + e.getMessage());
+        }
+    }
 } 

@@ -69,6 +69,14 @@ public class ExcelCell {
      * @param sCompleteFileName The complete file path and name of the workbook
      */
     protected ExcelCell(Sheet sheet, Workbook wb, int row, int col, FileInputStream inputStream, FileOutputStream outputStream, String sCompleteFileName) {
+        if (sheet == null) {
+            log.error("Sheet cannot be null in ExcelCell constructor");
+            throw new IllegalArgumentException("Sheet cannot be null");
+        }
+        if (wb == null) {
+            log.error("Workbook cannot be null in ExcelCell constructor");
+            throw new IllegalArgumentException("Workbook cannot be null");
+        }
         this.sheet = sheet;
         this.wb = wb;
         this.row = row;
@@ -81,9 +89,14 @@ public class ExcelCell {
         try {
             Row cRow = getOrCreateRow(sheet, this.row - 1);
             Cell cell1 = getOrCreateCell(cRow, this.col - 1);
+            if (cell1 == null) {
+                // Log the error, this.cell will remain null.
+                // Subsequent getCell() calls will return null, which should be handled by callers.
+                log.error("Cell object (cell1) is null after getOrCreateCell for row {}, col {}. Cell will not be set.", this.row, this.col);
+            }
             this.setCell(cell1);
         } catch (Exception e) {
-            log.error("Error in cell constructor creation: {}", e.getMessage());
+            log.error("Error in cell constructor creation: " + e.getMessage(), e);
         }
     }
 
@@ -136,13 +149,23 @@ public class ExcelCell {
      */
     public boolean setCellValue(String sText, boolean autoSizeColoumn) {
         try {
-            this.getCell().setCellValue(sText);
+            Cell currentCell = this.getCell();
+            if (currentCell == null) {
+                log.error("Cannot set cell value, cell is null (row {}, col {})", this.row, this.col);
+                return false;
+            }
+            currentCell.setCellValue(sText);
             if (autoSizeColoumn) {
+                // Ensure sheet is not null, though it should be if currentCell is not.
+                if (this.sheet == null) {
+                    log.warn("Sheet is null, cannot auto-size column for cell (row {}, col {})", this.row, this.col);
+                    return false; // Or handle as appropriate
+                }
                 this.sheet.autoSizeColumn(col - 1);
             }
             return true;
         } catch (Exception e) {
-            log.error("Error in setting cell value: {}", e.getMessage());
+            log.error("Error in setting cell value: " + e.getMessage(), e);
             return false;
         }
     }
@@ -156,13 +179,22 @@ public class ExcelCell {
      */
     public boolean setNumericValue(double value, boolean autoSizeColumn) {
         try {
-            this.getCell().setCellValue(value);
+            Cell currentCell = this.getCell();
+            if (currentCell == null) {
+                log.error("Cannot set numeric value, cell is null (row {}, col {})", this.row, this.col);
+                return false;
+            }
+            currentCell.setCellValue(value);
             if (autoSizeColumn) {
+                if (this.sheet == null) {
+                    log.warn("Sheet is null, cannot auto-size column for cell (row {}, col {})", this.row, this.col);
+                    return false;
+                }
                 this.sheet.autoSizeColumn(col - 1);
             }
             return true;
         } catch (Exception e) {
-            log.error("Error in setting numeric value: {}", e.getMessage());
+            log.error("Error in setting numeric value: " + e.getMessage(), e);
             return false;
         }
     }
@@ -186,13 +218,22 @@ public class ExcelCell {
      */
     public boolean setDateValue(java.util.Date date, boolean autoSizeColumn) {
         try {
-            this.getCell().setCellValue(date);
+            Cell currentCell = this.getCell();
+            if (currentCell == null) {
+                log.error("Cannot set date value, cell is null (row {}, col {})", this.row, this.col);
+                return false;
+            }
+            currentCell.setCellValue(date);
             if (autoSizeColumn) {
+                if (this.sheet == null) {
+                    log.warn("Sheet is null, cannot auto-size column for cell (row {}, col {})", this.row, this.col);
+                    return false;
+                }
                 this.sheet.autoSizeColumn(col - 1);
             }
             return true;
         } catch (Exception e) {
-            log.error("Error in setting date value: {}", e.getMessage());
+            log.error("Error in setting date value: " + e.getMessage(), e);
             return false;
         }
     }
@@ -216,17 +257,26 @@ public class ExcelCell {
      */
     public boolean setFormula(String formula, boolean autoSizeColumn) {
         try {
+            Cell currentCell = this.getCell();
+            if (currentCell == null) {
+                log.error("Cannot set formula, cell is null (row {}, col {})", this.row, this.col);
+                return false;
+            }
             // Remove leading equals sign if present
             if (formula != null && formula.startsWith("=")) {
                 formula = formula.substring(1);
             }
-            this.getCell().setCellFormula(formula);
+            currentCell.setCellFormula(formula);
             if (autoSizeColumn) {
+                if (this.sheet == null) {
+                    log.warn("Sheet is null, cannot auto-size column for cell (row {}, col {})", this.row, this.col);
+                    return false;
+                }
                 this.sheet.autoSizeColumn(col - 1);
             }
             return true;
         } catch (Exception e) {
-            log.error("Error in setting formula: {}", e.getMessage());
+            log.error("Error in setting formula: " + e.getMessage(), e);
             return false;
         }
     }
@@ -253,12 +303,19 @@ public class ExcelCell {
 
         try {
             cCell = this.getCell();
+            if (cCell == null) {
+                log.error("Cannot set text, cell is null (row {}, col {})", this.row, this.col);
+                return false;
+            }
 
             // Get the current cell style
-            Workbook workbook = cCell.getSheet().getWorkbook();
+            Workbook workbook = cCell.getSheet().getWorkbook(); // NPE if cCell.getSheet() is null, but POI normally ensures sheet exists for a cell
             CellStyle originalStyle = cCell.getCellStyle();
             CellStyle newStyle = workbook.createCellStyle();
-            newStyle.cloneStyleFrom(originalStyle);
+            if (originalStyle != null) {
+                newStyle.cloneStyleFrom(originalStyle);
+            }
+            // If originalStyle is null, newStyle remains a fresh, default style.
 
             // Set the data format to Text
             DataFormat format = workbook.createDataFormat();
@@ -275,12 +332,17 @@ public class ExcelCell {
             cCell.setCellStyle(newStyle);
 
             if (autoSizeColoumn) {
-                this.sheet.autoSizeColumn(col - 1);
+                if (this.sheet == null) {
+                    log.warn("Sheet is null, cannot auto-size column for cell (row {}, col {})", this.row, this.col);
+                    // Decide if this should be a failure or just a warning
+                } else {
+                    this.sheet.autoSizeColumn(col - 1);
+                }
             }
 
             return true;
         } catch (Exception e) {
-            log.error("Error in setting text value: {}", e.getMessage());
+            log.error("Error in setting text value: " + e.getMessage(), e);
             return false;
         }
     }
@@ -295,8 +357,10 @@ public class ExcelCell {
             org.apache.poi.xssf.usermodel.XSSFFont xssfFont = (org.apache.poi.xssf.usermodel.XSSFFont) newFont;
             xssfFont.setColor(new org.apache.poi.xssf.usermodel.XSSFColor(rgb, null));
         } catch (Exception e) {
-            log.error("Error parsing hex color: {}", e.getMessage());
-            newFont.setColor(org.apache.poi.ss.usermodel.IndexedColors.BLACK.getIndex());
+            log.error("Error parsing hex color: " + e.getMessage(), e);
+            if (newFont != null) { // newFont itself could be null if workbook.createFont() failed, though unlikely
+                newFont.setColor(org.apache.poi.ss.usermodel.IndexedColors.BLACK.getIndex());
+            }
         }
     }
 
@@ -308,8 +372,10 @@ public class ExcelCell {
             short closestIndex = getClosestIndexedColor(r, g, b);
             newFont.setColor(closestIndex);
         } catch (Exception e) {
-            log.error("Error parsing hex color for HSSF: {}", e.getMessage());
-            newFont.setColor(org.apache.poi.ss.usermodel.IndexedColors.BLACK.getIndex());
+            log.error("Error parsing hex color for HSSF: " + e.getMessage(), e);
+            if (newFont != null) {
+                newFont.setColor(org.apache.poi.ss.usermodel.IndexedColors.BLACK.getIndex());
+            }
         }
     }
 
@@ -330,13 +396,44 @@ public class ExcelCell {
     public ExcelCell setFontColor(String fontColor) {
         try {
             Cell cCell = this.getCell();
-            Workbook workbook = cCell.getSheet().getWorkbook();
+            if (cCell == null) {
+                log.error("Cannot set font color, cell is null (row {}, col {})", this.row, this.col);
+                return this;
+            }
+            // Ensure workbook (wb) is available
+            if (this.wb == null) {
+                log.error("Workbook (wb) is null, cannot set font color for cell (row {}, col {})", this.row, this.col);
+                return this;
+            }
+
+            Workbook workbook = this.wb; // Use this.wb for consistency and null-safety
             CellStyle originalStyle = cCell.getCellStyle();
             CellStyle newStyle = workbook.createCellStyle();
-            newStyle.cloneStyleFrom(originalStyle);
-            Font existingFont = workbook.getFontAt(originalStyle.getFontIndex());
-            Font newFont = workbook.createFont();
-            Common.copyFontProperties(existingFont, newFont);
+            Font newFont = workbook.createFont(); // Create font before trying to copy
+
+            if (originalStyle != null) {
+                newStyle.cloneStyleFrom(originalStyle);
+                // In POI, getFontIndex() is short, getFontAt(short) is fine.
+                // Let's use getFontIndexAsInt() if available, otherwise getFontIndex().
+                // For safety, check if font index is valid or if getFontAt returns null.
+                Font existingFont = null;
+                try {
+                    // Attempting with getFontIndexAsInt(), common in newer POI versions
+                    existingFont = workbook.getFontAt(originalStyle.getFontIndexAsInt());
+                } catch (NoSuchMethodError nsme) {
+                    // Fallback for older POI versions
+                    existingFont = workbook.getFontAt(originalStyle.getFontIndex());
+                }
+
+                if (existingFont != null) {
+                    Common.copyFontProperties(existingFont, newFont);
+                } else {
+                    // existingFont is null, newFont will keep its default properties.
+                    // This might happen if the font index in the style is somehow invalid.
+                    log.warn("Existing font not found for cell (row {}, col {}), using default font properties.", this.row, this.col);
+                }
+            }
+            // If originalStyle is null, newStyle is a fresh style, and newFont has defaults.
 
             if (fontColor != null && fontColor.startsWith("#")) {
                 String hexColor = fontColor.substring(1);
@@ -357,7 +454,7 @@ public class ExcelCell {
 
             return this;
         } catch (Exception e) {
-            log.error("Error in setting font color: {}", e.getMessage());
+            log.error("Error in setting font color: " + e.getMessage(), e);
             return this;
         }
     }
@@ -401,12 +498,23 @@ public class ExcelCell {
     public void setFillColor(String fillColor) {
         try {
             Cell cCell = this.getCell();
+            if (cCell == null) {
+                log.error("Cannot set fill color, cell is null (row {}, col {})", this.row, this.col);
+                return;
+            }
+            // Ensure workbook (wb) is available
+            if (this.wb == null) {
+                log.error("Workbook (wb) is null, cannot set fill color for cell (row {}, col {})", this.row, this.col);
+                return;
+            }
 
-            // Get the current cell style
-            Workbook workbook = cCell.getSheet().getWorkbook();
+            Workbook workbook = this.wb;
             CellStyle originalStyle = cCell.getCellStyle();
             CellStyle newStyle = workbook.createCellStyle();
-            newStyle.cloneStyleFrom(originalStyle);
+
+            if (originalStyle != null) {
+                newStyle.cloneStyleFrom(originalStyle);
+            }
 
             // Set the fill pattern and color
             newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
@@ -415,7 +523,7 @@ public class ExcelCell {
             // Apply the new style to the cell
             cCell.setCellStyle(newStyle);
         } catch (Exception e) {
-            log.error("Error in setting fill color: {}", e.getMessage());
+            log.error("Error in setting fill color: " + e.getMessage(), e);
         }
     }
 
@@ -428,15 +536,28 @@ public class ExcelCell {
     public boolean setHorizontalAlignment(String alignment) {
         try {
             Cell cCell = this.getCell();
+            if (cCell == null) {
+                log.error("Cannot set horizontal alignment, cell is null (row {}, col {})", this.row, this.col);
+                return false;
+            }
+            if (this.wb == null) {
+                log.error("Workbook (wb) is null, cannot set horizontal alignment for cell (row {}, col {})", this.row, this.col);
+                return false;
+            }
 
-            // Get the current cell style
-            Workbook workbook = cCell.getSheet().getWorkbook();
+            Workbook workbook = this.wb;
             CellStyle originalStyle = cCell.getCellStyle();
             CellStyle newStyle = workbook.createCellStyle();
-            newStyle.cloneStyleFrom(originalStyle);
+            if (originalStyle != null) {
+                newStyle.cloneStyleFrom(originalStyle);
+            }
 
             HorizontalAlignment hAlign;
-            switch (alignment.toUpperCase()) {
+            if (alignment == null) { // Guard against NPE from alignment.toUpperCase()
+                log.warn("Alignment string is null, using default (GENERAL) for cell (row {}, col {})", this.row, this.col);
+                hAlign = HorizontalAlignment.GENERAL;
+            } else {
+                switch (alignment.toUpperCase()) {
                 case "LEFT":
                     hAlign = HorizontalAlignment.LEFT;
                     break;
@@ -459,11 +580,17 @@ public class ExcelCell {
             // Set the horizontal alignment
             newStyle.setAlignment(hAlign);
 
+                }
+            }
+
+            // Set the horizontal alignment
+            newStyle.setAlignment(hAlign);
+
             // Apply the new style to the cell
             cCell.setCellStyle(newStyle);
             return true;
         } catch (Exception e) {
-            log.error("Error in setting horizontal alignment: {}", e.getMessage());
+            log.error("Error in setting horizontal alignment: " + e.getMessage(), e);
             return false;
         }
     }
@@ -477,15 +604,28 @@ public class ExcelCell {
     public boolean setVerticalAlignment(String alignment) {
         try {
             Cell cCell = this.getCell();
+            if (cCell == null) {
+                log.error("Cannot set vertical alignment, cell is null (row {}, col {})", this.row, this.col);
+                return false;
+            }
+            if (this.wb == null) {
+                log.error("Workbook (wb) is null, cannot set vertical alignment for cell (row {}, col {})", this.row, this.col);
+                return false;
+            }
 
-            // Get the current cell style
-            Workbook workbook = cCell.getSheet().getWorkbook();
+            Workbook workbook = this.wb;
             CellStyle originalStyle = cCell.getCellStyle();
             CellStyle newStyle = workbook.createCellStyle();
-            newStyle.cloneStyleFrom(originalStyle);
+            if (originalStyle != null) {
+                newStyle.cloneStyleFrom(originalStyle);
+            }
 
             VerticalAlignment vAlign;
-            switch (alignment.toUpperCase()) {
+            if (alignment == null) { // Guard against NPE from alignment.toUpperCase()
+                log.warn("Alignment string is null, using default (CENTER) for cell (row {}, col {})", this.row, this.col);
+                vAlign = VerticalAlignment.CENTER;
+            } else {
+                switch (alignment.toUpperCase()) {
                 case "TOP":
                     vAlign = VerticalAlignment.TOP;
                     break;
@@ -508,11 +648,17 @@ public class ExcelCell {
             // Set the vertical alignment
             newStyle.setVerticalAlignment(vAlign);
 
+                }
+            }
+
+            // Set the vertical alignment
+            newStyle.setVerticalAlignment(vAlign);
+
             // Apply the new style to the cell
             cCell.setCellStyle(newStyle);
             return true;
         } catch (Exception e) {
-            log.error("Error in setting vertical alignment: {}", e.getMessage());
+            log.error("Error in setting vertical alignment: " + e.getMessage(), e);
             return false;
         }
     }
@@ -526,12 +672,25 @@ public class ExcelCell {
     public boolean setNumberFormat(String formatPattern) {
         try {
             Cell cCell = this.getCell();
+            if (cCell == null) {
+                log.error("Cannot set number format, cell is null (row {}, col {})", this.row, this.col);
+                return false;
+            }
+            if (this.wb == null) {
+                log.error("Workbook (wb) is null, cannot set number format for cell (row {}, col {})", this.row, this.col);
+                return false;
+            }
+            if (formatPattern == null) {
+                log.error("Format pattern is null for cell (row {}, col {})", this.row, this.col);
+                return false;
+            }
 
-            // Get the current cell style
-            Workbook workbook = cCell.getSheet().getWorkbook();
+            Workbook workbook = this.wb;
             CellStyle originalStyle = cCell.getCellStyle();
             CellStyle newStyle = workbook.createCellStyle();
-            newStyle.cloneStyleFrom(originalStyle);
+            if (originalStyle != null) {
+                newStyle.cloneStyleFrom(originalStyle);
+            }
 
             // Set the number format
             DataFormat format = workbook.createDataFormat();
@@ -541,7 +700,7 @@ public class ExcelCell {
             cCell.setCellStyle(newStyle);
             return true;
         } catch (Exception e) {
-            log.error("Error in setting number format: {}", e.getMessage());
+            log.error("Error in setting number format: " + e.getMessage(), e);
             return false;
         }
     }
@@ -557,7 +716,15 @@ public class ExcelCell {
     public boolean setFontStyle(boolean bold, boolean italic, boolean underline) {
         try {
             Cell cCell = this.getCell();
-            Font font = wb.createFont();
+            if (cCell == null) {
+                log.error("Cannot set font style, cell is null (row {}, col {})", this.row, this.col);
+                return false;
+            }
+            if (this.wb == null) { // Check this.wb instead of just wb (which is a local var here if not careful)
+                log.error("Workbook (this.wb) is null, cannot set font style for cell (row {}, col {})", this.row, this.col);
+                return false;
+            }
+            Font font = this.wb.createFont(); // Use this.wb
             font.setBold(bold);
             font.setItalic(italic);
             if (underline) {
@@ -566,7 +733,7 @@ public class ExcelCell {
             CellUtil.setFont(cCell, font);
             return true;
         } catch (Exception e) {
-            log.error("Error in setting font style: {}", e.getMessage());
+            log.error("Error in setting font style: " + e.getMessage(), e);
             return false;
         }
     }
@@ -579,15 +746,28 @@ public class ExcelCell {
     public void setFullBorder(String borderColor) {
         try {
             Cell cCell = this.getCell();
+            if (cCell == null) {
+                log.error("Cannot set full border, cell is null (row {}, col {})", this.row, this.col);
+                return;
+            }
+            if (this.wb == null) {
+                log.error("Workbook (wb) is null, cannot set full border for cell (row {}, col {})", this.row, this.col);
+                return;
+            }
+            if (borderColor == null) {
+                log.warn("Border color is null, using default for cell (row {}, col {})", this.row, this.col);
+                // Potentially set a default color or return, for now proceeding with Common.getColorCode which might handle null
+            }
 
-            // Get the current cell style
-            Workbook workbook = cCell.getSheet().getWorkbook();
+            Workbook workbook = this.wb;
             CellStyle originalStyle = cCell.getCellStyle();
             CellStyle newStyle = workbook.createCellStyle();
-            newStyle.cloneStyleFrom(originalStyle);
+            if (originalStyle != null) {
+                newStyle.cloneStyleFrom(originalStyle);
+            }
 
             // Set border styles directly
-            short colorCode = Common.getColorCode(borderColor);
+            short colorCode = Common.getColorCode(borderColor); // Common.getColorCode should handle null borderColor gracefully
 
             newStyle.setBorderLeft(BorderStyle.MEDIUM);
             newStyle.setBorderRight(BorderStyle.MEDIUM);
@@ -602,7 +782,7 @@ public class ExcelCell {
             // Apply the new style to the cell
             cCell.setCellStyle(newStyle);
         } catch (Exception e) {
-            log.error("Error in setting border: {}", e.getMessage());
+            log.error("Error in setting border: " + e.getMessage(), e);
         }
     }
 
@@ -645,17 +825,17 @@ public class ExcelCell {
                         val = String.valueOf(cell.getBooleanCellValue());
                         break;
                     case FORMULA:
-                        val = cell.getCellFormula();
+                        val = cell.getCellFormula(); // Consider: evaluate formula if needed using FormulaEvaluator
                         break;
                     case BLANK:
                         val = "";
                         break;
                     default:
-                        val = cell.toString();
+                        val = cell.toString(); // Fallback, might not always be desirable
                 }
             }
         } catch (Exception e) {
-            log.error("Error in getting text value: {}", e.getMessage());
+            log.error("Error in getting text value for cell (row {}, col {}): {}", this.row, this.col, e.getMessage(), e);
         }
         return val;
     }
@@ -691,9 +871,13 @@ public class ExcelCell {
      */
     private String getFileExtension(String sCompleteFilePath) {
         try {
-            return sCompleteFilePath.substring(sCompleteFilePath.lastIndexOf("."));
+            if (sCompleteFilePath != null && sCompleteFilePath.contains(".")) {
+                return sCompleteFilePath.substring(sCompleteFilePath.lastIndexOf("."));
+            } else {
+                log.debug("Could not determine file extension for path: {}", sCompleteFilePath); // Changed to debug as it might be normal for non-file paths
+            }
         } catch (Exception e) {
-            log.error("Error in getting file extension: {}", e.getMessage());
+            log.error("Error in getting file extension for '" + sCompleteFilePath + "': " + e.getMessage(), e);
         }
 
         return ""; // Return empty string on error

@@ -6,14 +6,42 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.UUID;
+
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class ExcelCellTest {
 
+    private static final String TEST_DATA_DIR = "./resources/testdata";
+
+    // Helper to get a unique file path and ensure directory exists
+    private String getTestFilePath(String baseName, String extension) throws IOException {
+        Files.createDirectories(Path.of(TEST_DATA_DIR));
+        String uniqueId = UUID.randomUUID().toString().substring(0, 8);
+        String fileName = baseName + "_" + uniqueId + "." + extension;
+        return Path.of(TEST_DATA_DIR, fileName).toString();
+    }
+
+    // Helper for cleanup
+    private void cleanupTestFile(String filePath) {
+        try {
+            Files.deleteIfExists(Path.of(filePath));
+        } catch (IOException e) {
+            System.err.println("Could not delete test file: " + filePath + " : " + e.getMessage());
+        }
+    }
 
     @Test
-    void aSetFontColor() {
-        setColor("./resources/testdata/cellFormatCheck1.XLSX");
-        setColor("./resources/testdata/cellFormatCheck1.XLS");
+    void aSetFontColor() throws IOException {
+        String xlsxFile = getTestFilePath("cellFontColor", "xlsx");
+        setColor(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("cellFontColor", "xls");
+        setColor(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void setColor(String strCompleteFileName) {
@@ -42,12 +70,56 @@ class ExcelCellTest {
 
         sh1.saveWorkBook();
         xlApp.closeAllWorkBooks();
+
+        // Reopen and assert
+        ExcelApplication assertApp = new ExcelApplication();
+        ExcelWorkBook assertBook = assertApp.openWorkbook(strCompleteFileName);
+        Assertions.assertNotNull(assertBook, "Failed to reopen workbook for assertions.");
+        ExcelWorkSheet assertSheet = assertBook.getExcelSheet("Bismi1");
+        Assertions.assertNotNull(assertSheet, "Failed to get sheet Bismi1 for assertions.");
+
+        // Assert c1 (Blue font)
+        ExcelCell assertC1 = assertSheet.cell(3, 4);
+        Assertions.assertEquals("Alpha lion", assertC1.getTextValue());
+        org.apache.poi.ss.usermodel.Cell poiC1 = assertC1.getCell();
+        org.apache.poi.ss.usermodel.CellStyle styleC1 = poiC1.getCellStyle();
+        org.apache.poi.ss.usermodel.Font fontC1 = assertBook.getWb().getFontAt(styleC1.getFontIndexAsInt());
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.BLUE.getIndex(), fontC1.getColor(), "Font color for c1 should be BLUE");
+
+        // Assert c2 (Red font)
+        ExcelCell assertC2 = assertSheet.cell(5, 7);
+        Assertions.assertEquals("Beta", assertC2.getTextValue());
+        org.apache.poi.ss.usermodel.Cell poiC2 = assertC2.getCell();
+        org.apache.poi.ss.usermodel.CellStyle styleC2 = poiC2.getCellStyle();
+        org.apache.poi.ss.usermodel.Font fontC2 = assertBook.getWb().getFontAt(styleC2.getFontIndexAsInt());
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.RED.getIndex(), fontC2.getColor(), "Font color for c2 should be RED");
+
+        // Assert c3 (Hex Red #FF0000) - XSSF specific check for exact color
+        ExcelCell assertC3 = assertSheet.cell(7, 4);
+        Assertions.assertEquals("Hex Color Test", assertC3.getTextValue());
+        if (assertBook.getWb() instanceof org.apache.poi.xssf.usermodel.XSSFWorkbook) {
+            org.apache.poi.xssf.usermodel.XSSFFont fontC3 = (org.apache.poi.xssf.usermodel.XSSFFont) assertBook.getWb().getFontAt(assertC3.getCell().getCellStyle().getFontIndexAsInt());
+            Assertions.assertNotNull(fontC3.getXSSFColor(), "XSSFColor should not be null for c3");
+            Assertions.assertEquals("FF0000", fontC3.getXSSFColor().getARGBHex().substring(2), "Font color for c3 should be #FF0000 (Red)");
+        } else { // HSSFWorkbook
+            org.apache.poi.hssf.usermodel.HSSFFont fontC3 = (org.apache.poi.hssf.usermodel.HSSFFont) assertBook.getWb().getFontAt(assertC3.getCell().getCellStyle().getFontIndexAsInt());
+            // HSSF approximates hex colors, checking for not black might be the best we can do without complex color matching
+            Assertions.assertNotEquals(org.apache.poi.ss.usermodel.IndexedColors.BLACK.getIndex(), fontC3.getColor(), "Font color for c3 (HSSF) should be an approximation of Red, not default Black.");
+        }
+
+
+        assertApp.closeAllWorkBooks();
     }
 
     @Test
-    void bSetFillcolor() {
-        setColor2("./resources/testdata/cellFormatCheck2.XLSX");
-        setColor2("./resources/testdata/cellFormatCheck2.XLS");
+    void bSetFillcolor() throws IOException {
+        String xlsxFile = getTestFilePath("cellFillColor", "xlsx");
+        setColor2(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("cellFillColor", "xls");
+        setColor2(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void setColor2(String strCompleteFileName) {
@@ -85,12 +157,61 @@ class ExcelCellTest {
 
         sh1.saveWorkBook();
         xlApp.closeAllWorkBooks();
+
+        // Reopen and assert
+        ExcelApplication assertApp = new ExcelApplication();
+        ExcelWorkBook assertBook = assertApp.openWorkbook(strCompleteFileName);
+        Assertions.assertNotNull(assertBook, "Failed to reopen workbook for fill color assertions.");
+        ExcelWorkSheet assertSheet = assertBook.getExcelSheet("Bismi1");
+        Assertions.assertNotNull(assertSheet, "Failed to get sheet Bismi1 for fill color assertions.");
+
+        // Assert cell (10,10) - Text, Font Color (Blue), Fill Color (Yellow)
+        ExcelCell assertCell10_10 = assertSheet.cell(10, 10);
+        Assertions.assertEquals("TestColor", assertCell10_10.getTextValue());
+
+        org.apache.poi.ss.usermodel.Cell poiCell10_10 = assertCell10_10.getCell();
+        org.apache.poi.ss.usermodel.CellStyle style10_10 = poiCell10_10.getCellStyle();
+
+        org.apache.poi.ss.usermodel.Font font10_10 = assertBook.getWb().getFontAt(style10_10.getFontIndexAsInt());
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.BLUE.getIndex(), font10_10.getColor(), "Font color for (10,10) should be BLUE");
+
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.YELLOW.getIndex(), style10_10.getFillForegroundColor(), "Fill color for (10,10) should be YELLOW");
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND, style10_10.getFillPattern(), "Fill pattern for (10,10) should be SOLID_FOREGROUND");
+
+        // Assert cell (1,1) - Fill Color (GREEN)
+        ExcelCell assertCell1_1 = assertSheet.cell(1, 1);
+        org.apache.poi.ss.usermodel.Cell poiCell1_1 = assertCell1_1.getCell();
+        org.apache.poi.ss.usermodel.CellStyle style1_1 = poiCell1_1.getCellStyle();
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.GREEN.getIndex(), style1_1.getFillForegroundColor(), "Fill color for (1,1) should be GREEN");
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND, style1_1.getFillPattern(), "Fill pattern for (1,1) should be SOLID_FOREGROUND");
+
+        // Assert cell (5,5) - Hex Fill Color (#00FF00 - Green)
+        ExcelCell assertCell5_5 = assertSheet.cell(5, 5);
+         Assertions.assertEquals("Hex Fill Color", assertCell5_5.getTextValue());
+        if (assertBook.getWb() instanceof org.apache.poi.xssf.usermodel.XSSFWorkbook) {
+            org.apache.poi.xssf.usermodel.XSSFCellStyle style5_5 = (org.apache.poi.xssf.usermodel.XSSFCellStyle) assertCell5_5.getCell().getCellStyle();
+            org.apache.poi.xssf.usermodel.XSSFColor fillColor5_5 = style5_5.getFillForegroundXSSFColor();
+            Assertions.assertNotNull(fillColor5_5, "Fill XSSFColor should not be null for (5,5)");
+            Assertions.assertEquals("00FF00", fillColor5_5.getARGBHex().substring(2), "Fill color for (5,5) should be #00FF00 (Green)");
+        } else { // HSSFWorkbook
+             org.apache.poi.hssf.usermodel.HSSFCellStyle style5_5 = (org.apache.poi.hssf.usermodel.HSSFCellStyle) assertCell5_5.getCell().getCellStyle();
+             Assertions.assertNotEquals(org.apache.poi.ss.usermodel.IndexedColors.AUTOMATIC.getIndex(), style5_5.getFillForegroundColor(), "Fill color for (5,5) (HSSF) should be an approximation of Green.");
+             // Could add a more specific check against HSSFPalette if needed, but this confirms a color was set.
+        }
+
+
+        assertApp.closeAllWorkBooks();
     }
 
     @Test
-    void cTestFormulas() {
-        testFormulas("./resources/testdata/formulaTest.XLSX");
-        testFormulas("./resources/testdata/formulaTest.XLS");
+    void cTestFormulas() throws IOException {
+        String xlsxFile = getTestFilePath("formulaTest", "xlsx");
+        testFormulas(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("formulaTest", "xls");
+        testFormulas(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void testFormulas(String strCompleteFileName) {
@@ -160,9 +281,14 @@ class ExcelCellTest {
     }
 
     @Test
-    void dTestCellMerging() {
-        testCellMerging("./resources/testdata/mergeTest.XLSX");
-        testCellMerging("./resources/testdata/mergeTest.XLS");
+    void dTestCellMerging() throws IOException {
+        String xlsxFile = getTestFilePath("mergeTest", "xlsx");
+        testCellMerging(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("mergeTest", "xls");
+        testCellMerging(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void testCellMerging(String strCompleteFileName) {
@@ -202,9 +328,14 @@ class ExcelCellTest {
 
 
     @Test
-    void eTestDateAndVerticalAlignment() {
-        testDateAndVerticalAlignment("./resources/testdata/dateAlignTest.XLSX");
-        testDateAndVerticalAlignment("./resources/testdata/dateAlignTest.XLS");
+    void eTestDateAndVerticalAlignment() throws IOException {
+        String xlsxFile = getTestFilePath("dateAlignTest", "xlsx");
+        testDateAndVerticalAlignment(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("dateAlignTest", "xls");
+        testDateAndVerticalAlignment(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void testDateAndVerticalAlignment(String strCompleteFileName) {
@@ -247,39 +378,17 @@ class ExcelCellTest {
         xlApp.closeAllWorkBooks();
     }
 
-    @Test
-    void fTestErrorHandling() {
-        ExcelApplication xlApp = new ExcelApplication();
-        ExcelWorkBook xlbook = xlApp.createWorkBook("./resources/testdata/errorHandlingTest.XLSX");
-        ExcelWorkSheet sh1 = xlbook.addSheet("ErrorTest");
-        sh1.activate();
-
-        // Test with invalid formula (should not throw exception)
-        try {
-            sh1.cell(1, 1).setFormula("INVALID_FORMULA(A1)");
-        } catch (Exception e) {
-            Assertions.fail("Should not throw exception with invalid formula");
-        }
-
-        // Test with invalid color name (should not throw exception)
-        try {
-            sh1.cell(2, 1).setFontColor("NONEXISTENT_COLOR");
-        } catch (Exception e) {
-            Assertions.fail("Should not throw exception with invalid color name");
-        }
-
-        // Test getValue on empty cell
-        String value = sh1.cell(3, 3).getValue();
-        Assertions.assertEquals("", value, "Empty cell should return empty string");
-
-        sh1.saveWorkBook();
-        xlApp.closeAllWorkBooks();
-    }
+    // fTestErrorHandling is removed as its checks are incorporated into fTestEdgeCasesAndErrorConditions (testEdgeCases)
 
     @Test
-    void fTestEdgeCasesAndErrorConditions() {
-        testEdgeCases("./resources/testdata/edgeCasesTest.XLSX");
-        testEdgeCases("./resources/testdata/edgeCasesTest.XLS");
+    void fTestEdgeCasesAndErrorConditions() throws IOException {
+        String xlsxFile = getTestFilePath("edgeCasesTest", "xlsx");
+        testEdgeCases(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("edgeCasesTest", "xls");
+        testEdgeCases(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void testEdgeCases(String strCompleteFileName) {
@@ -318,11 +427,53 @@ class ExcelCellTest {
         ExcelCell invalidFormulaCell = sh1.cell(1, 6);
         Assertions.assertTrue(invalidFormulaCell.setFormula("=INVALID_FORMULA()"), "Should handle invalid formula");
         sh1.saveWorkBook();
-        // Test invalid color values
+        // Test invalid color values - and ensure previous valid state is retained or defaults correctly
         ExcelCell invalidColorCell = sh1.cell(1, 7);
-        invalidColorCell.setFontColor("INVALID_COLOR");
-        invalidColorCell.setFillColor("INVALID_COLOR");
-        sh1.saveWorkBook();
+        invalidColorCell.setText("ColorTest");
+        // Set a valid color first
+        invalidColorCell.setFontColor("BLUE");
+        invalidColorCell.setFillColor("YELLOW");
+        Assertions.assertTrue(sh1.saveWorkBook(), "Save after setting initial valid colors should succeed.");
+        xlApp.closeAllWorkBooks();
+
+        // Reopen to check initial valid colors
+        xlApp = new ExcelApplication(); // New app instance
+        xlbook = xlApp.openWorkbook(strCompleteFileName);
+        Assertions.assertNotNull(xlbook, "Workbook should reopen for edge case color test (part 1)");
+        sh1 = xlbook.getExcelSheet("EdgeCases");
+        Assertions.assertNotNull(sh1, "Sheet should exist for edge case color test (part 1)");
+        invalidColorCell = sh1.cell(1, 7); // Re-fetch cell
+
+        org.apache.poi.ss.usermodel.Cell poiInvalidColorCell = invalidColorCell.getCell();
+        org.apache.poi.ss.usermodel.CellStyle styleInitial = poiInvalidColorCell.getCellStyle();
+        org.apache.poi.ss.usermodel.Font fontInitial = xlbook.getWb().getFontAt(styleInitial.getFontIndexAsInt());
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.BLUE.getIndex(), fontInitial.getColor(), "Initial font color should be BLUE.");
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.YELLOW.getIndex(), styleInitial.getFillForegroundColor(), "Initial fill color should be YELLOW.");
+
+        // Now attempt to set invalid colors
+        invalidColorCell.setFontColor("INVALID_COLOR_XYZ"); // More unique invalid name
+        invalidColorCell.setFillColor("INVALID_COLOR_ABC"); // More unique invalid name
+
+        // The ExcelCell methods for setFontColor/setFillColor internally catch exceptions and don't change style on error.
+        // So, the style should remain the same as before these calls.
+        // We save, close, reopen to confirm this persistence of the *original* valid style.
+        Assertions.assertTrue(sh1.saveWorkBook(), "Save after attempting invalid colors should succeed.");
+        xlApp.closeAllWorkBooks();
+
+        // Reopen again to check that colors were not corrupted
+        xlApp = new ExcelApplication();
+        xlbook = xlApp.openWorkbook(strCompleteFileName);
+        Assertions.assertNotNull(xlbook, "Workbook should reopen for edge case color test (part 2)");
+        sh1 = xlbook.getExcelSheet("EdgeCases");
+        Assertions.assertNotNull(sh1, "Sheet should exist for edge case color test (part 2)");
+        invalidColorCell = sh1.cell(1, 7); // Re-fetch cell
+
+        poiInvalidColorCell = invalidColorCell.getCell();
+        org.apache.poi.ss.usermodel.CellStyle styleAfterInvalid = poiInvalidColorCell.getCellStyle();
+        org.apache.poi.ss.usermodel.Font fontAfterInvalid = xlbook.getWb().getFontAt(styleAfterInvalid.getFontIndexAsInt());
+
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.BLUE.getIndex(), fontAfterInvalid.getColor(), "Font color should remain BLUE after invalid attempt.");
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.IndexedColors.YELLOW.getIndex(), styleAfterInvalid.getFillForegroundColor(), "Fill color should remain YELLOW after invalid attempt.");
         // Should not throw exception
 
         // Test invalid alignment values
@@ -339,9 +490,14 @@ class ExcelCellTest {
     }
 
     @Test
-    void gTestCellFormattingCombinations() {
-        testFormattingCombinations("./resources/testdata/formattingCombinations.XLSX");
-        testFormattingCombinations("./resources/testdata/formattingCombinations.XLS");
+    void gTestCellFormattingCombinations() throws IOException {
+        String xlsxFile = getTestFilePath("formattingCombinations", "xlsx");
+        testFormattingCombinations(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("formattingCombinations", "xls");
+        testFormattingCombinations(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void testFormattingCombinations(String strCompleteFileName) {
@@ -400,9 +556,14 @@ class ExcelCellTest {
     }
 
     @Test
-    void hTestCellValueRetrieval() {
-        testValueRetrieval("./resources/testdata/valueRetrieval.XLSX");
-        testValueRetrieval("./resources/testdata/valueRetrieval.XLS");
+    void hTestCellValueRetrieval() throws IOException {
+        String xlsxFile = getTestFilePath("valueRetrieval", "xlsx");
+        testValueRetrieval(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("valueRetrieval", "xls");
+        testValueRetrieval(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void testValueRetrieval(String strCompleteFileName) {
@@ -446,9 +607,14 @@ class ExcelCellTest {
     }
 
     @Test
-    void iTestRowOperations() {
-        testRowOperations("./resources/testdata/rowOperations.XLSX");
-        testRowOperations("./resources/testdata/rowOperations.XLS");
+    void iTestRowOperations() throws IOException {
+        String xlsxFile = getTestFilePath("rowOperations", "xlsx");
+        testRowOperations(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("rowOperations", "xls");
+        testRowOperations(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void testRowOperations(String strCompleteFileName) {
@@ -496,9 +662,14 @@ class ExcelCellTest {
     }
 
     @Test
-    void jTestSheetOperations() {
-        testSheetOperations("./resources/testdata/sheetOperations.XLSX");
-        testSheetOperations("./resources/testdata/sheetOperations.XLS");
+    void jTestSheetOperations() throws IOException {
+        String xlsxFile = getTestFilePath("sheetOperations", "xlsx");
+        testSheetOperations(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("sheetOperations", "xls");
+        testSheetOperations(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void testSheetOperations(String strCompleteFileName) {
@@ -541,9 +712,14 @@ class ExcelCellTest {
     }
 
     @Test
-    void kTestAdvancedFormatting() {
-        testAdvancedFormatting("./resources/testdata/advancedFormatting.XLSX");
-        testAdvancedFormatting("./resources/testdata/advancedFormatting.XLS");
+    void kTestAdvancedFormatting() throws IOException {
+        String xlsxFile = getTestFilePath("advancedFormatting", "xlsx");
+        testAdvancedFormatting(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("advancedFormatting", "xls");
+        testAdvancedFormatting(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void testAdvancedFormatting(String strCompleteFileName) {
@@ -592,9 +768,14 @@ class ExcelCellTest {
     }
 
     @Test
-    void lTestErrorRecovery() {
-        testErrorRecovery("./resources/testdata/errorRecovery.XLSX");
-        testErrorRecovery("./resources/testdata/errorRecovery.XLS");
+    void lTestErrorRecovery() throws IOException {
+        String xlsxFile = getTestFilePath("errorRecovery", "xlsx");
+        testErrorRecovery(xlsxFile);
+        cleanupTestFile(xlsxFile);
+
+        String xlsFile = getTestFilePath("errorRecovery", "xls");
+        testErrorRecovery(xlsFile);
+        cleanupTestFile(xlsFile);
     }
 
     private void testErrorRecovery(String strCompleteFileName) {

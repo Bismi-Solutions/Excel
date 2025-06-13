@@ -29,9 +29,19 @@ class ExcelApplicationTest {
         return filePath;
     }
 
+    private String getUniqueTestFilePath(String testName) throws IOException {
+        // Create test data directory if it doesn't exist
+        Files.createDirectories(Path.of(TEST_DATA_DIR));
+
+        String uniqueId = UUID.randomUUID().toString().substring(0, 8);
+        String fileName = testName + "_" + uniqueId + ".xlsx"; // Standardized extension for clarity
+        return Path.of(TEST_DATA_DIR, fileName).toString();
+    }
+
     @Test
     void testCreateExcelWorkBook() throws IOException {
-        String file2 = createTestFile("createWorkbook");
+        // This test creates a new workbook, so it only needs a unique path.
+        String file2 = getUniqueTestFilePath("createWorkbook");
         testCreateXLSWorkBook(file2);
     }
 
@@ -171,26 +181,35 @@ class ExcelApplicationTest {
     @Test
     void testGetWorkbookByName() throws IOException {
         ExcelApplication xlApp = new ExcelApplication();
-        String file1 = createTestFile("getByName");
+        String validFilePath = createTestFile("getByNameValid");
 
         // Test with valid name
-        ExcelWorkBook xlBook1 = xlApp.openWorkbook(file1);
-        String bookName = xlBook1.getExcelBookName();
+        ExcelWorkBook xlBookValidName = xlApp.openWorkbook(validFilePath);
+        Assertions.assertNotNull(xlBookValidName, "Workbook with valid name should open.");
+        Assertions.assertNotNull(xlBookValidName.getExcelBookName(), "Book name should not be null.");
+        Assertions.assertFalse(xlBookValidName.getExcelBookName().isEmpty(), "Book name should not be empty.");
 
+        String bookName = xlBookValidName.getExcelBookName();
         ExcelWorkBook retrievedBook = xlApp.getWorkbook(bookName);
-        Assertions.assertNotNull(retrievedBook);
-        Assertions.assertEquals(bookName, retrievedBook.getExcelBookName());
+        Assertions.assertNotNull(retrievedBook, "Should retrieve workbook by its valid name.");
+        Assertions.assertEquals(bookName, retrievedBook.getExcelBookName(), "Retrieved book name should match.");
 
         // Test with invalid name
         retrievedBook = xlApp.getWorkbook("NonExistentBook");
-        Assertions.assertNull(retrievedBook);
+        Assertions.assertNull(retrievedBook, "Should not retrieve workbook by non-existent name.");
 
-        // Test with null and empty name
+        // Test with null and empty name for search term
         retrievedBook = xlApp.getWorkbook(null);
-        Assertions.assertNull(retrievedBook);
+        Assertions.assertNull(retrievedBook, "Should not retrieve workbook by null name search.");
 
         retrievedBook = xlApp.getWorkbook("");
-        Assertions.assertNull(retrievedBook);
+        Assertions.assertNull(retrievedBook, "Should not retrieve workbook by empty name search.");
+
+        // Test scenario: a workbook in the list might have a null or empty name
+        // This is hard to achieve directly with current ExcelWorkBook API as it tries to assign a name.
+        // However, the internal loop in ExcelApplication.getWorkbook(String) now checks for null names from getExcelBookName().
+        // We can simulate this by adding a mock or a specially crafted ExcelWorkBook if needed,
+        // but for now, trust the NPE guard `if (currentBookName != null && ...)` in ExcelApplication.
 
         xlApp.closeAllWorkBooks();
     }

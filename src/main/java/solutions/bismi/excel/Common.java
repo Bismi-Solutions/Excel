@@ -25,6 +25,14 @@ public abstract class Common {
      * @param target The target font to copy properties to
      */
     public static void copyFontProperties(org.apache.poi.ss.usermodel.Font source, org.apache.poi.ss.usermodel.Font target) {
+        if (source == null) {
+            log.warn("Source font is null in copyFontProperties. Cannot copy properties.");
+            return;
+        }
+        if (target == null) {
+            log.warn("Target font is null in copyFontProperties. Cannot copy properties.");
+            return;
+        }
         target.setBold(source.getBold());
         target.setItalic(source.getItalic());
         target.setStrikeout(source.getStrikeout());
@@ -42,9 +50,20 @@ public abstract class Common {
      */
     public static void updateIndexedValues() {
         if (values == null) {
-            values = getEnumValues(IndexedColors.class);
-            for (IndexedColors ele : values) {
-                map.put(ele.toString(), ele.getIndex());
+            E[] localValues = getEnumValues(IndexedColors.class);
+            if (localValues != null) { // Check if getEnumValues succeeded
+                values = (IndexedColors[]) localValues; // Assign only if successful
+                map.clear(); // Clear map before repopulating, in case of partial previous load or re-entry
+                for (IndexedColors ele : values) {
+                    if (ele != null) { // Guard against null elements if reflection somehow returns such an array
+                        map.put(ele.toString(), ele.getIndex());
+                    }
+                }
+            } else {
+                log.error("Failed to retrieve enum values for IndexedColors. Color mapping will be incomplete.");
+                // values remains null, map might be empty or hold previous (possibly stale) data.
+                // Consider explicitly setting values to an empty array or map to empty to avoid repeated attempts if it's a permanent failure.
+                // For now, it will retry on next call if values is still null.
             }
         }
     }
@@ -55,15 +74,27 @@ public abstract class Common {
      * @return The color code as a short value, or 0 if the color is not found
      */
     public static short getColorCode(String color) {
-        updateIndexedValues();
+        if (color == null || color.trim().isEmpty()) {
+            log.warn("Color string is null or empty. Cannot get color code.");
+            return 0; // Or a default color index like IndexedColors.AUTOMATIC.getIndex()
+        }
 
-        String availableColors = Arrays.toString(values);
-        if (map.containsKey(color.toUpperCase().trim())) {
-            return map.get(color.toUpperCase().trim());
+        updateIndexedValues(); // Ensures 'values' and 'map' are populated if possible
+
+        if (values == null) { // Check if values array is still null after updateIndexedValues attempt
+            log.error("IndexedColors values array is null. Cannot perform color lookup for: {}", color);
+            return 0; // Or a default color index
+        }
+
+        String availableColors = Arrays.toString(values); // Safe now due to null check above
+        String processedColor = color.toUpperCase().trim();
+
+        if (map.containsKey(processedColor)) {
+            return map.get(processedColor);
         } else {
-            log.debug("Supported string constant colors are: {}", availableColors);
-            log.debug("Hex code can also be passed if you need more colors");
-            return 0;
+            log.warn("Color '{}' not found in standard IndexedColors. Supported string constant colors are: {}. Hex code can also be passed for XLSX.", color, availableColors);
+            // Consider returning a specific default or error indicator if strict color matching is required.
+            return 0; // Defaulting to black or an error-indicating index might be an option.
         }
     }
 
@@ -75,13 +106,20 @@ public abstract class Common {
      * @return An array of enum values, or null if an error occurs
      */
     private static <E extends Enum<E>> E[] getEnumValues(Class<E> enumClass) {
+        if (enumClass == null) {
+            log.error("Enum class provided to getEnumValues is null.");
+            return null;
+        }
         try {
-            Field fld = enumClass.getDeclaredField("$VALUES");
-            fld.setAccessible(true);
-            Object o = fld.get(null);
-            return (E[]) o;
-        } catch (Exception e) {
-            log.error("Error in getting color enumerators", e);
+            // Using enumClass.getEnumConstants() is the standard and safer way
+            E[] enumConstants = enumClass.getEnumConstants();
+            if (enumConstants == null) {
+                // This can happen if enumClass is not an enum type, or has no constants.
+                log.error("Failed to get enum constants for class: {}. It might not be an enum or has no values.", enumClass.getName());
+            }
+            return enumConstants;
+        } catch (Exception e) { // Catching general exception as getEnumConstants() theoretically shouldn't throw checked ones here.
+            log.error("Error in getting enum constants for {}: " + e.getMessage(), enumClass.getName(), e);
             return null;
         }
     }
@@ -128,13 +166,28 @@ public abstract class Common {
      *
      * @param wb The workbook to save
      * @param filePath The complete file path and name to save to
+     * @return true if save was successful, false otherwise
      */
-    public static void saveWorkBook(org.apache.poi.ss.usermodel.Workbook wb, String filePath) {
+    public static boolean saveWorkBook(org.apache.poi.ss.usermodel.Workbook wb, String filePath) {
+        if (wb == null) {
+            log.error("Workbook object is null. Cannot save.");
+            return false;
+        }
+        if (filePath == null || filePath.trim().isEmpty()) {
+            log.error("File path is null or empty. Cannot save workbook.");
+            return false;
+        }
         try (java.io.OutputStream fileOut = new java.io.FileOutputStream(filePath)) {
             wb.write(fileOut);
             log.debug("Workbook saved successfully to: {}", filePath);
-        } catch (Exception e) {
-            log.error("Error in saving workbook: {}", e.getMessage());
+            return true;
+        } catch (java.io.FileNotFoundException e) {
+            log.error("Error saving workbook to '{}': File not found or path is a directory. " + e.getMessage(), filePath, e);
+        } catch (java.io.IOException e) {
+            log.error("IO error saving workbook to '{}': " + e.getMessage(), filePath, e);
+        } catch (Exception e) { // Catch any other unexpected exceptions
+            log.error("Unexpected error saving workbook to '{}': " + e.getMessage(), filePath, e);
         }
+        return false;
     }
 }
