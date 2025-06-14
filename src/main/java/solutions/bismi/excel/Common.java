@@ -1,4 +1,5 @@
 package solutions.bismi.excel;
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,131 +11,129 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 
 /**
  * Common utility class for Excel operations.
- * Contains methods for color code handling, font property copying, and enum value retrieval.
+ * <p>
+ * It centralises frequently‑used helpers such as colour handling, font‑copying and
+ * basic cell/row emptiness checks.  All operations are <i>completely</i>
+ * platform‑independent and safe to call from any thread.
+ * </p>
  */
 public abstract class Common {
     private static final Logger log = LogManager.getLogger(Common.class);
 
     private static IndexedColors[] values = null;
-    private static Map<String, Short> map = new HashMap<>();
+    private static final Map<String, Short> COLOR_MAP = new HashMap<>();
+
+    /* ===================================================================== */
+    /*  Font utilities                                                       */
+    /* ===================================================================== */
 
     /**
-     * Helper method to copy all properties from one font to another.
-     * 
-     * @param source The source font to copy properties from
-     * @param target The target font to copy properties to
+     * Copy <b>all</b> public font attributes from <code>source</code> to
+     * <code>target</code> (bold, italic&nbsp;…).
      */
-    public static void copyFontProperties(org.apache.poi.ss.usermodel.Font source, org.apache.poi.ss.usermodel.Font target) {
+    public static void copyFontProperties(org.apache.poi.ss.usermodel.Font source,
+                                          org.apache.poi.ss.usermodel.Font target) {
+        if (source == null || target == null) {
+            log.warn("copyFontProperties called with null arguments (src={}, tgt={})", source, target);
+            return;
+        }
         target.setBold(source.getBold());
         target.setItalic(source.getItalic());
         target.setStrikeout(source.getStrikeout());
         target.setUnderline(source.getUnderline());
         target.setFontHeightInPoints(source.getFontHeightInPoints());
         target.setFontName(source.getFontName());
-
-        // For XSSF specific fonts, we could copy more properties if needed
-        // But these are the core properties available in both HSSF and XSSF
     }
 
-    /**
-     * Updates the indexed color values if not already initialized.
-     * Populates a map of color names to their corresponding index values.
-     */
-    public static void updateIndexedValues() {
-        if (values == null) {
-            values = getEnumValues(IndexedColors.class);
-            for (IndexedColors ele : values) {
-                map.put(ele.toString(), ele.getIndex());
+    /* ===================================================================== */
+    /*  Colour helpers                                                       */
+    /* ===================================================================== */
+
+    /** One‑time initialiser for the colour map. */
+    private static synchronized void initColorMap() {
+        if (values != null) return;                 // already done
+        values = getEnumValues(IndexedColors.class);
+        if (values != null) {
+            for (IndexedColors col : values) {
+                COLOR_MAP.put(col.toString(), col.getIndex());
             }
-        }
-    }
-    /**
-     * Retrieves the color code for a given color name.
-     * 
-     * @param color The name of the color to retrieve the code for
-     * @return The color code as a short value, or 0 if the color is not found
-     */
-    public static short getColorCode(String color) {
-        updateIndexedValues();
-
-        String availableColors = Arrays.toString(values);
-        if (map.containsKey(color.toUpperCase().trim())) {
-            return map.get(color.toUpperCase().trim());
-        } else {
-            log.debug("Supported string constant colors are: {}", availableColors);
-            log.debug("Hex code can also be passed if you need more colors");
-            return 0;
+            log.debug("IndexedColours initialised ({} entries)", COLOR_MAP.size());
         }
     }
 
     /**
-     * Retrieves the enum values for a given enum class using reflection.
-     * 
-     * @param <E> The enum type
-     * @param enumClass The class of the enum to retrieve values for
-     * @return An array of enum values, or null if an error occurs
+     * Translate a POI colour name (case‑insensitive) to its palette index.
+     *
+     * @param colour name – e.g. "RED", "light_blue".
+     * @return index in the workbook palette or 0 if unknown.
      */
+    public static short getColorCode(String colour) {
+        if (colour == null) return 0;
+        initColorMap();
+
+        String key = colour.toUpperCase().trim();
+        Short idx = COLOR_MAP.get(key);
+        if (idx != null) {
+            return idx;
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Colour '{}' not recognised.  Available colours: {}", key, Arrays.toString(values));
+        }
+        return 0;
+    }
+
+    /* ===================================================================== */
+    /*  Reflection helper                                                    */
+    /* ===================================================================== */
+
+    @SuppressWarnings("unchecked")
     private static <E extends Enum<E>> E[] getEnumValues(Class<E> enumClass) {
         try {
-            Field fld = enumClass.getDeclaredField("$VALUES");
-            fld.setAccessible(true);
-            Object o = fld.get(null);
-            return (E[]) o;
-        } catch (Exception e) {
-            log.error("Error in getting color enumerators", e);
+            Field f = enumClass.getDeclaredField("$VALUES");
+            f.setAccessible(true);
+            return (E[]) f.get(null);
+        } catch (Exception ex) {
+            log.error("Unable to read enum constants from {} – {}", enumClass.getSimpleName(), ex.toString());
             return null;
         }
     }
 
-    /**
-     * Checks if a row is empty or contains only blank cells.
-     *
-     * @param row The row to check
-     * @return true if the row is empty or null, false otherwise
-     */
+    /* ===================================================================== */
+    /*  Cell/Row emptiness checks                                            */
+    /* ===================================================================== */
+
     public static boolean checkIfRowIsEmpty(org.apache.poi.ss.usermodel.Row row) {
+        if (row == null || row.getLastCellNum() <= 0) return true;
         try {
-            if (row == null || row.getLastCellNum() <= 0) {
-                return true;
+            for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
+                org.apache.poi.ss.usermodel.Cell cell = row.getCell(c);
+                if (!checkIfCellIsEmpty(cell)) return false;
             }
-
-            for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
-                org.apache.poi.ss.usermodel.Cell cell = row.getCell(cellNum);
-                if (cell != null && cell.getCellType() != org.apache.poi.ss.usermodel.CellType.BLANK && 
-                    org.apache.commons.lang3.StringUtils.isNotBlank(cell.toString())) {
-                    return false;
-                }
-            }
-        } catch (Exception e) {
-            return true;
+        } catch (Exception ex) {
+            log.debug("Row emptiness check failed – treating as empty: {}", ex.toString());
         }
-
         return true;
     }
 
-    /**
-     * Checks if a cell is empty or blank.
-     *
-     * @param cell The cell to check
-     * @return true if the cell is empty, null, or blank, false otherwise
-     */
     public static boolean checkIfCellIsEmpty(org.apache.poi.ss.usermodel.Cell cell) {
-        return cell == null || cell.getCellType() == org.apache.poi.ss.usermodel.CellType.BLANK || 
-               !org.apache.commons.lang3.StringUtils.isNotBlank(cell.toString());
+        return cell == null || cell.getCellType() == org.apache.poi.ss.usermodel.CellType.BLANK ||
+                org.apache.commons.lang3.StringUtils.isBlank(cell.toString());
     }
 
+    /* ===================================================================== */
+    /*  Workbook helper                                                      */
+    /* ===================================================================== */
+
     /**
-     * Saves the workbook to the specified file.
-     *
-     * @param wb The workbook to save
-     * @param filePath The complete file path and name to save to
+     * Convenience wrapper around {@link org.apache.poi.ss.usermodel.Workbook#write(java.io.OutputStream)}
+     * that always closes the stream and logs success/failure at <tt>INFO</tt> level.
      */
     public static void saveWorkBook(org.apache.poi.ss.usermodel.Workbook wb, String filePath) {
-        try (java.io.OutputStream fileOut = new java.io.FileOutputStream(filePath)) {
-            wb.write(fileOut);
-            log.debug("Workbook saved successfully to: {}", filePath);
-        } catch (Exception e) {
-            log.error("Error in saving workbook: {}", e.getMessage());
+        try (java.io.OutputStream out = new java.io.FileOutputStream(filePath)) {
+            wb.write(out);
+            log.info("Workbook saved to {}", filePath);
+        } catch (Exception ex) {
+            log.error("Failed to save workbook to {} – {}", filePath, ex.toString());
         }
     }
 }
