@@ -356,7 +356,11 @@ public class ExcelWorkBook {
      * @return The full path of the Excel file
      */
     private String getFullPath() {
-        return excelBookPath + "\\" + excelBookName;
+        if (excelBookPath.endsWith(java.io.File.separator)) {
+            return excelBookPath + excelBookName;
+        } else {
+            return excelBookPath + java.io.File.separator + excelBookName;
+        }
     }
 
     /**
