@@ -47,7 +47,7 @@
 
         <apachepoi.version>5.4.1</apachepoi.version>
         <junit.version>5.10.0</junit.version>
-        <log4j.version>2.20.0</log4j.version>
+        <log4j.version>2.25.3</log4j.version>
         <commons.lang.version>3.13.0</commons.lang.version>
         <jacoco.version>0.8.11</jacoco.version>
         <lombok.version>1.18.30</lombok.version>
