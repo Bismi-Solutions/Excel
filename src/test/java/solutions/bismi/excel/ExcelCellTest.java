@@ -290,33 +290,33 @@ class ExcelCellTest {
 
         // Test null values
         ExcelCell nullCell = sh1.cell(1, 1);
-        Assertions.assertTrue(nullCell.setText(null), "Should handle null text value");
+        Assertions.assertSame(nullCell, nullCell.setText(null), "setText(null) should return the same cell");
         Assertions.assertEquals("", nullCell.getTextValue(), "Null text should be converted to empty string");
         sh1.saveWorkBook();
         // Test empty string
         ExcelCell emptyCell = sh1.cell(1, 2);
-        Assertions.assertTrue(emptyCell.setText(""), "Should handle empty string");
+        Assertions.assertSame(emptyCell, emptyCell.setText(""), "setText(\"\") should return the same cell");
         Assertions.assertEquals("", emptyCell.getTextValue(), "Empty string should be preserved");
         sh1.saveWorkBook();
         // Test very long text
         String longText = "x".repeat(32767); // Maximum cell text length
         ExcelCell longTextCell = sh1.cell(1, 3);
-        Assertions.assertTrue(longTextCell.setText(longText), "Should handle maximum length text");
+        Assertions.assertSame(longTextCell, longTextCell.setText(longText), "setText(longText) should return the same cell");
         Assertions.assertEquals(longText, longTextCell.getTextValue(), "Long text should be preserved");
         sh1.saveWorkBook();
         // Test invalid numeric values
         ExcelCell invalidNumericCell = sh1.cell(1, 4);
-        Assertions.assertTrue(invalidNumericCell.setNumericValue(Double.NaN), "Should handle NaN");
-        Assertions.assertTrue(invalidNumericCell.setNumericValue(Double.POSITIVE_INFINITY), "Should handle infinity");
-        Assertions.assertTrue(invalidNumericCell.setNumericValue(Double.NEGATIVE_INFINITY), "Should handle negative infinity");
+        Assertions.assertSame(invalidNumericCell, invalidNumericCell.setNumericValue(Double.NaN), "setNumericValue(NaN) should return the same cell");
+        Assertions.assertSame(invalidNumericCell, invalidNumericCell.setNumericValue(Double.POSITIVE_INFINITY), "setNumericValue(+Inf) should return the same cell");
+        Assertions.assertSame(invalidNumericCell, invalidNumericCell.setNumericValue(Double.NEGATIVE_INFINITY), "setNumericValue(-Inf) should return the same cell");
         sh1.saveWorkBook();
         // Test invalid date values
         ExcelCell invalidDateCell = sh1.cell(1, 5);
-        Assertions.assertTrue(invalidDateCell.setDateValue(null), "Should handle null date");
+        Assertions.assertSame(invalidDateCell, invalidDateCell.setDateValue(null), "setDateValue(null) should return the same cell");
         sh1.saveWorkBook();
         // Test invalid formula
         ExcelCell invalidFormulaCell = sh1.cell(1, 6);
-        Assertions.assertTrue(invalidFormulaCell.setFormula("=INVALID_FORMULA()"), "Should handle invalid formula");
+        Assertions.assertSame(invalidFormulaCell, invalidFormulaCell.setFormula("=INVALID_FORMULA()"), "setFormula(invalid) should return the same cell");
         sh1.saveWorkBook();
         // Test invalid color values
         ExcelCell invalidColorCell = sh1.cell(1, 7);
@@ -327,12 +327,12 @@ class ExcelCellTest {
 
         // Test invalid alignment values
         ExcelCell invalidAlignCell = sh1.cell(1, 8);
-        Assertions.assertTrue(invalidAlignCell.setHorizontalAlignment("INVALID_ALIGNMENT"), "Should handle invalid horizontal alignment");
-        Assertions.assertTrue(invalidAlignCell.setVerticalAlignment("INVALID_ALIGNMENT"), "Should handle invalid vertical alignment");
+        Assertions.assertSame(invalidAlignCell, invalidAlignCell.setHorizontalAlignment("INVALID_ALIGNMENT"), "setHorizontalAlignment(invalid) should return the same cell");
+        Assertions.assertSame(invalidAlignCell, invalidAlignCell.setVerticalAlignment("INVALID_ALIGNMENT"), "setVerticalAlignment(invalid) should return the same cell");
         sh1.saveWorkBook();
         // Test invalid number format
         ExcelCell invalidFormatCell = sh1.cell(1, 9);
-        Assertions.assertTrue(invalidFormatCell.setNumberFormat("INVALID_FORMAT"), "Should handle invalid number format");
+        Assertions.assertSame(invalidFormatCell, invalidFormatCell.setNumberFormat("INVALID_FORMAT"), "setNumberFormat(invalid) should return the same cell");
         sh1.saveWorkBook();
         sh1.saveWorkBook();
         xlApp.closeAllWorkBooks();
@@ -641,5 +641,100 @@ class ExcelCellTest {
 
         sh1.saveWorkBook();
         xlApp.closeAllWorkBooks();
+    }
+
+    @Test
+    void mSetValuePolymorphic() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/cellSetValue.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("V");
+
+        sh.cell(1, 1).setValue("hello");
+        sh.cell(1, 2).setValue(42);
+        sh.cell(1, 3).setValue(3.14);
+        sh.cell(1, 4).setValue(true);
+        sh.cell(1, 5).setValue(new java.util.Date(0L));
+        sh.cell(1, 6).setValue((Object) null);
+
+        org.apache.poi.ss.usermodel.Sheet raw = wb.getWb().getSheet("V");
+        Assertions.assertEquals("hello", raw.getRow(0).getCell(0).getStringCellValue());
+        Assertions.assertEquals(42.0,    raw.getRow(0).getCell(1).getNumericCellValue(), 0.0001);
+        Assertions.assertEquals(3.14,    raw.getRow(0).getCell(2).getNumericCellValue(), 0.0001);
+        Assertions.assertTrue(raw.getRow(0).getCell(3).getBooleanCellValue());
+        Assertions.assertNotNull(raw.getRow(0).getCell(4).getDateCellValue());
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.CellType.BLANK,
+                raw.getRow(0).getCell(5).getCellType());
+
+        sh.saveWorkBook();
+        app.closeAllWorkBooks();
+    }
+
+    @Test
+    void nSetValueWithLocalDateAndLocalDateTime() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/cellLocalDate.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("D");
+
+        sh.cell(1, 1).setValue(java.time.LocalDate.of(2026, 4, 21));
+        sh.cell(1, 2).setValue(java.time.LocalDateTime.of(2026, 4, 21, 12, 0));
+
+        org.apache.poi.ss.usermodel.Sheet raw = wb.getWb().getSheet("D");
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.CellType.NUMERIC,
+                raw.getRow(0).getCell(0).getCellType());
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.CellType.NUMERIC,
+                raw.getRow(0).getCell(1).getCellType());
+
+        sh.saveWorkBook();
+        app.closeAllWorkBooks();
+    }
+
+    @Test
+    void oApplyStyleToCellChangesFormat() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/cellApplyStyle.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("S");
+
+        sh.cell(1, 1).setValue(1000.5).applyStyle(ExcelStyle.currency());
+
+        org.apache.poi.ss.usermodel.Cell raw = wb.getWb().getSheet("S").getRow(0).getCell(0);
+        Assertions.assertTrue(raw.getCellStyle().getDataFormatString().contains("$"));
+
+        sh.saveWorkBook();
+        app.closeAllWorkBooks();
+    }
+
+    @Test
+    void pSetHyperlinkCreatesLink() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/cellHyperlink.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("H");
+
+        sh.cell(1, 1).setHyperlink("https://example.com", "Example");
+
+        org.apache.poi.ss.usermodel.Cell raw = wb.getWb().getSheet("H").getRow(0).getCell(0);
+        Assertions.assertNotNull(raw.getHyperlink());
+        Assertions.assertEquals("https://example.com", raw.getHyperlink().getAddress());
+        Assertions.assertEquals("Example", raw.getStringCellValue());
+
+        sh.saveWorkBook();
+        app.closeAllWorkBooks();
+    }
+
+    @Test
+    void qSetCommentAttachesComment() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/cellComment.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("C");
+
+        sh.cell(2, 2).setValue("Data");
+        sh.cell(2, 2).setComment("This is a note", "Tester");
+
+        org.apache.poi.ss.usermodel.Cell raw = wb.getWb().getSheet("C").getRow(1).getCell(1);
+        Assertions.assertNotNull(raw.getCellComment());
+        Assertions.assertEquals("This is a note", raw.getCellComment().getString().getString());
+        Assertions.assertEquals("Tester", raw.getCellComment().getAuthor());
+
+        sh.saveWorkBook();
+        app.closeAllWorkBooks();
     }
 }

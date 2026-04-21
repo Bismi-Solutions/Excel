@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 500" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <linearGradient id="hdr" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#2d6cdf"/>
+      <stop offset="100%" stop-color="#1e4fb2"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect x="10" y="10" width="960" height="480" rx="6" fill="#ffffff" stroke="#d0d7de" filter="url(#shadow)"/>
+
+  <!-- Window chrome -->
+  <rect x="10" y="10" width="960" height="32" rx="6" fill="#0d4ba1"/>
+  <rect x="10" y="30" width="960" height="12" fill="#0d4ba1"/>
+  <circle cx="28" cy="26" r="5" fill="#ff5f57"/>
+  <circle cx="44" cy="26" r="5" fill="#febc2e"/>
+  <circle cx="60" cy="26" r="5" fill="#28c840"/>
+  <text x="82" y="30" fill="#ffffff" font-size="13" font-weight="600">employees.xlsx — Directory</text>
+
+  <!-- Column letter row -->
+  <g font-size="11" fill="#57606a" text-anchor="middle">
+    <rect x="10"  y="58" width="30"  height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="40"  y="58" width="60"  height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="100" y="58" width="160" height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="260" y="58" width="180" height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="440" y="58" width="220" height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="660" y="58" width="120" height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="780" y="58" width="110" height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="890" y="58" width="80"  height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="73">#</text>
+    <text x="70"  y="73">A</text>
+    <text x="180" y="73">B</text>
+    <text x="350" y="73">C</text>
+    <text x="550" y="73">D</text>
+    <text x="720" y="73">E</text>
+    <text x="835" y="73">F</text>
+    <text x="930" y="73">G</text>
+  </g>
+
+  <!-- Header row (row 1 in file — no title) -->
+  <rect x="10" y="80" width="30" height="32" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="100" font-size="11" fill="#57606a" text-anchor="middle">1</text>
+  <g font-size="12" fill="#ffffff" font-weight="700" text-anchor="middle">
+    <rect x="40"  y="80" width="60"  height="32" fill="url(#hdr)" stroke="#0d4ba1"/>
+    <rect x="100" y="80" width="160" height="32" fill="url(#hdr)" stroke="#0d4ba1"/>
+    <rect x="260" y="80" width="180" height="32" fill="url(#hdr)" stroke="#0d4ba1"/>
+    <rect x="440" y="80" width="220" height="32" fill="url(#hdr)" stroke="#0d4ba1"/>
+    <rect x="660" y="80" width="120" height="32" fill="url(#hdr)" stroke="#0d4ba1"/>
+    <rect x="780" y="80" width="110" height="32" fill="url(#hdr)" stroke="#0d4ba1"/>
+    <rect x="890" y="80" width="80"  height="32" fill="url(#hdr)" stroke="#0d4ba1"/>
+    <text x="70"  y="100">Id</text>
+    <text x="180" y="100">Name</text>
+    <text x="350" y="100">Role</text>
+    <text x="550" y="100">Email</text>
+    <text x="720" y="100">Joined</text>
+    <text x="835" y="100">Salary</text>
+    <text x="930" y="100">Active</text>
+  </g>
+  <!-- auto-filter triangles -->
+  <g fill="#ffffff">
+    <polygon points="88,95 96,95 92,101"/>
+    <polygon points="248,95 256,95 252,101"/>
+    <polygon points="428,95 436,95 432,101"/>
+    <polygon points="648,95 656,95 652,101"/>
+    <polygon points="768,95 776,95 772,101"/>
+    <polygon points="878,95 886,95 882,101"/>
+    <polygon points="958,95 966,95 962,101"/>
+  </g>
+
+  <!-- Freeze marker -->
+  <line x1="40" y1="112" x2="970" y2="112" stroke="#2d6cdf" stroke-width="0.8" stroke-dasharray="4,2" opacity="0.6"/>
+  <text x="960" y="108" font-size="9" fill="#2d6cdf" text-anchor="end" font-weight="700">↑ header frozen</text>
+
+  <!-- Data rows -->
+  <!-- Row 2 (white) — with red comment triangle on Name -->
+  <g font-size="12" fill="#24292f">
+    <rect x="10"  y="112" width="30"  height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="130" font-size="11" fill="#57606a" text-anchor="middle">2</text>
+    <rect x="40"  y="112" width="60"  height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="100" y="112" width="160" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="260" y="112" width="180" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="440" y="112" width="220" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="660" y="112" width="120" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="780" y="112" width="110" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="890" y="112" width="80"  height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="70"  y="130" text-anchor="middle">101</text>
+    <text x="112" y="130">Amina Khan</text>
+    <text x="272" y="130">Engineer</text>
+    <text x="452" y="130" fill="#0969da" text-decoration="underline">amina.khan@example.com</text>
+    <text x="720" y="130" text-anchor="middle">12-Jul-2021</text>
+    <text x="880" y="130" text-anchor="end">$95,000</text>
+    <text x="930" y="130" text-anchor="middle">true</text>
+  </g>
+  <!-- comment indicator on Name cell -->
+  <polygon points="255,113 260,113 260,118" fill="#cf222e"/>
+
+  <!-- Row 3 (zebra) -->
+  <g font-size="12" fill="#24292f">
+    <rect x="10"  y="140" width="30"  height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="158" font-size="11" fill="#57606a" text-anchor="middle">3</text>
+    <rect x="40"  y="140" width="60"  height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="100" y="140" width="160" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="260" y="140" width="180" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="440" y="140" width="220" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="660" y="140" width="120" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="780" y="140" width="110" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="890" y="140" width="80"  height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <text x="70"  y="158" text-anchor="middle">102</text>
+    <text x="112" y="158">Rahul Menon</text>
+    <text x="272" y="158">Senior Engineer</text>
+    <text x="452" y="158" fill="#0969da" text-decoration="underline">rahul.menon@example.com</text>
+    <text x="720" y="158" text-anchor="middle">04-Mar-2019</text>
+    <text x="880" y="158" text-anchor="end">$135,000</text>
+    <text x="930" y="158" text-anchor="middle">true</text>
+  </g>
+
+  <!-- Row 4 (white) -->
+  <g font-size="12" fill="#24292f">
+    <rect x="10"  y="168" width="30"  height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="186" font-size="11" fill="#57606a" text-anchor="middle">4</text>
+    <rect x="40"  y="168" width="60"  height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="100" y="168" width="160" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="260" y="168" width="180" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="440" y="168" width="220" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="660" y="168" width="120" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="780" y="168" width="110" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="890" y="168" width="80"  height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="70"  y="186" text-anchor="middle">103</text>
+    <text x="112" y="186">Sofia Gomez</text>
+    <text x="272" y="186">Product Manager</text>
+    <text x="452" y="186" fill="#0969da" text-decoration="underline">sofia.gomez@example.com</text>
+    <text x="720" y="186" text-anchor="middle">21-Nov-2022</text>
+    <text x="880" y="186" text-anchor="end">$110,000</text>
+    <text x="930" y="186" text-anchor="middle">true</text>
+  </g>
+
+  <!-- Row 5 (zebra + INACTIVE grey italic) -->
+  <g font-size="12" fill="#6e7781" font-style="italic">
+    <rect x="10"  y="196" width="30"  height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="214" font-size="11" fill="#57606a" text-anchor="middle" font-style="normal">5</text>
+    <rect x="40"  y="196" width="60"  height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="100" y="196" width="160" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="260" y="196" width="180" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="440" y="196" width="220" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="660" y="196" width="120" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="780" y="196" width="110" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="890" y="196" width="80"  height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <text x="70"  y="214" text-anchor="middle">104</text>
+    <text x="112" y="214">Dmitri Ivanov</text>
+    <text x="272" y="214">QA Lead</text>
+    <text x="452" y="214" fill="#6e7781" text-decoration="underline">dmitri.ivanov@example.com</text>
+    <text x="720" y="214" text-anchor="middle">09-Jan-2018</text>
+    <text x="880" y="214" text-anchor="end">$120,000</text>
+    <text x="930" y="214" text-anchor="middle">false</text>
+  </g>
+
+  <!-- Row 6 (white) -->
+  <g font-size="12" fill="#24292f">
+    <rect x="10"  y="224" width="30"  height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="242" font-size="11" fill="#57606a" text-anchor="middle">6</text>
+    <rect x="40"  y="224" width="60"  height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="100" y="224" width="160" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="260" y="224" width="180" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="440" y="224" width="220" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="660" y="224" width="120" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="780" y="224" width="110" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="890" y="224" width="80"  height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="70"  y="242" text-anchor="middle">105</text>
+    <text x="112" y="242">Priya Naidu</text>
+    <text x="272" y="242">Designer</text>
+    <text x="452" y="242" fill="#0969da" text-decoration="underline">priya.naidu@example.com</text>
+    <text x="720" y="242" text-anchor="middle">15-Jun-2023</text>
+    <text x="880" y="242" text-anchor="end">$88,000</text>
+    <text x="930" y="242" text-anchor="middle">true</text>
+  </g>
+
+  <!-- Comment popup (next to row 2 Name cell) -->
+  <g filter="url(#shadow)">
+    <rect x="280" y="145" width="240" height="54" rx="4" fill="#fffbd7" stroke="#bf8700"/>
+    <text x="292" y="164" font-size="11" fill="#57606a" font-weight="700">HR Team:</text>
+    <text x="292" y="180" font-size="11" fill="#24292f">Go-to for onboarding questions</text>
+  </g>
+  <line x1="260" y1="125" x2="280" y2="155" stroke="#bf8700" stroke-width="1" stroke-dasharray="2,2"/>
+
+  <!-- Code callout -->
+  <rect x="40" y="290" width="900" height="160" rx="6" fill="#fff" stroke="#d0d7de"/>
+  <text x="56" y="310" font-size="12" fill="#24292f" font-weight="700">examples/EmployeeDirectoryExample.java — Write + round-trip read</text>
+  <text x="56" y="334" font-size="11" fill="#57606a" font-family="Consolas, monospace">ReportBuilder.on(sheet).rowsFromBeans(staff)</text>
+  <text x="56" y="350" font-size="11" fill="#57606a" font-family="Consolas, monospace">    .zebraStripes(true).freezeHeader(true).autoFilter(true).render();</text>
+  <text x="56" y="372" font-size="11" fill="#57606a" font-family="Consolas, monospace">// post-process: hyperlink emails + pin a comment</text>
+  <text x="56" y="388" font-size="11" fill="#57606a" font-family="Consolas, monospace">sheet.cell(row, 4).setHyperlink("mailto:" + emp.email, emp.email);</text>
+  <text x="56" y="404" font-size="11" fill="#57606a" font-family="Consolas, monospace">sheet.cell(2, 2).setComment("Go-to for onboarding questions", "HR Team");</text>
+  <text x="56" y="426" font-size="11" fill="#57606a" font-family="Consolas, monospace">// read the same file back into a List&lt;Employee&gt;</text>
+  <text x="56" y="442" font-size="11" fill="#57606a" font-family="Consolas, monospace">List&lt;Employee&gt; staff = sheet.readAsBeans(Employee.class);</text>
+</svg>

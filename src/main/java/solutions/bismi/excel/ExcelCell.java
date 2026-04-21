@@ -9,6 +9,7 @@ import lombok.Builder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellUtil;
 
@@ -113,110 +114,88 @@ public class ExcelCell {
         return localCell;
     }
 
-    public boolean setText(String sText) {
-
-
+    public ExcelCell setText(String sText) {
         return setText(sText, false);
-
     }
 
-    public boolean setCellValue(String sText) {
-
-
+    public ExcelCell setCellValue(String sText) {
         return setCellValue(sText, false);
-
     }
 
     /**
-     * Sets a text value in the cell.
+     * Sets a plain text value in the cell.
      *
      * @param sText           The text value to set
      * @param autoSizeColoumn Whether to auto-size the column
-     * @return true if successful, false otherwise
+     * @return this cell for chaining
      */
-    public boolean setCellValue(String sText, boolean autoSizeColoumn) {
+    public ExcelCell setCellValue(String sText, boolean autoSizeColoumn) {
         try {
             this.getCell().setCellValue(sText);
             if (autoSizeColoumn) {
                 this.sheet.autoSizeColumn(col - 1);
             }
-            return true;
         } catch (Exception e) {
             log.error("Error in setting cell value: {}", e.getMessage());
-            return false;
         }
+        return this;
     }
 
     /**
-     * Sets a numeric value in the cell
+     * Sets a numeric value in the cell.
      *
      * @param value          The numeric value to set
      * @param autoSizeColumn Whether to auto-size the column
-     * @return true if successful, false otherwise
+     * @return this cell for chaining
      */
-    public boolean setNumericValue(double value, boolean autoSizeColumn) {
+    public ExcelCell setNumericValue(double value, boolean autoSizeColumn) {
         try {
             this.getCell().setCellValue(value);
             if (autoSizeColumn) {
                 this.sheet.autoSizeColumn(col - 1);
             }
-            return true;
         } catch (Exception e) {
             log.error("Error in setting numeric value: {}", e.getMessage());
-            return false;
         }
+        return this;
     }
 
-    /**
-     * Sets a numeric value in the cell
-     *
-     * @param value The numeric value to set
-     * @return true if successful, false otherwise
-     */
-    public boolean setNumericValue(double value) {
+    public ExcelCell setNumericValue(double value) {
         return setNumericValue(value, false);
     }
 
     /**
-     * Sets a date value in the cell
+     * Sets a date value in the cell.
      *
      * @param date           The date value to set
      * @param autoSizeColumn Whether to auto-size the column
-     * @return true if successful, false otherwise
+     * @return this cell for chaining
      */
-    public boolean setDateValue(java.util.Date date, boolean autoSizeColumn) {
+    public ExcelCell setDateValue(java.util.Date date, boolean autoSizeColumn) {
         try {
             this.getCell().setCellValue(date);
             if (autoSizeColumn) {
                 this.sheet.autoSizeColumn(col - 1);
             }
-            return true;
         } catch (Exception e) {
             log.error("Error in setting date value: {}", e.getMessage());
-            return false;
         }
+        return this;
     }
 
-    /**
-     * Sets a date value in the cell
-     *
-     * @param date The date value to set
-     * @return true if successful, false otherwise
-     */
-    public boolean setDateValue(java.util.Date date) {
+    public ExcelCell setDateValue(java.util.Date date) {
         return setDateValue(date, false);
     }
 
     /**
-     * Sets a formula in the cell
+     * Sets a formula in the cell. Leading {@code =} is stripped if present.
      *
-     * @param formula        The formula to set (without the leading '=')
+     * @param formula        The formula to set
      * @param autoSizeColumn Whether to auto-size the column
-     * @return true if successful, false otherwise
+     * @return this cell for chaining
      */
-    public boolean setFormula(String formula, boolean autoSizeColumn) {
+    public ExcelCell setFormula(String formula, boolean autoSizeColumn) {
         try {
-            // Remove leading equals sign if present
             if (formula != null && formula.startsWith("=")) {
                 formula = formula.substring(1);
             }
@@ -224,47 +203,35 @@ public class ExcelCell {
             if (autoSizeColumn) {
                 this.sheet.autoSizeColumn(col - 1);
             }
-            return true;
         } catch (Exception e) {
             log.error("Error in setting formula: {}", e.getMessage());
-            return false;
         }
+        return this;
     }
 
-    /**
-     * Sets a formula in the cell
-     *
-     * @param formula The formula to set (without the leading '=')
-     * @return true if successful, false otherwise
-     */
-    public boolean setFormula(String formula) {
+    public ExcelCell setFormula(String formula) {
         return setFormula(formula, false);
     }
 
     /**
-     * Sets a text value in the cell with text formatting.
+     * Sets a text value in the cell with explicit "@" text formatting.
      *
      * @param sText           The text value to set
      * @param autoSizeColoumn Whether to auto-size the column
-     * @return true if successful, false otherwise
+     * @return this cell for chaining
      */
-    public boolean setText(String sText, boolean autoSizeColoumn) {
-        Cell cCell = null;
-
+    public ExcelCell setText(String sText, boolean autoSizeColoumn) {
         try {
-            cCell = this.getCell();
+            Cell cCell = this.getCell();
 
-            // Get the current cell style
             Workbook workbook = cCell.getSheet().getWorkbook();
             CellStyle originalStyle = cCell.getCellStyle();
             CellStyle newStyle = workbook.createCellStyle();
             newStyle.cloneStyleFrom(originalStyle);
 
-            // Set the data format to Text
             DataFormat format = workbook.createDataFormat();
-            newStyle.setDataFormat(format.getFormat("@"));  // "@" is the format code for Text
+            newStyle.setDataFormat(format.getFormat("@"));
 
-            // Use RichTextString for long text to ensure proper handling
             if (sText != null && !sText.isEmpty()) {
                 RichTextString richText = workbook.getCreationHelper().createRichTextString(sText);
                 cCell.setCellValue(richText);
@@ -277,12 +244,10 @@ public class ExcelCell {
             if (autoSizeColoumn) {
                 this.sheet.autoSizeColumn(col - 1);
             }
-
-            return true;
         } catch (Exception e) {
             log.error("Error in setting text value: {}", e.getMessage());
-            return false;
         }
+        return this;
     }
 
     private void setHexColor(String hexColor, Font newFont) {
@@ -397,39 +362,36 @@ public class ExcelCell {
      * Sets the background fill color for the cell.
      *
      * @param fillColor The color name to set for the cell background
+     * @return this cell for chaining
      */
-    public void setFillColor(String fillColor) {
+    public ExcelCell setFillColor(String fillColor) {
         try {
             Cell cCell = this.getCell();
 
-            // Get the current cell style
             Workbook workbook = cCell.getSheet().getWorkbook();
             CellStyle originalStyle = cCell.getCellStyle();
             CellStyle newStyle = workbook.createCellStyle();
             newStyle.cloneStyleFrom(originalStyle);
 
-            // Set the fill pattern and color
             newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             newStyle.setFillForegroundColor(Common.getColorCode(fillColor));
 
-            // Apply the new style to the cell
             cCell.setCellStyle(newStyle);
         } catch (Exception e) {
             log.error("Error in setting fill color: {}", e.getMessage());
         }
+        return this;
     }
 
     /**
-     * Sets the horizontal alignment of the cell content
+     * Sets the horizontal alignment of the cell content.
      *
-     * @param alignment The alignment to set (LEFT, CENTER, RIGHT, etc.)
-     * @return true if successful, false otherwise
+     * @param alignment LEFT / CENTER / RIGHT / JUSTIFY / FILL / GENERAL
+     * @return this cell for chaining
      */
-    public boolean setHorizontalAlignment(String alignment) {
+    public ExcelCell setHorizontalAlignment(String alignment) {
         try {
             Cell cCell = this.getCell();
-
-            // Get the current cell style
             Workbook workbook = cCell.getSheet().getWorkbook();
             CellStyle originalStyle = cCell.getCellStyle();
             CellStyle newStyle = workbook.createCellStyle();
@@ -437,48 +399,30 @@ public class ExcelCell {
 
             HorizontalAlignment hAlign;
             switch (alignment.toUpperCase()) {
-                case "LEFT":
-                    hAlign = HorizontalAlignment.LEFT;
-                    break;
-                case "CENTER":
-                    hAlign = HorizontalAlignment.CENTER;
-                    break;
-                case "RIGHT":
-                    hAlign = HorizontalAlignment.RIGHT;
-                    break;
-                case "JUSTIFY":
-                    hAlign = HorizontalAlignment.JUSTIFY;
-                    break;
-                case "FILL":
-                    hAlign = HorizontalAlignment.FILL;
-                    break;
-                default:
-                    hAlign = HorizontalAlignment.GENERAL;
+                case "LEFT":    hAlign = HorizontalAlignment.LEFT;    break;
+                case "CENTER":  hAlign = HorizontalAlignment.CENTER;  break;
+                case "RIGHT":   hAlign = HorizontalAlignment.RIGHT;   break;
+                case "JUSTIFY": hAlign = HorizontalAlignment.JUSTIFY; break;
+                case "FILL":    hAlign = HorizontalAlignment.FILL;    break;
+                default:        hAlign = HorizontalAlignment.GENERAL;
             }
-
-            // Set the horizontal alignment
             newStyle.setAlignment(hAlign);
-
-            // Apply the new style to the cell
             cCell.setCellStyle(newStyle);
-            return true;
         } catch (Exception e) {
             log.error("Error in setting horizontal alignment: {}", e.getMessage());
-            return false;
         }
+        return this;
     }
 
     /**
-     * Sets the vertical alignment of the cell content
+     * Sets the vertical alignment of the cell content.
      *
-     * @param alignment The alignment to set (TOP, CENTER, BOTTOM, etc.)
-     * @return true if successful, false otherwise
+     * @param alignment TOP / CENTER / BOTTOM / JUSTIFY / DISTRIBUTED
+     * @return this cell for chaining
      */
-    public boolean setVerticalAlignment(String alignment) {
+    public ExcelCell setVerticalAlignment(String alignment) {
         try {
             Cell cCell = this.getCell();
-
-            // Get the current cell style
             Workbook workbook = cCell.getSheet().getWorkbook();
             CellStyle originalStyle = cCell.getCellStyle();
             CellStyle newStyle = workbook.createCellStyle();
@@ -486,75 +430,51 @@ public class ExcelCell {
 
             VerticalAlignment vAlign;
             switch (alignment.toUpperCase()) {
-                case "TOP":
-                    vAlign = VerticalAlignment.TOP;
-                    break;
-                case "CENTER":
-                    vAlign = VerticalAlignment.CENTER;
-                    break;
-                case "BOTTOM":
-                    vAlign = VerticalAlignment.BOTTOM;
-                    break;
-                case "JUSTIFY":
-                    vAlign = VerticalAlignment.JUSTIFY;
-                    break;
-                case "DISTRIBUTED":
-                    vAlign = VerticalAlignment.DISTRIBUTED;
-                    break;
-                default:
-                    vAlign = VerticalAlignment.CENTER;
+                case "TOP":         vAlign = VerticalAlignment.TOP;         break;
+                case "CENTER":      vAlign = VerticalAlignment.CENTER;      break;
+                case "BOTTOM":      vAlign = VerticalAlignment.BOTTOM;      break;
+                case "JUSTIFY":     vAlign = VerticalAlignment.JUSTIFY;     break;
+                case "DISTRIBUTED": vAlign = VerticalAlignment.DISTRIBUTED; break;
+                default:            vAlign = VerticalAlignment.CENTER;
             }
-
-            // Set the vertical alignment
             newStyle.setVerticalAlignment(vAlign);
-
-            // Apply the new style to the cell
             cCell.setCellStyle(newStyle);
-            return true;
         } catch (Exception e) {
             log.error("Error in setting vertical alignment: {}", e.getMessage());
-            return false;
         }
+        return this;
     }
 
     /**
-     * Sets the number format for the cell
+     * Sets the number format for the cell.
      *
-     * @param formatPattern The format pattern to use (e.g., "#,##0.00", "dd/mm/yyyy")
-     * @return true if successful, false otherwise
+     * @param formatPattern e.g. "#,##0.00", "dd/mm/yyyy", "$#,##0.00"
+     * @return this cell for chaining
      */
-    public boolean setNumberFormat(String formatPattern) {
+    public ExcelCell setNumberFormat(String formatPattern) {
         try {
             Cell cCell = this.getCell();
-
-            // Get the current cell style
             Workbook workbook = cCell.getSheet().getWorkbook();
             CellStyle originalStyle = cCell.getCellStyle();
             CellStyle newStyle = workbook.createCellStyle();
             newStyle.cloneStyleFrom(originalStyle);
 
-            // Set the number format
             DataFormat format = workbook.createDataFormat();
             newStyle.setDataFormat(format.getFormat(formatPattern));
 
-            // Apply the new style to the cell
             cCell.setCellStyle(newStyle);
-            return true;
         } catch (Exception e) {
             log.error("Error in setting number format: {}", e.getMessage());
-            return false;
         }
+        return this;
     }
 
     /**
-     * Sets the font style (bold, italic, etc.)
+     * Sets the font style (bold, italic, underline).
      *
-     * @param bold      true to make the font bold
-     * @param italic    true to make the font italic
-     * @param underline true to underline the text
-     * @return true if successful, false otherwise
+     * @return this cell for chaining
      */
-    public boolean setFontStyle(boolean bold, boolean italic, boolean underline) {
+    public ExcelCell setFontStyle(boolean bold, boolean italic, boolean underline) {
         try {
             Cell cCell = this.getCell();
             Font font = wb.createFont();
@@ -564,29 +484,26 @@ public class ExcelCell {
                 font.setUnderline(org.apache.poi.ss.usermodel.FontUnderline.SINGLE.getByteValue());
             }
             CellUtil.setFont(cCell, font);
-            return true;
         } catch (Exception e) {
             log.error("Error in setting font style: {}", e.getMessage());
-            return false;
         }
+        return this;
     }
 
     /**
-     * Sets a full border around the cell with the specified color.
+     * Adds a medium-weight border (all four sides) around the cell.
      *
-     * @param borderColor The color name to set for the border
+     * @param borderColor colour of the border (named or hex for XLSX)
+     * @return this cell for chaining
      */
-    public void setFullBorder(String borderColor) {
+    public ExcelCell setFullBorder(String borderColor) {
         try {
             Cell cCell = this.getCell();
-
-            // Get the current cell style
             Workbook workbook = cCell.getSheet().getWorkbook();
             CellStyle originalStyle = cCell.getCellStyle();
             CellStyle newStyle = workbook.createCellStyle();
             newStyle.cloneStyleFrom(originalStyle);
 
-            // Set border styles directly
             short colorCode = Common.getColorCode(borderColor);
 
             newStyle.setBorderLeft(BorderStyle.MEDIUM);
@@ -599,11 +516,11 @@ public class ExcelCell {
             newStyle.setTopBorderColor(colorCode);
             newStyle.setBottomBorderColor(colorCode);
 
-            // Apply the new style to the cell
             cCell.setCellStyle(newStyle);
         } catch (Exception e) {
             log.error("Error in setting border: {}", e.getMessage());
         }
+        return this;
     }
 
 
@@ -614,6 +531,119 @@ public class ExcelCell {
      */
     public String getValue() {
         return getTextValue();
+    }
+
+    /**
+     * Polymorphic value setter — dispatches to the correct typed setter based on runtime type.
+     * Accepts {@link Number}, {@link Boolean}, {@link java.util.Date}, {@link java.time.LocalDate},
+     * {@link java.time.LocalDateTime}, {@link CharSequence}, or {@code null}. Anything else
+     * is written via {@code toString()}.
+     *
+     * @param value the value to write
+     * @return this cell for chaining
+     */
+    public ExcelCell setValue(Object value) {
+        try {
+            Cell c = this.getCell();
+            if (value == null) {
+                c.setBlank();
+            } else if (value instanceof Number) {
+                c.setCellValue(((Number) value).doubleValue());
+            } else if (value instanceof Boolean) {
+                c.setCellValue((Boolean) value);
+            } else if (value instanceof java.util.Date) {
+                c.setCellValue((java.util.Date) value);
+            } else if (value instanceof java.time.LocalDate) {
+                c.setCellValue((java.time.LocalDate) value);
+            } else if (value instanceof java.time.LocalDateTime) {
+                c.setCellValue((java.time.LocalDateTime) value);
+            } else if (value instanceof CharSequence) {
+                c.setCellValue(value.toString());
+            } else {
+                c.setCellValue(value.toString());
+            }
+        } catch (Exception e) {
+            log.error("Error in setValue: {}", e.getMessage());
+        }
+        return this;
+    }
+
+    /**
+     * Applies a reusable {@link ExcelStyle} to this cell.
+     *
+     * @param style the style to apply (no-op if null)
+     * @return this cell for chaining
+     */
+    public ExcelCell applyStyle(ExcelStyle style) {
+        if (style != null) {
+            style.applyTo(this);
+        }
+        return this;
+    }
+
+    /**
+     * Attaches a clickable hyperlink to this cell (URL, email, or file path).
+     *
+     * @param url       target URL (e.g. {@code https://example.com} or {@code mailto:a@b.com})
+     * @param displayText text shown in the cell (if null, the URL is used)
+     * @return this cell for chaining
+     */
+    public ExcelCell setHyperlink(String url, String displayText) {
+        try {
+            Cell c = this.getCell();
+            Workbook workbook = c.getSheet().getWorkbook();
+            CreationHelper helper = workbook.getCreationHelper();
+            HyperlinkType type = HyperlinkType.URL;
+            if (url != null && url.toLowerCase().startsWith("mailto:")) {
+                type = HyperlinkType.EMAIL;
+            } else if (url != null && (url.startsWith("file:") || url.matches("^[A-Za-z]:\\\\.*") || url.startsWith("/"))) {
+                type = HyperlinkType.FILE;
+            }
+            Hyperlink link = helper.createHyperlink(type);
+            link.setAddress(url);
+            c.setHyperlink(link);
+            c.setCellValue(displayText != null ? displayText : url);
+
+            Font blue = workbook.createFont();
+            blue.setColor(IndexedColors.BLUE.getIndex());
+            blue.setUnderline(Font.U_SINGLE);
+            CellStyle linkStyle = workbook.createCellStyle();
+            linkStyle.cloneStyleFrom(c.getCellStyle());
+            linkStyle.setFont(blue);
+            c.setCellStyle(linkStyle);
+        } catch (Exception e) {
+            log.error("Error setting hyperlink: {}", e.getMessage());
+        }
+        return this;
+    }
+
+    /**
+     * Attaches a note / comment to this cell (appears on hover in Excel).
+     *
+     * @param text   comment body
+     * @param author author label (null falls back to empty)
+     * @return this cell for chaining
+     */
+    public ExcelCell setComment(String text, String author) {
+        try {
+            Cell c = this.getCell();
+            Sheet s = c.getSheet();
+            Workbook workbook = s.getWorkbook();
+            Drawing<?> drawing = s.createDrawingPatriarch();
+            CreationHelper helper = workbook.getCreationHelper();
+            ClientAnchor anchor = helper.createClientAnchor();
+            anchor.setCol1(c.getColumnIndex());
+            anchor.setCol2(c.getColumnIndex() + 3);
+            anchor.setRow1(c.getRowIndex());
+            anchor.setRow2(c.getRowIndex() + 3);
+            Comment comment = drawing.createCellComment(anchor);
+            comment.setString(helper.createRichTextString(text != null ? text : ""));
+            comment.setAuthor(author != null ? author : "");
+            c.setCellComment(comment);
+        } catch (Exception e) {
+            log.error("Error setting cell comment: {}", e.getMessage());
+        }
+        return this;
     }
 
     /**

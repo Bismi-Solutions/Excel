@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 620" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect x="10" y="10" width="800" height="600" rx="6" fill="#ffffff" stroke="#d0d7de" filter="url(#shadow)"/>
+
+  <!-- Window chrome -->
+  <rect x="10" y="10" width="800" height="32" rx="6" fill="#0d4ba1"/>
+  <rect x="10" y="30" width="800" height="12" fill="#0d4ba1"/>
+  <circle cx="28" cy="26" r="5" fill="#ff5f57"/>
+  <circle cx="44" cy="26" r="5" fill="#febc2e"/>
+  <circle cx="60" cy="26" r="5" fill="#28c840"/>
+  <text x="82" y="30" fill="#ffffff" font-size="13" font-weight="600">invoice.xlsx — Excel</text>
+
+  <!-- Title row (merged A1:E1) -->
+  <rect x="30" y="60" width="760" height="42" fill="#0d4ba1"/>
+  <text x="410" y="87" font-size="22" font-weight="700" fill="#ffffff" text-anchor="middle">INVOICE</text>
+
+  <!-- Invoice meta -->
+  <text x="40"  y="130" font-size="12" fill="#0d4ba1" font-weight="700">Invoice #:</text>
+  <text x="130" y="130" font-size="12" fill="#24292f">INV-2026-0042</text>
+  <text x="480" y="130" font-size="12" fill="#0d4ba1" font-weight="700">Date:</text>
+  <text x="540" y="130" font-size="12" fill="#24292f">21-Apr-2026</text>
+
+  <!-- From / Bill To labels -->
+  <text x="40"  y="170" font-size="12" fill="#0d4ba1" font-weight="700">From</text>
+  <text x="480" y="170" font-size="12" fill="#0d4ba1" font-weight="700">Bill To</text>
+
+  <!-- From block (grey fill) -->
+  <rect x="40"  y="178" width="400" height="62" fill="#ebeef2" stroke="#d0d7de"/>
+  <text x="52" y="198" font-size="12" fill="#24292f">Bismi Solutions</text>
+  <text x="52" y="215" font-size="12" fill="#24292f">Tech Park, Level 4</text>
+  <text x="52" y="232" font-size="12" fill="#24292f">Chennai, India 600001</text>
+
+  <!-- Bill To block -->
+  <rect x="480" y="178" width="300" height="62" fill="#ebeef2" stroke="#d0d7de"/>
+  <text x="492" y="198" font-size="12" fill="#24292f">Acme Corp.</text>
+  <text x="492" y="215" font-size="12" fill="#24292f">123 Market Street</text>
+  <text x="492" y="232" font-size="12" fill="#24292f">New York, NY 10001</text>
+
+  <!-- Line items table header -->
+  <rect x="40"  y="270" width="60"  height="30" fill="#636363" stroke="#404040"/>
+  <rect x="100" y="270" width="400" height="30" fill="#636363" stroke="#404040"/>
+  <rect x="500" y="270" width="140" height="30" fill="#636363" stroke="#404040"/>
+  <rect x="640" y="270" width="140" height="30" fill="#636363" stroke="#404040"/>
+  <g font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">
+    <text x="70"  y="289">Qty</text>
+    <text x="300" y="289">Description</text>
+    <text x="570" y="289">Unit Price</text>
+    <text x="710" y="289">Total</text>
+  </g>
+
+  <!-- Line items -->
+  <g font-size="12" fill="#24292f">
+    <!-- Row 1 -->
+    <rect x="40"  y="300" width="60"  height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="100" y="300" width="400" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="500" y="300" width="140" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="640" y="300" width="140" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="70"  y="319" text-anchor="middle">5</text>
+    <text x="114" y="319">Excel library — enterprise licence</text>
+    <text x="630" y="319" text-anchor="end">$299.00</text>
+    <text x="770" y="319" text-anchor="end">$1,495.00</text>
+
+    <!-- Row 2 -->
+    <rect x="40"  y="328" width="60"  height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="100" y="328" width="400" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="500" y="328" width="140" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="640" y="328" width="140" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <text x="70"  y="347" text-anchor="middle">12</text>
+    <text x="114" y="347">Premium support — hours</text>
+    <text x="630" y="347" text-anchor="end">$150.00</text>
+    <text x="770" y="347" text-anchor="end">$1,800.00</text>
+
+    <!-- Row 3 -->
+    <rect x="40"  y="356" width="60"  height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="100" y="356" width="400" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="500" y="356" width="140" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="640" y="356" width="140" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="70"  y="375" text-anchor="middle">1</text>
+    <text x="114" y="375">Onsite training day</text>
+    <text x="630" y="375" text-anchor="end">$1,200.00</text>
+    <text x="770" y="375" text-anchor="end">$1,200.00</text>
+
+    <!-- Row 4 -->
+    <rect x="40"  y="384" width="60"  height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="100" y="384" width="400" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="500" y="384" width="140" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="640" y="384" width="140" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <text x="70"  y="403" text-anchor="middle">3</text>
+    <text x="114" y="403">Custom reporting setup</text>
+    <text x="630" y="403" text-anchor="end">$450.00</text>
+    <text x="770" y="403" text-anchor="end">$1,350.00</text>
+  </g>
+
+  <!-- Totals -->
+  <rect x="500" y="440" width="140" height="26" fill="#ffffff" stroke="#d0d7de"/>
+  <rect x="640" y="440" width="140" height="26" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="512" y="458" font-size="12" fill="#0d4ba1" font-weight="700">Subtotal</text>
+  <text x="770" y="458" font-size="12" fill="#24292f" text-anchor="end">$5,845.00</text>
+
+  <rect x="500" y="466" width="140" height="26" fill="#ffffff" stroke="#d0d7de"/>
+  <rect x="640" y="466" width="140" height="26" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="512" y="484" font-size="12" fill="#0d4ba1" font-weight="700">Tax (8%)</text>
+  <text x="770" y="484" font-size="12" fill="#24292f" text-anchor="end">$467.60</text>
+
+  <rect x="500" y="492" width="140" height="34" fill="#e6eefc" stroke="#2d6cdf" stroke-width="1.5"/>
+  <rect x="640" y="492" width="140" height="34" fill="#e6eefc" stroke="#2d6cdf" stroke-width="1.5"/>
+  <text x="512" y="514" font-size="13" fill="#0d4ba1" font-weight="700">TOTAL</text>
+  <text x="770" y="514" font-size="13" fill="#0d4ba1" font-weight="700" text-anchor="end">$6,312.60</text>
+
+  <!-- Code callout -->
+  <rect x="40" y="545" width="740" height="55" rx="6" fill="#fff" stroke="#d0d7de"/>
+  <text x="56" y="565" font-size="11" fill="#24292f" font-weight="700">examples/InvoiceExample.java</text>
+  <text x="56" y="582" font-size="10.5" fill="#57606a" font-family="Consolas, monospace">sh.cell(r, 4).setFormula("A" + r + "*C" + r).applyStyle(money);</text>
+  <text x="56" y="595" font-size="10.5" fill="#57606a" font-family="Consolas, monospace">sh.cell(totalsRow, 4).setFormula("SUM(D" + startRow + ":D" + (totalsRow-2) + ")").applyStyle(money);</text>
+</svg>

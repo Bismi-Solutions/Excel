@@ -274,4 +274,70 @@ class ExcelWorkSheetTest {
         new ExcelWorkSheet(null, null, null, null);
         new ExcelWorkSheet(null, "sheet", null, null, null, "file.xlsx");
     }
+
+    @Test
+    void zaFreezePaneSetsCorrectSplit() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/sheetFreeze.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("F");
+        sh.cell(1, 1).setText("h");
+        sh.freezePane(2, 1);
+
+        org.apache.poi.xssf.usermodel.XSSFSheet xs =
+                (org.apache.poi.xssf.usermodel.XSSFSheet) wb.getWb().getSheet("F");
+        org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPane pane =
+                xs.getCTWorksheet().getSheetViews().getSheetViewArray(0).getPane();
+        Assertions.assertNotNull(pane);
+        Assertions.assertEquals(1.0, pane.getYSplit(), 0.0001);
+
+        app.closeAllWorkBooks();
+    }
+
+    @Test
+    void zbEnableAutoFilterSetsRange() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/sheetAutoFilter.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("A");
+        sh.row(1).setRowValues(new String[]{"A", "B", "C"});
+        sh.enableAutoFilter(1, 1, 3);
+
+        org.apache.poi.xssf.usermodel.XSSFSheet xs =
+                (org.apache.poi.xssf.usermodel.XSSFSheet) wb.getWb().getSheet("A");
+        Assertions.assertNotNull(xs.getCTWorksheet().getAutoFilter());
+        Assertions.assertEquals("A1:C1", xs.getCTWorksheet().getAutoFilter().getRef());
+
+        app.closeAllWorkBooks();
+    }
+
+    @Test
+    void zcSetColumnWidthAppliesExactly() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/sheetColWidth.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("W");
+        sh.setColumnWidth(1, 25);
+
+        Assertions.assertEquals(25 * 256, wb.getWb().getSheet("W").getColumnWidth(0));
+        app.closeAllWorkBooks();
+    }
+
+    @Test
+    void zdAutoSizeAllColumnsDoesNotThrow() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/sheetAutoSize.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("A");
+        sh.row(1).setRowValues(new String[]{"short", "a longer piece of text"});
+        Assertions.assertDoesNotThrow(sh::autoSizeAllColumns);
+        app.closeAllWorkBooks();
+    }
+
+    @Test
+    void zeProtectSheetWithPassword() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/sheetProtect.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("P");
+        sh.protect("secret");
+
+        Assertions.assertTrue(wb.getWb().getSheet("P").getProtect());
+        app.closeAllWorkBooks();
+    }
 }
