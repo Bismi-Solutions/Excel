@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 360" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect x="10" y="10" width="760" height="340" rx="6" fill="#ffffff" stroke="#d0d7de" filter="url(#shadow)"/>
+
+  <!-- Window chrome -->
+  <rect x="10" y="10" width="760" height="32" rx="6" fill="#0d4ba1"/>
+  <rect x="10" y="30" width="760" height="12" fill="#0d4ba1"/>
+  <circle cx="28" cy="26" r="5" fill="#ff5f57"/>
+  <circle cx="44" cy="26" r="5" fill="#febc2e"/>
+  <circle cx="60" cy="26" r="5" fill="#28c840"/>
+  <text x="82" y="30" fill="#ffffff" font-size="13" font-weight="600">kpiTiles.xlsx — KPIs</text>
+
+  <!-- Title (merged A1:D1) with blue header style -->
+  <rect x="40" y="60" width="700" height="36" fill="#2d6cdf" stroke="#000"/>
+  <text x="390" y="84" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">Q3 Snapshot</text>
+
+  <!-- KPI tile 1: Revenue (green) -->
+  <rect x="40"  y="120" width="170" height="30" fill="#1a7f37"/>
+  <text x="125" y="140" font-size="12" fill="#ffffff" font-weight="700" text-anchor="middle">Revenue</text>
+  <rect x="40"  y="150" width="170" height="40" fill="#ffffff" stroke="#000" stroke-width="1.5"/>
+  <text x="125" y="178" font-size="18" fill="#24292f" font-weight="700" text-anchor="middle">$1,248,500</text>
+
+  <!-- KPI tile 2: Orders (blue) -->
+  <rect x="225" y="120" width="170" height="30" fill="#2d6cdf"/>
+  <text x="310" y="140" font-size="12" fill="#ffffff" font-weight="700" text-anchor="middle">Orders</text>
+  <rect x="225" y="150" width="170" height="40" fill="#ffffff" stroke="#000" stroke-width="1.5"/>
+  <text x="310" y="178" font-size="18" fill="#24292f" font-weight="700" text-anchor="middle">4,812</text>
+
+  <!-- KPI tile 3: New Customers (orange) -->
+  <rect x="410" y="120" width="170" height="30" fill="#bc4c00"/>
+  <text x="495" y="140" font-size="12" fill="#ffffff" font-weight="700" text-anchor="middle">New Customers</text>
+  <rect x="410" y="150" width="170" height="40" fill="#ffffff" stroke="#000" stroke-width="1.5"/>
+  <text x="495" y="178" font-size="18" fill="#24292f" font-weight="700" text-anchor="middle">1,203</text>
+
+  <!-- KPI tile 4: Return Rate (red) -->
+  <rect x="595" y="120" width="170" height="30" fill="#cf222e"/>
+  <text x="680" y="140" font-size="12" fill="#ffffff" font-weight="700" text-anchor="middle">Return Rate</text>
+  <rect x="595" y="150" width="170" height="40" fill="#ffffff" stroke="#000" stroke-width="1.5"/>
+  <text x="680" y="178" font-size="18" fill="#24292f" font-weight="700" text-anchor="middle">2.4%</text>
+
+  <!-- Code callout -->
+  <rect x="40" y="215" width="725" height="120" rx="6" fill="#fff" stroke="#d0d7de"/>
+  <text x="56" y="235" font-size="12" fill="#24292f" font-weight="700">examples/KpiTilesExample.java</text>
+  <text x="56" y="255" font-size="11" fill="#57606a" font-family="Consolas, monospace">kpi(sh, 1, "Revenue",       "$1,248,500", "#1a7f37");</text>
+  <text x="56" y="271" font-size="11" fill="#57606a" font-family="Consolas, monospace">kpi(sh, 2, "Orders",        "4,812",      "#2d6cdf");</text>
+  <text x="56" y="287" font-size="11" fill="#57606a" font-family="Consolas, monospace">kpi(sh, 3, "New Customers", "1,203",      "#bc4c00");</text>
+  <text x="56" y="303" font-size="11" fill="#57606a" font-family="Consolas, monospace">kpi(sh, 4, "Return Rate",   "2.4%",       "#cf222e");</text>
+  <text x="56" y="325" font-size="10.5" fill="#636363" font-style="italic">~15 lines of actual logic — no beans, no annotations, no loops</text>
+</svg>

@@ -133,6 +133,38 @@ Every example below is a real file under [`examples/`](examples) that you can ru
 `mvn compile exec:java -Dexec.mainClass=<className>`. Each screenshot is a faithful
 mock of the workbook it produces — colours, zebra, freeze pane, auto-filter, and all.
 
+### 🟢 For beginners — no beans, no annotations
+
+These two are the simplest possible starting points — a title, a few cells, and one built-in style preset.
+
+#### 📝 Title and content — the simplest possible styled sheet
+
+<p align="center">
+  <img src="docs/title-content-preview.svg" alt="Title + content produced by TitleAndContentExample.java" width="80%"/>
+</p>
+
+> Source: [`examples/TitleAndContentExample.java`](examples/TitleAndContentExample.java) ·
+> Showcases: a merged title row · the `ExcelStyle.header()` preset · plain text rows · `autoSizeAllColumns()`.
+> **No beans, no loops, no annotations — about 15 lines of logic.**
+
+---
+
+#### 📊 KPI tiles — 4 colour-coded summary tiles on one sheet
+
+<p align="center">
+  <img src="docs/kpi-preview.svg" alt="KPIs produced by KpiTilesExample.java" width="90%"/>
+</p>
+
+> Source: [`examples/KpiTilesExample.java`](examples/KpiTilesExample.java) ·
+> Showcases: custom fill colours per tile (green / blue / orange / red) · a small helper method for reuse.
+> A beginner-sized slice of what [`DashboardExample`](examples/DashboardExample.java) does on sheet 1.
+
+---
+
+### 🟠 For intermediate + advanced users
+
+The rest use `@ExcelColumn` bean mapping, `ReportBuilder`, formulas, hyperlinks, round-trip reads, etc.
+
 ### 📦 Invoice — merged title · address blocks · line items · formulas · totals
 
 <p align="center">

@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 440" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect x="10" y="10" width="680" height="420" rx="6" fill="#ffffff" stroke="#d0d7de" filter="url(#shadow)"/>
+
+  <!-- Window chrome -->
+  <rect x="10" y="10" width="680" height="32" rx="6" fill="#0d4ba1"/>
+  <rect x="10" y="30" width="680" height="12" fill="#0d4ba1"/>
+  <circle cx="28" cy="26" r="5" fill="#ff5f57"/>
+  <circle cx="44" cy="26" r="5" fill="#febc2e"/>
+  <circle cx="60" cy="26" r="5" fill="#28c840"/>
+  <text x="82" y="30" fill="#ffffff" font-size="13" font-weight="600">titleContent.xlsx — Notes</text>
+
+  <!-- Column letters -->
+  <g font-size="11" fill="#57606a" text-anchor="middle">
+    <rect x="10"  y="54" width="30"  height="20" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="40"  y="54" width="610" height="20" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="68">#</text>
+    <text x="345" y="68">A</text>
+  </g>
+
+  <!-- Title (merged) -->
+  <rect x="10" y="74"  width="30"  height="30" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="93" font-size="11" fill="#57606a" text-anchor="middle">1</text>
+  <rect x="40" y="74"  width="650" height="30" fill="#2d6cdf" stroke="#000"/>
+  <text x="365" y="94" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">Project Kickoff — 2026 Roadmap</text>
+
+  <!-- Empty row 2 -->
+  <rect x="10" y="104" width="30"  height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="120" font-size="11" fill="#57606a" text-anchor="middle">2</text>
+  <rect x="40" y="104" width="650" height="22" fill="#ffffff" stroke="#d0d7de"/>
+
+  <!-- Row 3: Goals header -->
+  <rect x="10" y="126" width="30"  height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="143" font-size="11" fill="#57606a" text-anchor="middle">3</text>
+  <rect x="40" y="126" width="650" height="24" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="54" y="144" font-size="13" font-weight="700" fill="#24292f">Goals</text>
+
+  <!-- Goals bullets -->
+  <rect x="10" y="150" width="30"  height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="166" font-size="11" fill="#57606a" text-anchor="middle">4</text>
+  <rect x="40" y="150" width="650" height="22" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="54" y="166" font-size="12" fill="#24292f">• Migrate all clients to the v2 API</text>
+
+  <rect x="10" y="172" width="30"  height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="188" font-size="11" fill="#57606a" text-anchor="middle">5</text>
+  <rect x="40" y="172" width="650" height="22" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="54" y="188" font-size="12" fill="#24292f">• Cut average latency by 30%</text>
+
+  <rect x="10" y="194" width="30"  height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="210" font-size="11" fill="#57606a" text-anchor="middle">6</text>
+  <rect x="40" y="194" width="650" height="22" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="54" y="210" font-size="12" fill="#24292f">• Launch mobile SDK in Q3</text>
+
+  <!-- Empty row 7 -->
+  <rect x="10" y="216" width="30"  height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="232" font-size="11" fill="#57606a" text-anchor="middle">7</text>
+  <rect x="40" y="216" width="650" height="22" fill="#ffffff" stroke="#d0d7de"/>
+
+  <!-- Row 8: Owners header -->
+  <rect x="10" y="238" width="30"  height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="255" font-size="11" fill="#57606a" text-anchor="middle">8</text>
+  <rect x="40" y="238" width="650" height="24" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="54" y="256" font-size="13" font-weight="700" fill="#24292f">Owners</text>
+
+  <!-- Owners bullets -->
+  <rect x="10" y="262" width="30"  height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="278" font-size="11" fill="#57606a" text-anchor="middle">9</text>
+  <rect x="40" y="262" width="650" height="22" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="54" y="278" font-size="12" fill="#24292f">• Engineering — John Smith</text>
+
+  <rect x="10" y="284" width="30"  height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="300" font-size="11" fill="#57606a" text-anchor="middle">10</text>
+  <rect x="40" y="284" width="650" height="22" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="54" y="300" font-size="12" fill="#24292f">• Product — Amina Khan</text>
+
+  <rect x="10" y="306" width="30"  height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="322" font-size="11" fill="#57606a" text-anchor="middle">11</text>
+  <rect x="40" y="306" width="650" height="22" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="54" y="322" font-size="12" fill="#24292f">• Design — John Jones</text>
+
+  <!-- Code callout -->
+  <rect x="40" y="345" width="645" height="75" rx="6" fill="#fff" stroke="#d0d7de"/>
+  <text x="56" y="363" font-size="12" fill="#24292f" font-weight="700">examples/TitleAndContentExample.java — simplest possible styled workbook</text>
+  <text x="56" y="383" font-size="11" fill="#57606a" font-family="Consolas, monospace">sh.cell(1,1).setText("Project Kickoff — 2026 Roadmap");</text>
+  <text x="56" y="399" font-size="11" fill="#57606a" font-family="Consolas, monospace">sh.mergeCells(1, 1, 1, 4);</text>
+  <text x="56" y="415" font-size="11" fill="#57606a" font-family="Consolas, monospace">sh.row(1).applyStyle(ExcelStyle.header(), 1, 5);</text>
+</svg>
