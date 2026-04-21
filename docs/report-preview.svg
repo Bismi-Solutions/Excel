@@ -1,0 +1,261 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 520" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <linearGradient id="titleBar" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#1f6feb"/>
+      <stop offset="100%" stop-color="#0d4ba1"/>
+    </linearGradient>
+    <linearGradient id="headerBar" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#2d6cdf"/>
+      <stop offset="100%" stop-color="#1e4fb2"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect x="10" y="10" width="900" height="500" rx="6" fill="#ffffff" stroke="#d0d7de" filter="url(#shadow)"/>
+
+  <!-- Window title bar -->
+  <rect x="10" y="10" width="900" height="32" rx="6" fill="url(#titleBar)"/>
+  <rect x="10" y="30" width="900" height="12" fill="#0d4ba1"/>
+  <circle cx="28" cy="26" r="5" fill="#ff5f57"/>
+  <circle cx="44" cy="26" r="5" fill="#febc2e"/>
+  <circle cx="60" cy="26" r="5" fill="#28c840"/>
+  <text x="82" y="30" fill="#ffffff" font-size="13" font-weight="600">Q3-Sales-Report.xlsx — Excel</text>
+
+  <!-- Ribbon-lite bar -->
+  <rect x="10" y="42" width="900" height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="24" y="61" fill="#57606a" font-size="12">File  ·  Home  ·  Insert  ·  Page Layout  ·  Formulas  ·  Data  ·  Review  ·  View</text>
+
+  <!-- Name box + formula bar -->
+  <rect x="10" y="70" width="120" height="26" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="24" y="87" fill="#24292f" font-size="12" font-weight="600">A1</text>
+  <rect x="130" y="70" width="780" height="26" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="144" y="87" fill="#24292f" font-size="12">fx   Q3 Sales Report — Regional Breakdown</text>
+
+  <!-- Column letters -->
+  <g font-size="11" fill="#57606a" text-anchor="middle">
+    <rect x="10"  y="96" width="30"  height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="40"  y="96" width="170" height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="210" y="96" width="90"  height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="300" y="96" width="130" height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="430" y="96" width="110" height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="540" y="96" width="140" height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="680" y="96" width="130" height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="810" y="96" width="100" height="22" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="111">#</text>
+    <text x="125" y="111">A</text>
+    <text x="255" y="111">B</text>
+    <text x="365" y="111">C</text>
+    <text x="485" y="111">D</text>
+    <text x="610" y="111">E</text>
+    <text x="745" y="111">F</text>
+    <text x="860" y="111">G</text>
+  </g>
+
+  <!-- Row 1: Title (merged A1:G1) -->
+  <rect x="10"  y="118" width="30" height="32" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="138" font-size="11" fill="#57606a" text-anchor="middle">1</text>
+  <rect x="40" y="118" width="870" height="32" fill="#0f2d5c" stroke="#0a1f40"/>
+  <text x="475" y="138" font-size="15" fill="#ffffff" font-weight="700" text-anchor="middle">Q3 Sales Report — Regional Breakdown</text>
+
+  <!-- Row 2: Headers -->
+  <rect x="10" y="150" width="30" height="30" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="169" font-size="11" fill="#57606a" text-anchor="middle">2</text>
+
+  <g font-size="12" fill="#ffffff" font-weight="700" text-anchor="middle">
+    <rect x="40"  y="150" width="170" height="30" fill="url(#headerBar)" stroke="#0d4ba1"/>
+    <rect x="210" y="150" width="90"  height="30" fill="url(#headerBar)" stroke="#0d4ba1"/>
+    <rect x="300" y="150" width="130" height="30" fill="url(#headerBar)" stroke="#0d4ba1"/>
+    <rect x="430" y="150" width="110" height="30" fill="url(#headerBar)" stroke="#0d4ba1"/>
+    <rect x="540" y="150" width="140" height="30" fill="url(#headerBar)" stroke="#0d4ba1"/>
+    <rect x="680" y="150" width="130" height="30" fill="url(#headerBar)" stroke="#0d4ba1"/>
+    <rect x="810" y="150" width="100" height="30" fill="url(#headerBar)" stroke="#0d4ba1"/>
+    <text x="125" y="169">Product</text>
+    <text x="255" y="169">Units</text>
+    <text x="365" y="169">Revenue</text>
+    <text x="485" y="169">Growth</text>
+    <text x="610" y="169">Launched</text>
+    <text x="745" y="169">Owner</text>
+    <text x="860" y="169">Status</text>
+  </g>
+  <!-- auto-filter dropdown arrows -->
+  <g fill="#ffffff">
+    <polygon points="198,164 206,164 202,170"/>
+    <polygon points="288,164 296,164 292,170"/>
+    <polygon points="418,164 426,164 422,170"/>
+    <polygon points="528,164 536,164 532,170"/>
+    <polygon points="668,164 676,164 672,170"/>
+    <polygon points="798,164 806,164 802,170"/>
+    <polygon points="898,164 906,164 902,170"/>
+  </g>
+
+  <!-- Data rows -->
+  <!-- Row 3 (white) -->
+  <g font-size="12" fill="#24292f">
+    <rect x="10"  y="180" width="30"  height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="198" font-size="11" fill="#57606a" text-anchor="middle">3</text>
+    <rect x="40"  y="180" width="170" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="210" y="180" width="90"  height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="300" y="180" width="130" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="430" y="180" width="110" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="540" y="180" width="140" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="680" y="180" width="130" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="810" y="180" width="100" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="54"  y="198">Widget Pro</text>
+    <text x="290" y="198" text-anchor="end">2,450</text>
+    <text x="420" y="198" text-anchor="end">$18,375.00</text>
+    <text x="530" y="198" text-anchor="end" fill="#1a7f37" font-weight="600">▲ 12.40%</text>
+    <text x="554" y="198">12-Jan-2026</text>
+    <text x="694" y="198">A. Rahman</text>
+  </g>
+  <!-- status pill row 3 -->
+  <rect x="820" y="186" width="80" height="18" rx="9" fill="#d1f4dc" stroke="#1a7f37"/>
+  <text x="860" y="199" font-size="11" fill="#1a7f37" font-weight="700" text-anchor="middle">Active</text>
+
+  <!-- Row 4 (zebra grey) -->
+  <g font-size="12" fill="#24292f">
+    <rect x="10"  y="208" width="30"  height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="226" font-size="11" fill="#57606a" text-anchor="middle">4</text>
+    <rect x="40"  y="208" width="170" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="210" y="208" width="90"  height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="300" y="208" width="130" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="430" y="208" width="110" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="540" y="208" width="140" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="680" y="208" width="130" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="810" y="208" width="100" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <text x="54"  y="226">Gadget Max</text>
+    <text x="290" y="226" text-anchor="end">1,820</text>
+    <text x="420" y="226" text-anchor="end">$24,934.00</text>
+    <text x="530" y="226" text-anchor="end" fill="#1a7f37" font-weight="600">▲ 8.75%</text>
+    <text x="554" y="226">03-Feb-2026</text>
+    <text x="694" y="226">J. Smith</text>
+  </g>
+  <rect x="820" y="214" width="80" height="18" rx="9" fill="#d1f4dc" stroke="#1a7f37"/>
+  <text x="860" y="227" font-size="11" fill="#1a7f37" font-weight="700" text-anchor="middle">Active</text>
+
+  <!-- Row 5 (white) -->
+  <g font-size="12" fill="#24292f">
+    <rect x="10"  y="236" width="30"  height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="254" font-size="11" fill="#57606a" text-anchor="middle">5</text>
+    <rect x="40"  y="236" width="170" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="210" y="236" width="90"  height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="300" y="236" width="130" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="430" y="236" width="110" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="540" y="236" width="140" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="680" y="236" width="130" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="810" y="236" width="100" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="54"  y="254">Contraption</text>
+    <text x="290" y="254" text-anchor="end">960</text>
+    <text x="420" y="254" text-anchor="end">$9,504.00</text>
+    <text x="530" y="254" text-anchor="end" fill="#cf222e" font-weight="600">▼ 3.20%</text>
+    <text x="554" y="254">21-Feb-2026</text>
+    <text x="694" y="254">S. Ali</text>
+  </g>
+  <rect x="820" y="242" width="80" height="18" rx="9" fill="#fff1e5" stroke="#bc4c00"/>
+  <text x="860" y="255" font-size="11" fill="#bc4c00" font-weight="700" text-anchor="middle">Review</text>
+
+  <!-- Row 6 (zebra grey) -->
+  <g font-size="12" fill="#24292f">
+    <rect x="10"  y="264" width="30"  height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="282" font-size="11" fill="#57606a" text-anchor="middle">6</text>
+    <rect x="40"  y="264" width="170" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="210" y="264" width="90"  height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="300" y="264" width="130" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="430" y="264" width="110" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="540" y="264" width="140" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="680" y="264" width="130" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <rect x="810" y="264" width="100" height="28" fill="#f3f6f9" stroke="#d0d7de"/>
+    <text x="54"  y="282">Gizmo Lite</text>
+    <text x="290" y="282" text-anchor="end">3,105</text>
+    <text x="420" y="282" text-anchor="end">$6,210.50</text>
+    <text x="530" y="282" text-anchor="end" fill="#1a7f37" font-weight="600">▲ 22.10%</text>
+    <text x="554" y="282">05-Mar-2026</text>
+    <text x="694" y="282">D. Wu</text>
+  </g>
+  <rect x="820" y="270" width="80" height="18" rx="9" fill="#d1f4dc" stroke="#1a7f37"/>
+  <text x="860" y="283" font-size="11" fill="#1a7f37" font-weight="700" text-anchor="middle">Active</text>
+
+  <!-- Row 7 (white) -->
+  <g font-size="12" fill="#24292f">
+    <rect x="10"  y="292" width="30"  height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="310" font-size="11" fill="#57606a" text-anchor="middle">7</text>
+    <rect x="40"  y="292" width="170" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="210" y="292" width="90"  height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="300" y="292" width="130" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="430" y="292" width="110" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="540" y="292" width="140" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="680" y="292" width="130" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="810" y="292" width="100" height="28" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="54"  y="310">Legacy Kit</text>
+    <text x="290" y="310" text-anchor="end">410</text>
+    <text x="420" y="310" text-anchor="end">$2,050.00</text>
+    <text x="530" y="310" text-anchor="end" fill="#cf222e" font-weight="600">▼ 15.00%</text>
+    <text x="554" y="310">12-Nov-2024</text>
+    <text x="694" y="310">R. Khan</text>
+  </g>
+  <rect x="820" y="298" width="80" height="18" rx="9" fill="#ffebe9" stroke="#cf222e"/>
+  <text x="860" y="311" font-size="11" fill="#cf222e" font-weight="700" text-anchor="middle">Closed</text>
+
+  <!-- Row 8: Totals -->
+  <g font-size="12" fill="#0f2d5c" font-weight="700">
+    <rect x="10"  y="320" width="30"  height="30" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="339" font-size="11" fill="#57606a" text-anchor="middle">8</text>
+    <rect x="40"  y="320" width="170" height="30" fill="#e6eefc" stroke="#2d6cdf"/>
+    <rect x="210" y="320" width="90"  height="30" fill="#e6eefc" stroke="#2d6cdf"/>
+    <rect x="300" y="320" width="130" height="30" fill="#e6eefc" stroke="#2d6cdf"/>
+    <rect x="430" y="320" width="110" height="30" fill="#e6eefc" stroke="#2d6cdf"/>
+    <rect x="540" y="320" width="140" height="30" fill="#e6eefc" stroke="#2d6cdf"/>
+    <rect x="680" y="320" width="130" height="30" fill="#e6eefc" stroke="#2d6cdf"/>
+    <rect x="810" y="320" width="100" height="30" fill="#e6eefc" stroke="#2d6cdf"/>
+    <text x="54"  y="340">TOTALS</text>
+    <text x="290" y="340" text-anchor="end">8,745</text>
+    <text x="420" y="340" text-anchor="end">$61,073.50</text>
+    <text x="530" y="340" text-anchor="end" fill="#1a7f37">▲ 5.01%</text>
+    <text x="554" y="340">—</text>
+    <text x="694" y="340">5 owners</text>
+    <text x="860" y="340" text-anchor="middle">4 / 5</text>
+  </g>
+
+  <!-- Comment indicator (red triangle on "Contraption" cell) -->
+  <polygon points="205,237 210,237 210,242" fill="#cf222e"/>
+
+  <!-- Sheet tabs -->
+  <rect x="10" y="480" width="900" height="30" fill="#f6f8fa" stroke="#d0d7de"/>
+  <rect x="20" y="482" width="90"  height="28" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="65" y="500" font-size="12" fill="#0d4ba1" font-weight="700" text-anchor="middle">Summary</text>
+  <rect x="110" y="482" width="90" height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="155" y="500" font-size="12" fill="#24292f" text-anchor="middle">Products</text>
+  <rect x="200" y="482" width="90" height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="245" y="500" font-size="12" fill="#24292f" text-anchor="middle">Regions</text>
+  <rect x="290" y="482" width="90" height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="335" y="500" font-size="12" fill="#24292f" text-anchor="middle">Raw Data</text>
+
+  <!-- Freeze marker -->
+  <line x1="40" y1="180" x2="910" y2="180" stroke="#2d6cdf" stroke-width="0.8" stroke-dasharray="4,2" opacity="0.6"/>
+  <text x="905" y="175" font-size="9" fill="#2d6cdf" text-anchor="end" font-weight="700">↑ header frozen</text>
+
+  <!-- Callout: generated by library -->
+  <g>
+    <rect x="450" y="385" width="440" height="82" rx="8" fill="#fff" stroke="#d0d7de" filter="url(#shadow)"/>
+    <text x="466" y="405" font-size="12" fill="#24292f" font-weight="700">Generated in 5 lines:</text>
+    <text x="466" y="424" font-size="11" fill="#57606a" font-family="Consolas, monospace">ReportBuilder.on(sheet)</text>
+    <text x="466" y="438" font-size="11" fill="#57606a" font-family="Consolas, monospace">    .title("Q3 Sales Report — Regional Breakdown")</text>
+    <text x="466" y="452" font-size="11" fill="#57606a" font-family="Consolas, monospace">    .rowsFromBeans(products)</text>
+    <text x="466" y="466" font-size="11" fill="#57606a" font-family="Consolas, monospace">    .zebraStripes(true).freezeHeader(true).autoFilter(true).render();</text>
+  </g>
+
+  <!-- Feature callouts -->
+  <g font-size="10.5" fill="#0d4ba1" font-weight="600">
+    <text x="30"  y="385">✓ Colored title</text>
+    <text x="30"  y="403">✓ Styled headers</text>
+    <text x="30"  y="421">✓ Zebra striping</text>
+    <text x="30"  y="439">✓ Frozen header row</text>
+    <text x="30"  y="457">✓ Auto-filter dropdowns</text>
+    <text x="220" y="385">✓ Number formats (qty)</text>
+    <text x="220" y="403">✓ Currency formatting</text>
+    <text x="220" y="421">✓ Percent + trend color</text>
+    <text x="220" y="439">✓ Date formatting</text>
+    <text x="220" y="457">✓ Status pills + totals</text>
+  </g>
+</svg>

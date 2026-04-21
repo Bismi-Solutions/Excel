@@ -295,6 +295,56 @@ public class ExcelRow {
     }
 
     /**
+     * Sets values of mixed types in this row (Number, Date, Boolean, String, null).
+     * Prefer this over {@link #setRowValues(String[])} when your data is not all strings.
+     *
+     * @param values values to write, starting at column 1
+     */
+    public void setValues(Object[] values) {
+        setValues(values, 1);
+    }
+
+    /**
+     * Sets values of mixed types starting at the specified 1-based column.
+     */
+    public void setValues(Object[] values, int startCol) {
+        if (values == null || values.length == 0) return;
+        for (int i = 0; i < values.length; i++) {
+            ExcelCell c = new ExcelCell(sheet, wb, rowNumber, startCol + i, inputStream, outputStream, sCompleteFileName);
+            c.setValue(values[i]);
+        }
+    }
+
+    /**
+     * Applies a reusable {@link ExcelStyle} to every populated cell in this row.
+     * If the row is empty, applies to column 1 only.
+     */
+    public ExcelRow applyStyle(ExcelStyle style) {
+        if (style == null) return this;
+        Row cRow = getOrCreateRow();
+        int endCol = cRow == null ? 1 : cRow.getLastCellNum();
+        if (endCol <= 0) endCol = 1;
+        applyStyle(style, 1, endCol + 1);
+        return this;
+    }
+
+    /**
+     * Applies a reusable {@link ExcelStyle} to a range of cells in this row.
+     *
+     * @param style    style to apply
+     * @param startCol 1-based start column (inclusive)
+     * @param endCol   end column (exclusive)
+     */
+    public ExcelRow applyStyle(ExcelStyle style, int startCol, int endCol) {
+        if (style == null) return this;
+        for (int c = startCol; c < endCol; c++) {
+            ExcelCell cell = new ExcelCell(sheet, wb, rowNumber, c, inputStream, outputStream, sCompleteFileName);
+            style.applyTo(cell);
+        }
+        return this;
+    }
+
+    /**
      * Checks if a row is empty or contains only blank cells.
      * Delegates to Common utility method.
      *

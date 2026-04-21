@@ -1,219 +1,382 @@
 # Excel 📈
 
 <div align="center">
-  <em>A powerful and easy-to-use Java library for Excel file manipulation</em>
-  <br><br>
 
-  [![CI & Release](https://github.com/Bismi-Solutions/Excel/actions/workflows/ci.yml/badge.svg)](https://github.com/Bismi-Solutions/Excel/actions/workflows/ci.yml)
-  [![codecov](https://codecov.io/gh/Bismi-Solutions/Excel/branch/master/graph/badge.svg)](https://codecov.io/gh/Bismi-Solutions/Excel)
-  [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Bismi-Solutions_Excel&metric=alert_status)](https://sonarcloud.io/project/overview?id=Bismi-Solutions_Excel)
-  [![Known Vulnerabilities](https://snyk.io/test/github/Bismi-Solutions/Excel/badge.svg?targetFile=pom.xml)](https://snyk.io/test/github/Bismi-Solutions/Excel?targetFile=pom.xml)
-  [![Maven Central](https://img.shields.io/maven-central/v/solutions.bismi.excel/excel.svg)](https://search.maven.org/artifact/solutions.bismi.excel/excel)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-  [![Java Version](https://img.shields.io/badge/Java-17%2B-blue)](https://openjdk.java.net/)
+<h3><em>Ship a styled Excel report in 5 lines — skip the 60 lines of Apache POI boilerplate.</em></h3>
+
+[![CI & Release](https://github.com/Bismi-Solutions/Excel/actions/workflows/ci.yml/badge.svg)](https://github.com/Bismi-Solutions/Excel/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/Bismi-Solutions/Excel/branch/master/graph/badge.svg)](https://codecov.io/gh/Bismi-Solutions/Excel)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Bismi-Solutions_Excel&metric=alert_status)](https://sonarcloud.io/project/overview?id=Bismi-Solutions_Excel)
+[![Known Vulnerabilities](https://snyk.io/test/github/Bismi-Solutions/Excel/badge.svg?targetFile=pom.xml)](https://snyk.io/test/github/Bismi-Solutions/Excel?targetFile=pom.xml)
+[![Maven Central](https://img.shields.io/maven-central/v/solutions.bismi.excel/excel.svg)](https://search.maven.org/artifact/solutions.bismi.excel/excel)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Java Version](https://img.shields.io/badge/Java-17%2B-blue)](https://openjdk.java.net/)
+
 </div>
 
-## 🚀  Why *Excel*?
+```java
+ReportBuilder.on(sheet)
+    .title("Q3 Sales Report")
+    .rowsFromBeans(products)      // ← your List<Bean>
+    .zebraStripes(true).freezeHeader(true).autoFilter(true)
+    .render();
+```
 
-Apache POI is wonderfully complete—but you pay in verbosity. *Excel* wraps POI with a **fluent, COM‑style API** so you can:
+**Result:**
 
-- Build a workbook in **two lines**:
-  ```java
-  ExcelApplication app = new ExcelApplication();
-  ExcelWorkBook wb = app.createWorkBook("hello.xlsx");
-  ExcelWorkSheet sh = wb.addSheet("Hi");
-  sh.cell(1,1).setText("👋");
-  sh.saveWorkBook();
-  app.closeAllWorkBooks();
-  ```
-- Use named or hex colours, borders, number‑formats, merges & formulas without memorising POI constants.
-- Keep full access to the underlying POI objects when you need edge‑case power.
-
-Works unchanged on Windows 🪟, macOS 🍎 and Linux 🐧 (Java 17 +).
+<p align="center">
+  <img src="docs/report-preview.svg" alt="Styled Excel report generated in 5 lines" width="100%"/>
+</p>
 
 ---
 
-## 📦 Installation (copy & go)
+## 🤔 Why *Excel*, not Apache POI directly?
 
-Choose the snippet for your build tool and you're done.
+POI is powerful — and verbose. Every styled cell forces you through the same choreography: `CreationHelper` → `CellStyle.cloneStyleFrom` → `DataFormat` → `Font` → manual type dispatch (`setCellValue(String)` vs `setCellValue(double)` vs `setCellValue(Date)`) → `CellRangeAddress` → `createFreezePane` → `setAutoFilter`.
 
-### Maven
+Most business-Excel tasks boil down to **"take a list of objects and make it look like a report."** *Excel* gives you **one call** for that, while still exposing the POI workbook for edge cases.
 
-```xml
-<dependency>
-  <groupId>solutions.bismi.excel</groupId>
-  <artifactId>excel</artifactId>
-  <version>1.1.12</version>
-</dependency>
-```
+### What you skip
 
-### Gradle (Groovy DSL)
+| You no longer juggle | Because *Excel* handles it |
+|---|---|
+| Creating/cloning `CellStyle` for every cell | `ExcelStyle` — build once, apply everywhere |
+| Hitting POI's **64K-CellStyle quota** in big reports | Reused immutable styles by design |
+| Casting between `HSSFWorkbook` / `XSSFWorkbook` for hex colours | Auto-detects format; hex falls back to nearest indexed on `.xls` |
+| `FileInputStream` / `FileOutputStream` lifecycle | Opened and closed internally |
+| `setCellValue` type dispatch | `setValue(Object)` — accepts `String`, `Number`, `Boolean`, `Date`, `LocalDate`, `null` |
+| 0-based POI indexes | 1-based public API (matches Excel UI) |
+| Bean-to-sheet and sheet-to-bean loops | `@ExcelColumn` + `writeBeans` / `readAsBeans` |
 
-```groovy
-dependencies {
-  implementation "solutions.bismi.excel:excel:1.1.12"
-}
-```
+### ⏱️ Time saved (measured in lines of code)
 
-### Gradle (Kotlin DSL)
-
-```kotlin
-dependencies {
-  implementation("solutions.bismi.excel:excel:1.1.12")
-}
-```
-
-### Scala
-
-```scala
-libraryDependencies += "solutions.bismi.excel" % "excel" % "1.1.12"
-```
+| Task | Apache POI | **Excel** | Ratio |
+|---|---:|---:|---:|
+| Create `.xlsx` + write "Hello World" with a style | ~15 | **5** | **3×** |
+| Write `List<Bean>` as a styled, filtered, frozen table | ~60 | **5** | **12×** |
+| Apply one reused style to 1,000 cells | ~8 / cell (repeat loops) | **1** | ≫10× |
+| Read sheet into `List<Map<String,String>>` | ~30 | **1** | **30×** |
+| Round-trip `List<Bean>` → file → `List<Bean>` | ~80 | **2** | **40×** |
+| Freeze header + auto-filter + column widths | ~20 | **3** | **7×** |
 
 ---
 
-## 📑 Index
+## 🚀 Jump-away examples
 
-- [Why *Excel*?](#🚀--why-excel)
-- [Features ☑️](#features-☑️)
-- [Quick Start](#quick-start-)
-- [Usage Snippets](#usage-snippets)
-  - [Workbook Basics](#workbook-basics)
-  - [Cell Goodies](#cell-goodies)
-  - [Rows & Columns](#rows--columns)
-  - [Merging Cells](#merging-cells)
-- [Advanced Demo 🛠️](#advanced-demo-)
-- [Architecture](#architecture)
-- [Comparison 🆚 POI / JExcel](#comparison--🆚-poi--jexcel)
-- [Contributing 🤝](#contributing-)
-- [License](#license)
-
----
-
-## Features ☑️
-
-|                      |                                                                     |
-| -------------------- | ------------------------------------------------------------------- |
-| 📑 **Workbook**      | create, open, save, multi‑format (.xlsx / .xls)                     |
-| 📄 **Sheets**        | add / rename / activate / protect                                   |
-| 📝 **Cells**         | text, numbers, dates, formulas, conditional formatting              |
-| 🎨 **Styling**       | fonts, colours (named ✨ or hex), borders, alignment, number formats |
-| 📋 **Rows/Cols**     | bulk value setting, auto‑fit, insert/delete                         |
-| 🔗 **Merge/Unmerge** | succinct helpers & intersection safety checks                       |
-
-Fast: streams large datasets (100 k+ rows) & reuses POI styles to keep memory low.
-
----
-
-## Quick Start 🎉
+### 1 · Hello, styled workbook (6 lines)
 
 ```java
 ExcelApplication app = new ExcelApplication();
 ExcelWorkBook wb = app.createWorkBook("demo.xlsx");
 ExcelWorkSheet sh = wb.addSheet("Summary");
-sh.activate();
-sh.cell(1,1).setText("Hello World");
-sh.cell(1,1).setFontStyle(true, false, false);
-sh.cell(1,1).setFillColor("LIGHT_GREEN");
+sh.cell(1,1).setText("Hello World").applyStyle(ExcelStyle.header());
 wb.saveWorkbook();
 app.closeAllWorkBooks();
 ```
 
-Runs on Java 17+; produces a styled workbook in seconds.
-
----
-
-## Usage Snippets
-
-### Workbook Basics
+### 2 · Bean → styled report (one call)
 
 ```java
-ExcelApplication app = new ExcelApplication();
-ExcelWorkBook wb = app.openWorkbook("existing.xls");
-wb.addSheet("2025-Q2");
-System.out.println(wb.getSheetCount());
+public class Product {
+    @ExcelColumn(name = "SKU",   order = 1)                      String sku;
+    @ExcelColumn(name = "Item",  order = 2)                      String name;
+    @ExcelColumn(name = "Units", order = 3, format = "#,##0")    int    units;
+    @ExcelColumn(name = "Price", order = 4, format = "$#,##0.00") double price;
+}
+
+ReportBuilder.on(sheet)
+    .title("Catalog")
+    .rowsFromBeans(productList)
+    .zebraStripes(true).freezeHeader(true).autoFilter(true)
+    .render();
 ```
 
-### Cell Goodies
+### 3 · `List<Map>` → spreadsheet
 
 ```java
-ExcelCell c = wb.getActiveSheet().cell(2,3);
-c.setNumericValue(42);
-c.setNumberFormat("#,##0.00");
-c.setFontColor("#FF9900");
-c.setHorizontalAlignment("RIGHT");
+List<Map<String,Object>> rows = List.of(
+    Map.of("Item","Apple", "Qty",10, "Price",1.20),
+    Map.of("Item","Pear",  "Qty", 8, "Price",1.80));
+
+sheet.writeMaps(rows).freezePane(2,1).autoSizeAllColumns();
 ```
 
-### Rows & Columns
+### 4 · Read Excel → `List<Bean>`
 
 ```java
-String[] header = {"Item","Qty","Price","Total"};
-ExcelRow row = wb.getActiveSheet().row(5);
-row.setRowValues(header);
-row.setFontColor("white");
-row.setFillColor("grey_50_percent");
-row.setFullBorder("black");
+List<Product> products = sheet.readAsBeans(Product.class);   // headers → fields
 ```
 
-### Merging Cells
+### 5 · Reusable style, applied 1,000 times
 
 ```java
-ExcelWorkSheet s = wb.getActiveSheet();
-s.mergeCells(1,1,1,5);                 // A1:E1
+ExcelStyle money = ExcelStyle.builder()
+        .numberFormat("$#,##0.00").horizontalAlignment("RIGHT").fullBorder("black").build();
 
-// later…
-if (s.isCellMerged(1,3)) s.unmergeCells(1,1,1,5);
+for (int r = 2; r <= 1001; r++) {
+    sheet.cell(r, 3).setValue(revenue[r-2]).applyStyle(money);   // one style, many cells
+}
+```
+
+### 6 · Hyperlinks & comments
+
+```java
+sheet.cell(1,1).setHyperlink("https://bismi.solutions", "Bismi Solutions");
+sheet.cell(1,1).setComment("Official site", "Release notes");
 ```
 
 ---
 
-## Advanced Demo 🛠️
+## 🖼️ Runnable examples (each image is produced by the linked file)
 
-*See **`examples/SalesReport.java`** — multi‑sheet, fully‑formatted workbook with charts in under 80 LOC.*
+Every example below is a real file under [`examples/`](examples) that you can run with
+`mvn compile exec:java -Dexec.mainClass=<className>`. Each screenshot is a faithful
+mock of the workbook it produces — colours, zebra, freeze pane, auto-filter, and all.
+
+### 🟢 For beginners — no beans, no annotations
+
+These two are the simplest possible starting points — a title, a few cells, and one built-in style preset.
+
+#### 📝 Title and content — the simplest possible styled sheet
+
+<p align="center">
+  <img src="docs/title-content-preview.svg" alt="Title + content produced by TitleAndContentExample.java" width="80%"/>
+</p>
+
+> Source: [`examples/TitleAndContentExample.java`](examples/TitleAndContentExample.java) ·
+> Showcases: a merged title row · the `ExcelStyle.header()` preset · plain text rows · `autoSizeAllColumns()`.
+> **No beans, no loops, no annotations — about 15 lines of logic.**
 
 ---
 
-## Architecture
+#### 📊 KPI tiles — 4 colour-coded summary tiles on one sheet
 
+<p align="center">
+  <img src="docs/kpi-preview.svg" alt="KPIs produced by KpiTilesExample.java" width="90%"/>
+</p>
+
+> Source: [`examples/KpiTilesExample.java`](examples/KpiTilesExample.java) ·
+> Showcases: custom fill colours per tile (green / blue / orange / red) · a small helper method for reuse.
+> A beginner-sized slice of what [`DashboardExample`](examples/DashboardExample.java) does on sheet 1.
+
+---
+
+#### 🛒 Rows from arrays — one call writes the whole row
+
+<p align="center">
+  <img src="docs/row-array-preview.svg" alt="Shopping list produced by RowFromArrayExample.java" width="90%"/>
+</p>
+
+> Source: [`examples/RowFromArrayExample.java`](examples/RowFromArrayExample.java) ·
+> Showcases:
+>
+> ```java
+> // Header row from a String[]
+> String[] headers = {"Item", "Qty", "Unit", "Aisle"};
+> sh.row(2).setRowValues(headers);
+>
+> // Data rows from Object[] — mixed types get routed automatically
+> sh.row(3).setValues(new Object[]{"Apples",  6, "pcs", "Produce"});
+> sh.row(4).setValues(new Object[]{"Milk",    2, "L",   "Dairy"});
+> ```
+>
+> No per-cell loop, no column-index bookkeeping. Use `setRowValues(String[])` when
+> every cell is text (headers are the classic case) and `setValues(Object[])` when
+> the row mixes strings, numbers, dates, booleans, etc.
+
+---
+
+### 🟠 For intermediate + advanced users
+
+The rest use `@ExcelColumn` bean mapping, `ReportBuilder`, formulas, hyperlinks, round-trip reads, etc.
+
+### 📦 Invoice — merged title · address blocks · line items · formulas · totals
+
+<p align="center">
+  <img src="docs/invoice-preview.svg" alt="Invoice produced by InvoiceExample.java" width="90%"/>
+</p>
+
+> Source: [`examples/InvoiceExample.java`](examples/InvoiceExample.java) ·
+> Showcases: cell merging · reusable label/address/currency styles · formulas (`A*C`, `SUM`, tax) · bordered totals row · column widths.
+
+---
+
+### 📊 Executive Dashboard — KPI tiles · chart-ready sheet · raw data
+
+<p align="center">
+  <img src="docs/dashboard-preview.svg" alt="Dashboard produced by DashboardExample.java" width="95%"/>
+</p>
+
+> Source: [`examples/DashboardExample.java`](examples/DashboardExample.java) ·
+> Showcases: 4 colour-coded KPI tiles (green/blue/orange/red) built from merged cells ·
+> second sheet with `ReportBuilder` top-products table · third sheet with mixed-type raw data · frozen header + auto-filter.
+
+---
+
+### 👥 Employee Directory — beans + hyperlinks + comments + round-trip read
+
+<p align="center">
+  <img src="docs/employee-preview.svg" alt="Directory produced by EmployeeDirectoryExample.java" width="98%"/>
+</p>
+
+> Source: [`examples/EmployeeDirectoryExample.java`](examples/EmployeeDirectoryExample.java) ·
+> Showcases: `@ExcelColumn` beans · zebra stripes · frozen header · auto-filter ·
+> `mailto:` hyperlinks on the email column · greyed-italic style for inactive rows ·
+> cell comment with author · **round-trip read back into `List<Employee>` via `readAsBeans`**.
+
+---
+
+### 🗂️ Three-in-one Collection Report — beans, maps, raw
+
+> Source: [`examples/CollectionReportExample.java`](examples/CollectionReportExample.java) ·
+> Sheet 1 uses `ReportBuilder.rowsFromBeans(List<Product>)`, sheet 2 uses `rowsFromMaps(List<Map>)`
+> with a currency override on column 3, sheet 3 uses the bare-minimum `sheet.writeMaps(...)`.
+
+---
+
+## 📦 Installation
+
+### Maven
+```xml
+<dependency>
+  <groupId>solutions.bismi.excel</groupId>
+  <artifactId>excel</artifactId>
+  <version>1.2.0</version>
+</dependency>
 ```
-ExcelApplication
- └─ ExcelWorkBook
-     └─ ExcelWorkSheet
-         ├─ ExcelRow
-         └─ ExcelCell
+
+### Gradle (Kotlin DSL)
+```kotlin
+implementation("solutions.bismi.excel:excel:1.2.0")
 ```
 
-Each object only exposes context‑appropriate methods, making code completion your best documentation.
+### Gradle (Groovy DSL)
+```groovy
+implementation "solutions.bismi.excel:excel:1.2.0"
+```
+
+**Requires:** Java 17+  ·  Works on Windows · macOS · Linux.
 
 ---
 
-## Comparison 🆚 POI / JExcel
+## ☑️ Features at a glance
 
-|  Capability              |  Excel (lib) | Apache POI | JExcel API    |
-| ------------------------- | ------------ | ---------- | ------------- |
-| Fluent API                | ⭐⭐⭐⭐⭐        | ⭐⭐         | ⭐⭐⭐           |
-| Large‑data memory profile | ⭐⭐⭐⭐         | ⭐⭐⭐        | ⭐⭐⭐⭐          |
-| XLSX support              | ✅            | ✅          | ⚠ (read‑only) |
-| Styling shorthand         | Yes          | No         | Limited       |
-| Active development        | ✅            | ✅          | ❌             |
+| Area | What's in the box |
+|---|---|
+| 📑 **Workbook** | create · open · save · `.xlsx` + `.xls` |
+| 📄 **Sheets** | add · rename · activate · freeze panes · auto-filter · protect (password) |
+| 📝 **Cells** | text · numbers · dates · formulas · **polymorphic `setValue(Object)`** · hyperlinks · comments |
+| 🎨 **Styling** | fonts · 52 named colours ✨ · hex colours (XLSX) · borders · alignment · number formats · **reusable `ExcelStyle`** + presets |
+| 📋 **Rows/Cols** | bulk values (mixed types) · auto-fit · column width · range styling |
+| 🔗 **Merge/Unmerge** | succinct helpers · overlap safety checks |
+| 🗂️ **Collections** | `writeMaps` · `writeBeans` · `readAsMaps` · `readAsBeans` · `@ExcelColumn` annotation |
+| 🏗️ **Reports** | `ReportBuilder` — title · headers · zebra · freeze · auto-filter · per-column formats · column widths |
+| 🧪 **Quality** | 91 unit tests (incl. every README snippet) · CI · Codecov · Sonar · Snyk |
 
 ---
 
-## Contributing 🤝
+## 🗺️ Architecture
+
+```mermaid
+graph TD
+    A[ExcelApplication<br/><i>lifecycle & open workbooks</i>] --> B[ExcelWorkBook<br/><i>file I/O, sheets</i>]
+    B --> C[ExcelWorkSheet<br/><i>data, layout, filters</i>]
+    C --> D[ExcelRow<br/><i>bulk values & styling</i>]
+    C --> E[ExcelCell<br/><i>values, style, hyperlink, comment</i>]
+    C -.uses.-> F[ReportBuilder<br/><i>one-call styled tables</i>]
+    D -.applies.-> G[ExcelStyle<br/><i>reusable style defs</i>]
+    E -.applies.-> G
+    C -.reads/writes.-> H[List&lt;Map&gt; · List&lt;Bean&gt;<br/><i>@ExcelColumn</i>]
+
+    style A fill:#2d6cdf,color:#fff,stroke:#1e4fb2
+    style B fill:#2d9fdf,color:#fff,stroke:#1e7ba2
+    style C fill:#36b37e,color:#fff,stroke:#278658
+    style F fill:#ff9f43,color:#fff,stroke:#c77c2e
+    style G fill:#9b59b6,color:#fff,stroke:#6d3a87
+    style H fill:#e74c3c,color:#fff,stroke:#a33325
+```
+
+Each class exposes only methods appropriate to its scope — code completion *is* your documentation.
+
+### Data-flow for a collection-driven report
+
+```mermaid
+flowchart LR
+    subgraph Your_Data
+      M["List&lt;Map&lt;String,Object&gt;&gt;"]
+      B["List&lt;Bean&gt;<br/>@ExcelColumn"]
+      A["Object[] rows"]
+    end
+    subgraph Excel_Lib
+      RB[ReportBuilder]
+      WS[ExcelWorkSheet]
+      ST[ExcelStyle]
+    end
+    Out[(workbook.xlsx)]
+
+    M --> RB
+    B --> RB
+    A --> RB
+    M --> WS
+    B --> WS
+    RB -->|title · headers · data · zebra · freeze · filter| WS
+    ST -.applies.-> WS
+    WS --> Out
+
+    style M fill:#fdf6e3,stroke:#b58900
+    style B fill:#fdf6e3,stroke:#b58900
+    style A fill:#fdf6e3,stroke:#b58900
+    style RB fill:#ff9f43,color:#fff,stroke:#c77c2e
+    style WS fill:#36b37e,color:#fff,stroke:#278658
+    style ST fill:#9b59b6,color:#fff,stroke:#6d3a87
+    style Out fill:#2d6cdf,color:#fff,stroke:#1e4fb2
+```
+
+---
+
+## 🧱 Style reuse at a glance
+
+```java
+ExcelStyle header = ExcelStyle.header();         // grey fill · white bold · centred · bordered
+ExcelStyle zebra  = ExcelStyle.zebraStripe();    // light-grey fill
+ExcelStyle money  = ExcelStyle.currency();       // right-aligned $#,##0.00
+ExcelStyle pct    = ExcelStyle.percent();        // right-aligned 0.00%
+ExcelStyle when   = ExcelStyle.date();           // dd-MMM-yyyy
+
+ExcelStyle custom = ExcelStyle.builder()
+        .fontColor("white").fillColor("#0d4ba1")
+        .bold(true).horizontalAlignment("CENTER").fullBorder("black")
+        .build();
+```
+
+Apply to anything:
+
+```java
+sheet.row(1).applyStyle(header);
+sheet.row(5).applyStyle(money, 2, 6);            // cells 2..5 of row 5
+sheet.cell(10,3).applyStyle(money);              // single cell
+```
+
+---
+
+## 🤝 Contributing
 
 ```bash
 git clone https://github.com/Bismi-Solutions/Excel.git
 cd Excel
-mvn test   # green? great – pick an issue and hack away!
+mvn test        # 91 tests — all green is the baseline
 ```
 
-Pull requests are welcome. Please include unit tests and follow the log‑level convention:
+PRs welcome. Please include unit tests and follow the log-level convention:
 
-- **info** → user‑visible events (file created, sheet saved)
+- **info** → user-visible events (file created, sheet saved)
 - **debug** → flow diagnostics
 - **warn/error** → exceptional situations
 
+Area ideas that need love: charts · conditional formatting · data validation (dropdowns) · named ranges · images · pivot tables.
+
 ---
 
-## License
+## 📄 License
 
-MIT – *use it, fork it, profit.*  See [LICENSE](LICENSE).
+MIT — *use it, fork it, profit.* See [LICENSE](LICENSE).

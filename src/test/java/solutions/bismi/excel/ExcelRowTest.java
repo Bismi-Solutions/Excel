@@ -344,4 +344,83 @@ class ExcelRowTest {
         xlApp.closeAllWorkBooks();
     }
 
+    @Test
+    void iSetValuesMixedTypes() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/rowSetValues.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("V");
+
+        Object[] mixed = {"Widget", 10, 12.50, true, new java.util.Date(0L), null};
+        sh.row(1).setValues(mixed);
+
+        org.apache.poi.ss.usermodel.Row raw = wb.getWb().getSheet("V").getRow(0);
+        Assertions.assertEquals("Widget", raw.getCell(0).getStringCellValue());
+        Assertions.assertEquals(10.0,     raw.getCell(1).getNumericCellValue(), 0.0001);
+        Assertions.assertEquals(12.50,    raw.getCell(2).getNumericCellValue(), 0.0001);
+        Assertions.assertTrue(raw.getCell(3).getBooleanCellValue());
+        Assertions.assertNotNull(raw.getCell(4).getDateCellValue());
+
+        sh.saveWorkBook();
+        app.closeAllWorkBooks();
+    }
+
+    @Test
+    void jSetValuesWithStartColumn() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/rowSetValuesOffset.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("V");
+
+        sh.row(1).setValues(new Object[]{"a", "b"}, 3);
+        org.apache.poi.ss.usermodel.Row raw = wb.getWb().getSheet("V").getRow(0);
+        Assertions.assertEquals("a", raw.getCell(2).getStringCellValue());
+        Assertions.assertEquals("b", raw.getCell(3).getStringCellValue());
+        Assertions.assertNull(raw.getCell(0));
+
+        sh.saveWorkBook();
+        app.closeAllWorkBooks();
+    }
+
+    @Test
+    void kApplyStyleToRowAffectsAllCells() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/rowApplyStyle.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("S");
+
+        sh.row(1).setRowValues(new String[]{"A", "B", "C"});
+        sh.row(1).applyStyle(ExcelStyle.header());
+
+        org.apache.poi.ss.usermodel.Row raw = wb.getWb().getSheet("S").getRow(0);
+        for (int c = 0; c < 3; c++) {
+            Assertions.assertEquals(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND,
+                    raw.getCell(c).getCellStyle().getFillPattern());
+            Assertions.assertTrue(
+                    wb.getWb().getFontAt(raw.getCell(c).getCellStyle().getFontIndex()).getBold());
+        }
+
+        sh.saveWorkBook();
+        app.closeAllWorkBooks();
+    }
+
+    @Test
+    void lApplyStyleRangeOnlyAffectsRange() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/rowApplyStyleRange.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("S");
+
+        sh.row(1).setRowValues(new String[]{"A", "B", "C", "D"});
+        sh.row(1).applyStyle(ExcelStyle.builder().fillColor("yellow").build(), 2, 4);
+
+        org.apache.poi.ss.usermodel.Row raw = wb.getWb().getSheet("S").getRow(0);
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND,
+                raw.getCell(1).getCellStyle().getFillPattern());
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND,
+                raw.getCell(2).getCellStyle().getFillPattern());
+        Assertions.assertNotEquals(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND,
+                raw.getCell(0).getCellStyle().getFillPattern());
+        Assertions.assertNotEquals(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND,
+                raw.getCell(3).getCellStyle().getFillPattern());
+
+        sh.saveWorkBook();
+        app.closeAllWorkBooks();
+    }
 }
