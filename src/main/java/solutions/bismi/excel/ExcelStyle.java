@@ -142,4 +142,63 @@ public final class ExcelStyle {
     public static ExcelStyle date() {
         return builder().numberFormat("dd-MMM-yyyy").build();
     }
+
+    /**
+     * Navy merged-title bar — white bold centred text on {@code #0f2d5c}. Pairs
+     * with {@link #header()} for the column headers below it.
+     */
+    public static ExcelStyle title() {
+        return builder()
+                .fillColor("#0f2d5c")
+                .fontColor("white")
+                .bold(true)
+                .horizontalAlignment("CENTER")
+                .build();
+    }
+
+    /**
+     * Totals row — pale-blue fill with dark-navy bold text and blue border.
+     * Designed to sit directly under the data rows produced by {@link ReportBuilder}.
+     */
+    public static ExcelStyle totals() {
+        return builder()
+                .fillColor("#e6eefc")
+                .fontColor("#0f2d5c")
+                .bold(true)
+                .fullBorder("#2d6cdf")
+                .build();
+    }
+
+    /** Status pill — green fill, green bold text (e.g. {@code Active}, {@code OK}). */
+    public static ExcelStyle statusActive() {
+        return statusPill("#d1f4dc", "#1a7f37");
+    }
+
+    /** Status pill — amber fill, amber bold text (e.g. {@code Review}, {@code Pending}). */
+    public static ExcelStyle statusReview() {
+        return statusPill("#fff1e5", "#bc4c00");
+    }
+
+    /** Status pill — red fill, red bold text (e.g. {@code Closed}, {@code Error}). */
+    public static ExcelStyle statusClosed() {
+        return statusPill("#ffebe9", "#cf222e");
+    }
+
+    /**
+     * Builds a status-pill style from any two hex colours. {@code fillHex} is the
+     * pastel fill; {@code textHex} is used for both the bold font and the border.
+     *
+     * <pre>
+     * cell.applyStyle(ExcelStyle.statusPill("#e0e7ff", "#1d4ed8"));  // custom blue
+     * </pre>
+     */
+    public static ExcelStyle statusPill(String fillHex, String textHex) {
+        return builder()
+                .fillColor(fillHex)
+                .fontColor(textHex)
+                .bold(true)
+                .horizontalAlignment("CENTER")
+                .fullBorder(textHex)
+                .build();
+    }
 }

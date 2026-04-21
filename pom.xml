@@ -10,7 +10,7 @@
     <!-- ───────── coordinates ───────── -->
     <groupId>solutions.bismi.excel</groupId>
     <artifactId>excel</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
 
     <name>Excel</name>
     <description>Easy-to-use Excel wrapper for Apache POI</description>
@@ -133,6 +133,26 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
+                <configuration>
+                    <!--
+                        Exclude demo/example sources and documentation-only enums from coverage:
+                        - examples/ is compiled as a source root so the snippets in README stay
+                          valid, but it is sample code, not library code.
+                        - ExcelCell$NamedColor is an enum that exists purely for IDE
+                          autocomplete and Javadoc links; it has no executable call sites.
+                    -->
+                    <excludes>
+                        <exclude>SalesReport*</exclude>
+                        <exclude>DashboardExample*</exclude>
+                        <exclude>InvoiceExample*</exclude>
+                        <exclude>EmployeeDirectoryExample*</exclude>
+                        <exclude>CollectionReportExample*</exclude>
+                        <exclude>KpiTilesExample*</exclude>
+                        <exclude>TitleAndContentExample*</exclude>
+                        <exclude>RowFromArrayExample*</exclude>
+                        <exclude>solutions/bismi/excel/ExcelCell$NamedColor.class</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -209,17 +229,10 @@
         </plugins>
     </build>
 
-    <!-- ───────── GPG profile (activates when env var present) ───────── -->
-    <profiles>
-        <profile>
-            <id>gpg</id>
-            <activation>
-                <property><name>env.GPG_PASSPHRASE</name></property>
-            </activation>
-            <properties>
-                <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
-            </properties>
-        </profile>
-    </profiles>
+    <!--
+        GPG signing uses the MAVEN_GPG_PASSPHRASE env variable read natively
+        by maven-gpg-plugin 3.2+. The older <gpg.passphrase> Maven property is
+        deprecated (leaks via process args) so we don't set it.
+    -->
 
 </project>

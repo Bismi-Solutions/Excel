@@ -11,11 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
+    env:
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
@@ -32,10 +35,6 @@ jobs:
                 <username>${{ secrets.CENTRAL_USERNAME }}</username>
                 <password>${{ secrets.CENTRAL_PASSWORD }}</password>
               </server>
-              <server>
-                <id>gpg.passphrase</id>
-                <passphrase>${{ secrets.GPG_PASSPHRASE }}</passphrase>
-              </server>
             </servers>
           </settings>
           EOF
@@ -49,7 +48,7 @@ jobs:
         run: mvn -B verify
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./target/site/jacoco/jacoco.xml
