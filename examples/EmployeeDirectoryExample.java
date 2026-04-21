@@ -43,6 +43,7 @@ public class EmployeeDirectoryExample {
         ExcelApplication app = new ExcelApplication();
         ExcelWorkBook wb = app.createWorkBook(path);
         ExcelWorkSheet sh = wb.addSheet("Directory");
+        sh.activate();   // show this sheet by default when the file is opened
 
         List<Employee> staff = Arrays.asList(
                 new Employee(101, "Amina Khan",    "Engineer",         "amina.khan@example.com",   LocalDate.of(2021, 7, 12),  95000, true),

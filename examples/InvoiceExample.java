@@ -20,6 +20,7 @@ public class InvoiceExample {
         ExcelApplication app = new ExcelApplication();
         ExcelWorkBook wb = app.createWorkBook("./resources/testdata/invoice.xlsx");
         ExcelWorkSheet sh = wb.addSheet("Invoice");
+        sh.activate();   // show this sheet by default when the file is opened
 
         ExcelStyle titleStyle = ExcelStyle.builder()
                 .bold(true).fontColor("white").fillColor("#0d4ba1")

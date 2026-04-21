@@ -53,6 +53,7 @@ public class CollectionReportExample {
                 new Product("A-103", "Contraption", 42, 99.99, 0.15));
 
         ExcelWorkSheet catalog = wb.addSheet("Catalog");
+        catalog.activate();   // show this sheet by default when the file is opened
         ReportBuilder.on(catalog)
                 .title("Product Catalog — Q3")
                 .rowsFromBeans(products)
