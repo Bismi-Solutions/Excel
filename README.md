@@ -7,7 +7,7 @@
 [![CI & Release](https://github.com/Bismi-Solutions/Excel/actions/workflows/ci.yml/badge.svg)](https://github.com/Bismi-Solutions/Excel/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/Bismi-Solutions/Excel/branch/master/graph/badge.svg)](https://codecov.io/gh/Bismi-Solutions/Excel)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Bismi-Solutions_Excel&metric=alert_status)](https://sonarcloud.io/project/overview?id=Bismi-Solutions_Excel)
-[![Known Vulnerabilities](https://snyk.io/test/github/Bismi-Solutions/Excel/badge.svg?targetFile=pom.xml)](https://snyk.io/test/github/Bismi-Solutions/Excel?targetFile=pom.xml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Bismi-Solutions/Excel/badge)](https://scorecard.dev/viewer/?uri=github.com/Bismi-Solutions/Excel)
 [![Maven Central](https://img.shields.io/maven-central/v/solutions.bismi.excel/excel.svg)](https://search.maven.org/artifact/solutions.bismi.excel/excel)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Java Version](https://img.shields.io/badge/Java-17%2B-blue)](https://openjdk.java.net/)
@@ -27,6 +27,8 @@ ReportBuilder.on(sheet)
 <p align="center">
   <img src="docs/report-preview.svg" alt="Styled Excel report generated in 5 lines" width="100%"/>
 </p>
+
+> The workbook shown above is produced by [`examples/SalesReport.java`](examples/SalesReport.java) — beans + `ReportBuilder`, plus the new `ExcelStyle.title()` / `totals()` / `statusActive|Review|Closed()` presets for the navy title, the pale-blue totals row and the coloured status pills.
 
 ---
 
@@ -241,18 +243,18 @@ The rest use `@ExcelColumn` bean mapping, `ReportBuilder`, formulas, hyperlinks,
 <dependency>
   <groupId>solutions.bismi.excel</groupId>
   <artifactId>excel</artifactId>
-  <version>1.2.0</version>
+  <version>1.3.0</version>
 </dependency>
 ```
 
 ### Gradle (Kotlin DSL)
 ```kotlin
-implementation("solutions.bismi.excel:excel:1.2.0")
+implementation("solutions.bismi.excel:excel:1.3.0")
 ```
 
 ### Gradle (Groovy DSL)
 ```groovy
-implementation "solutions.bismi.excel:excel:1.2.0"
+implementation "solutions.bismi.excel:excel:1.3.0"
 ```
 
 **Requires:** Java 17+  ·  Works on Windows · macOS · Linux.
@@ -271,7 +273,7 @@ implementation "solutions.bismi.excel:excel:1.2.0"
 | 🔗 **Merge/Unmerge** | succinct helpers · overlap safety checks |
 | 🗂️ **Collections** | `writeMaps` · `writeBeans` · `readAsMaps` · `readAsBeans` · `@ExcelColumn` annotation |
 | 🏗️ **Reports** | `ReportBuilder` — title · headers · zebra · freeze · auto-filter · per-column formats · column widths |
-| 🧪 **Quality** | 91 unit tests (incl. every README snippet) · CI · Codecov · Sonar · Snyk |
+| 🧪 **Quality** | 97 unit tests (incl. every README snippet) · CI · Codecov · Sonar · OpenSSF Scorecard |
 
 ---
 
@@ -337,11 +339,19 @@ flowchart LR
 ## 🧱 Style reuse at a glance
 
 ```java
-ExcelStyle header = ExcelStyle.header();         // grey fill · white bold · centred · bordered
+ExcelStyle header = ExcelStyle.header();         // blue fill · white bold · centred · bordered
 ExcelStyle zebra  = ExcelStyle.zebraStripe();    // light-grey fill
 ExcelStyle money  = ExcelStyle.currency();       // right-aligned $#,##0.00
 ExcelStyle pct    = ExcelStyle.percent();        // right-aligned 0.00%
 ExcelStyle when   = ExcelStyle.date();           // dd-MMM-yyyy
+
+// v1.3 presets — pair with ReportBuilder for polished reports
+ExcelStyle title  = ExcelStyle.title();          // navy merged title bar (pairs with header())
+ExcelStyle totals = ExcelStyle.totals();         // pale-blue totals row, navy bold text
+ExcelStyle active = ExcelStyle.statusActive();   // green pill — e.g. "Active", "OK"
+ExcelStyle review = ExcelStyle.statusReview();   // amber pill — e.g. "Review", "Pending"
+ExcelStyle closed = ExcelStyle.statusClosed();   // red pill   — e.g. "Closed", "Error"
+ExcelStyle pill   = ExcelStyle.statusPill("#e0e7ff", "#1d4ed8");  // roll your own
 
 ExcelStyle custom = ExcelStyle.builder()
         .fontColor("white").fillColor("#0d4ba1")
@@ -364,7 +374,7 @@ sheet.cell(10,3).applyStyle(money);              // single cell
 ```bash
 git clone https://github.com/Bismi-Solutions/Excel.git
 cd Excel
-mvn test        # 91 tests — all green is the baseline
+mvn test        # 97 tests — all green is the baseline
 ```
 
 PRs welcome. Please include unit tests and follow the log-level convention:

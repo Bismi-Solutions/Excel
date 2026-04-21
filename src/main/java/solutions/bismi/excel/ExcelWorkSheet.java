@@ -117,8 +117,7 @@ public class ExcelWorkSheet {
 
 
     /**
-     * @param strArrSheets
-     * @return
+     * @param strArrSheets names of the sheets to create
      */
     protected void addSheets(String[] strArrSheets) {
         try {

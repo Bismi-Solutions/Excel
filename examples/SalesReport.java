@@ -1,146 +1,134 @@
-import solutions.bismi.excel.*;
+import solutions.bismi.excel.ExcelApplication;
+import solutions.bismi.excel.ExcelColumn;
+import solutions.bismi.excel.ExcelStyle;
+import solutions.bismi.excel.ExcelWorkBook;
+import solutions.bismi.excel.ExcelWorkSheet;
+import solutions.bismi.excel.ReportBuilder;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * A comprehensive example demonstrating Excel library features
- * Creates a multi-sheet sales report with formatting, formulas, and charts
+ * Reproduces the styled report rendered by {@code docs/report-preview.svg} — a
+ * polished Q3 regional breakdown with a navy title, blue gradient header, zebra
+ * stripes, coloured growth arrows, status pills, a comment, and a totals row.
+ *
+ * <p>Layout (sheet <b>Summary</b>):</p>
+ * <pre>
+ *   Row 1 : merged A1:G1 — dark-navy bar "Q3 Sales Report — Regional Breakdown"
+ *   Row 2 : blue header  — Product · Units · Revenue · Growth · Launched · Owner · Status
+ *   Row 3-7: data rows with zebra stripes
+ *           Growth column turns green (▲) on positive, red (▼) on negative.
+ *           Status column renders as a coloured pill (Active / Review / Closed).
+ *   Row 8 : pale-blue totals row with navy bold text
+ * </pre>
+ *
+ * <p>The workbook also carries three empty sibling tabs (Products, Regions,
+ * Raw Data) so the Excel tab strip matches the preview.</p>
  */
 public class SalesReport {
+
+    /** Bean with {@link ExcelColumn} annotations — drives the bulk of the report. */
+    public static class Product {
+        @ExcelColumn(name = "Product",  order = 1)                                 String name;
+        @ExcelColumn(name = "Units",    order = 2, format = "#,##0")               int units;
+        @ExcelColumn(name = "Revenue",  order = 3, format = "$#,##0.00")           double revenue;
+        @ExcelColumn(name = "Growth",   order = 4, format = "\"▲ \"0.00%;\"▼ \"0.00%") double growth;
+        @ExcelColumn(name = "Launched", order = 5, format = "dd-MMM-yyyy")         LocalDate launched;
+        @ExcelColumn(name = "Owner",    order = 6)                                 String owner;
+        @ExcelColumn(name = "Status",   order = 7)                                 String status;
+
+        public Product() {}
+        public Product(String name, int units, double revenue, double growth,
+                       LocalDate launched, String owner, String status) {
+            this.name = name; this.units = units; this.revenue = revenue;
+            this.growth = growth; this.launched = launched;
+            this.owner = owner; this.status = status;
+        }
+    }
+
     public static void main(String[] args) {
         ExcelApplication app = new ExcelApplication();
-        ExcelWorkBook wb = app.createWorkBook("SalesReport.xlsx");
-        
-        // Create Summary sheet
-        ExcelWorkSheet summary = wb.addSheet("Summary");
-        summary.activate();
-        createSummarySheet(summary);
-        
-        // Create Sales Data sheet
-        ExcelWorkSheet sales = wb.addSheet("Sales Data");
-        createSalesDataSheet(sales);
-        
-        // Create Charts sheet
-        ExcelWorkSheet charts = wb.addSheet("Charts");
-        createChartsSheet(charts, sales);
-        
-        // Save and close
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/salesReport.xlsx");
+
+        buildSummary(wb);
+        wb.addSheet("Products");
+        wb.addSheet("Regions");
+        wb.addSheet("Raw Data");
+
         wb.saveWorkbook();
         app.closeAllWorkBooks();
+        System.out.println("Sales report written to ./resources/testdata/salesReport.xlsx");
     }
-    
-    private static void createSummarySheet(ExcelWorkSheet sheet) {
-        // Title
-        sheet.cell(1, 1).setText("Q1 2024 Sales Report");
-        sheet.cell(1, 1).setFontStyle(true, false, false);
-        sheet.cell(1, 1).setHorizontalAlignment("CENTER");
-        sheet.mergeCells(1, 1, 1, 5);
-        
-        // Summary metrics
-        String[] metrics = {"Total Sales", "Average Order", "Top Product", "Growth"};
-        String[] values = {"=SUM('Sales Data'!B2:B31)", "=AVERAGE('Sales Data'!B2:B31)", 
-                          "=INDEX('Sales Data'!A2:A31,MATCH(MAX('Sales Data'!B2:B31),'Sales Data'!B2:B31,0))",
-                          "=((SUM('Sales Data'!B2:B31)-SUM('Sales Data'!C2:C31))/SUM('Sales Data'!C2:C31))"};
-        
-        for (int i = 0; i < metrics.length; i++) {
-            sheet.cell(3, i+1).setText(metrics[i]);
-            sheet.cell(3, i+1).setFontStyle(true, false, false);
-            sheet.cell(3, i+1).setFillColor("grey_25_percent");
-            sheet.cell(4, i+1).setFormula(values[i]);
-            if (i < 2) {
-                sheet.cell(4, i+1).setNumberFormat("$#,##0.00");
-            } else if (i == 3) {
-                sheet.cell(4, i+1).setNumberFormat("0.00%");
-            } else {
-                sheet.cell(4, i+1).setNumberFormat("@");
-            }
-        }
-        
-        // Format summary section
-        sheet.cell(3, 1).setFullBorder("black");
-        sheet.cell(3, 4).setFullBorder("black");
-        sheet.cell(4, 1).setFullBorder("black");
-        sheet.cell(4, 4).setFullBorder("black");
-    }
-    
-    private static void createSalesDataSheet(ExcelWorkSheet sheet) {
-        // Headers
-        String[] headers = {"Product", "Current Sales", "Previous Sales", "Growth", "Category"};
-        for (int i = 0; i < headers.length; i++) {
-            sheet.cell(1, i+1).setText(headers[i]);
-            sheet.cell(1, i+1).setFontStyle(true, false, false);
-            sheet.cell(1, i+1).setFillColor("grey_25_percent");
-            sheet.cell(1, i+1).setHorizontalAlignment("CENTER");
-        }
-        
-        // Sample data
+
+    private static void buildSummary(ExcelWorkBook wb) {
+        ExcelWorkSheet sh = wb.addSheet("Summary");
+        sh.activate();
+
         List<Product> products = Arrays.asList(
-            new Product("Laptop Pro", 125000, 100000, "Electronics"),
-            new Product("Smartphone X", 150000, 120000, "Electronics"),
-            new Product("Office Chair", 45000, 40000, "Furniture"),
-            new Product("Desk Lamp", 25000, 20000, "Furniture"),
-            new Product("Wireless Mouse", 35000, 30000, "Accessories")
-        );
-        
-        // Add data rows
+                new Product("Widget Pro",  2450, 18375.00,  0.1240, LocalDate.of(2026, 1, 12), "A. Rahman", "Active"),
+                new Product("Gadget Max",  1820, 24934.00,  0.0875, LocalDate.of(2026, 2,  3), "J. Smith",  "Active"),
+                new Product("Contraption",  960,  9504.00, -0.0320, LocalDate.of(2026, 2, 21), "S. Ali",    "Review"),
+                new Product("Gizmo Lite",  3105,  6210.50,  0.2210, LocalDate.of(2026, 3,  5), "D. Wu",     "Active"),
+                new Product("Legacy Kit",   410,  2050.00, -0.1500, LocalDate.of(2024,11, 12), "R. Khan",   "Closed"));
+
+        // The 5-line core the README advertises — title / headers / zebra / freeze / filter
+        // all come from the builder. titleStyle() swaps the default centred-bold title for
+        // the navy bar the preview uses.
+        ReportBuilder.on(sh)
+                .title("Q3 Sales Report — Regional Breakdown")
+                .titleStyle(ExcelStyle.title())
+                .rowsFromBeans(products)
+                .zebraStripes(true)
+                .freezeHeader(true)
+                .autoFilter(true)
+                .columnWidth(1, 18).columnWidth(2, 10).columnWidth(3, 14)
+                .columnWidth(4, 12).columnWidth(5, 14).columnWidth(6, 14)
+                .columnWidth(7, 12)
+                .render();
+
+        // Per-cell tweaks ReportBuilder can't infer: growth colour tracks sign,
+        // status colour tracks category. Rows 3..7 (title=1, header=2).
         for (int i = 0; i < products.size(); i++) {
+            int r = i + 3;
             Product p = products.get(i);
-            int row = i + 2;
-            
-            sheet.cell(row, 1).setText(p.name);
-            sheet.cell(row, 2).setNumericValue(p.currentSales);
-            sheet.cell(row, 2).setNumberFormat("$#,##0.00");
-            sheet.cell(row, 3).setNumericValue(p.previousSales);
-            sheet.cell(row, 3).setNumberFormat("$#,##0.00");
-            sheet.cell(row, 4).setFormula(String.format("=(B%d-C%d)/C%d", row, row, row));
-            sheet.cell(row, 4).setNumberFormat("0.00%");
-            sheet.cell(row, 5).setText(p.category);
+            sh.cell(r, 4).applyStyle(growthStyle(p.growth));
+            sh.cell(r, 7).applyStyle(statusStyle(p.status));
         }
-        
-        // Add totals row
-        int lastRow = products.size() + 2;
-        sheet.cell(lastRow, 1).setText("Total");
-        sheet.cell(lastRow, 1).setFontStyle(true, false, false);
-        sheet.cell(lastRow, 2).setFormula(String.format("=SUM(B2:B%d)", lastRow-1));
-        sheet.cell(lastRow, 2).setNumberFormat("$#,##0.00");
-        sheet.cell(lastRow, 2).setFontStyle(true, false, false);
-        sheet.cell(lastRow, 3).setFormula(String.format("=SUM(C2:C%d)", lastRow-1));
-        sheet.cell(lastRow, 3).setNumberFormat("$#,##0.00");
-        sheet.cell(lastRow, 3).setFontStyle(true, false, false);
-        
-        // Format data section
-        sheet.cell(1, 1).setFullBorder("black");
-        sheet.cell(lastRow, 5).setFullBorder("black");
+
+        // Comment on the "Contraption" row explaining the Review flag.
+        sh.cell(5, 1).setComment(
+                "Margin slipped below threshold this quarter — flagged for review.",
+                "Q3 Review");
+
+        // Totals row — row 8. Growth here is always positive, so we pin it green.
+        int totalsRow = products.size() + 3;
+        sh.row(totalsRow).setValues(new Object[]{"TOTALS", 8745, 61073.50, 0.0501, null, "5 owners", "4 / 5"});
+        sh.row(totalsRow).applyStyle(ExcelStyle.totals(), 1, 8);
+        sh.cell(totalsRow, 2).setNumberFormat("#,##0");
+        sh.cell(totalsRow, 3).setNumberFormat("$#,##0.00");
+        sh.cell(totalsRow, 4).setNumberFormat("\"▲ \"0.00%;\"▼ \"0.00%");
+        sh.cell(totalsRow, 4).setFontColor("#1a7f37");
+        sh.cell(totalsRow, 5).setText("—");
+        sh.cell(totalsRow, 7).setHorizontalAlignment("CENTER");
     }
-    
-    private static void createChartsSheet(ExcelWorkSheet sheet, ExcelWorkSheet data) {
-        // Title
-        sheet.cell(1, 1).setText("Sales Analysis");
-        sheet.cell(1, 1).setFontStyle(true, false, false);
-        
-        // Add chart (Note: This is a placeholder as chart creation would require additional implementation)
-        sheet.cell(3, 1).setText("Sales by Product");
-        sheet.cell(3, 1).setFontStyle(true, false, false);
-        // Chart implementation would go here
-        
-        sheet.cell(3, 4).setText("Growth Analysis");
-        sheet.cell(3, 4).setFontStyle(true, false, false);
-        // Chart implementation would go here
+
+    private static ExcelStyle growthStyle(double growth) {
+        return ExcelStyle.builder()
+                .fontColor(growth >= 0 ? "#1a7f37" : "#cf222e")
+                .bold(true)
+                .horizontalAlignment("RIGHT")
+                .numberFormat("\"▲ \"0.00%;\"▼ \"0.00%")
+                .build();
     }
-    
-    private static class Product {
-        final String name;
-        final double currentSales;
-        final double previousSales;
-        final String category;
-        
-        Product(String name, double currentSales, double previousSales, String category) {
-            this.name = name;
-            this.currentSales = currentSales;
-            this.previousSales = previousSales;
-            this.category = category;
+
+    private static ExcelStyle statusStyle(String status) {
+        switch (status) {
+            case "Active": return ExcelStyle.statusActive();
+            case "Review": return ExcelStyle.statusReview();
+            case "Closed": return ExcelStyle.statusClosed();
+            default:       return ExcelStyle.builder().horizontalAlignment("CENTER").build();
         }
     }
 }

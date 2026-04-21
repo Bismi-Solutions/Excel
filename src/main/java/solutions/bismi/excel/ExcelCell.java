@@ -12,6 +12,10 @@ import org.apache.logging.log4j.Logger;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellUtil;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -257,11 +261,11 @@ public class ExcelCell {
                 (byte) Integer.parseInt(hexColor.substring(2, 4), 16),
                 (byte) Integer.parseInt(hexColor.substring(4, 6), 16)
             };
-            org.apache.poi.xssf.usermodel.XSSFFont xssfFont = (org.apache.poi.xssf.usermodel.XSSFFont) newFont;
-            xssfFont.setColor(new org.apache.poi.xssf.usermodel.XSSFColor(rgb, null));
+            XSSFFont xssfFont = (XSSFFont) newFont;
+            xssfFont.setColor(new XSSFColor(rgb, null));
         } catch (Exception e) {
             log.error("Error parsing hex color: {}", e.getMessage());
-            newFont.setColor(org.apache.poi.ss.usermodel.IndexedColors.BLACK.getIndex());
+            newFont.setColor(IndexedColors.BLACK.getIndex());
         }
     }
 
@@ -305,7 +309,7 @@ public class ExcelCell {
 
             if (fontColor != null && fontColor.startsWith("#")) {
                 String hexColor = fontColor.substring(1);
-                if (workbook instanceof org.apache.poi.xssf.usermodel.XSSFWorkbook) {
+                if (workbook instanceof XSSFWorkbook) {
                     // XLSX: true hex color
                     setHexColor(hexColor, newFont);
                 } else {
@@ -381,7 +385,7 @@ public class ExcelCell {
 
             if (fillColor != null && fillColor.startsWith("#") && fillColor.length() >= 7) {
                 String hex = fillColor.substring(1);
-                if (workbook instanceof org.apache.poi.xssf.usermodel.XSSFWorkbook) {
+                if (workbook instanceof XSSFWorkbook) {
                     setXSSFHexFillColor(hex, newStyle);
                 } else {
                     setHSSFHexFillColor(hex, newStyle);
@@ -404,8 +408,8 @@ public class ExcelCell {
                 (byte) Integer.parseInt(hex.substring(2, 4), 16),
                 (byte) Integer.parseInt(hex.substring(4, 6), 16)
             };
-            org.apache.poi.xssf.usermodel.XSSFCellStyle xs = (org.apache.poi.xssf.usermodel.XSSFCellStyle) style;
-            xs.setFillForegroundColor(new org.apache.poi.xssf.usermodel.XSSFColor(rgb, null));
+            XSSFCellStyle xs = (XSSFCellStyle) style;
+            xs.setFillForegroundColor(new XSSFColor(rgb, null));
         } catch (Exception e) {
             log.error("Error parsing hex fill color: {}", e.getMessage());
             style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
@@ -532,9 +536,13 @@ public class ExcelCell {
     }
 
     /**
-     * Adds a medium-weight border (all four sides) around the cell.
+     * Adds a medium-weight border (all four sides) around the cell. Accepts a
+     * {@linkplain NamedColor named colour} or a hex code ({@code "#RRGGBB"}).
+     * Hex is rendered exactly on {@code .xlsx}; on {@code .xls} (HSSF) it falls
+     * back to the closest indexed colour — mirroring how {@link #setFillColor}
+     * and {@link #setFontColor} behave, so a single hex palette works for both.
      *
-     * @param borderColor colour of the border (named or hex for XLSX)
+     * @param borderColor named or hex colour
      * @return this cell for chaining
      */
     public ExcelCell setFullBorder(String borderColor) {
@@ -545,23 +553,55 @@ public class ExcelCell {
             CellStyle newStyle = workbook.createCellStyle();
             newStyle.cloneStyleFrom(originalStyle);
 
-            short colorCode = Common.getColorCode(borderColor);
-
             newStyle.setBorderLeft(BorderStyle.MEDIUM);
             newStyle.setBorderRight(BorderStyle.MEDIUM);
             newStyle.setBorderTop(BorderStyle.MEDIUM);
             newStyle.setBorderBottom(BorderStyle.MEDIUM);
 
-            newStyle.setLeftBorderColor(colorCode);
-            newStyle.setRightBorderColor(colorCode);
-            newStyle.setTopBorderColor(colorCode);
-            newStyle.setBottomBorderColor(colorCode);
+            boolean isHex = borderColor != null
+                    && borderColor.startsWith("#")
+                    && borderColor.length() >= 7;
+
+            if (isHex && workbook instanceof XSSFWorkbook) {
+                // XLSX: apply the exact hex on all four sides via XSSFColor.
+                XSSFColor color = hexToXSSFColor(borderColor.substring(1));
+                XSSFCellStyle xs = (XSSFCellStyle) newStyle;
+                xs.setLeftBorderColor(color);
+                xs.setRightBorderColor(color);
+                xs.setTopBorderColor(color);
+                xs.setBottomBorderColor(color);
+            } else {
+                // HSSF (hex → nearest indexed) or a named colour.
+                short colorCode = isHex
+                        ? closestIndexedForHex(borderColor.substring(1))
+                        : Common.getColorCode(borderColor);
+                newStyle.setLeftBorderColor(colorCode);
+                newStyle.setRightBorderColor(colorCode);
+                newStyle.setTopBorderColor(colorCode);
+                newStyle.setBottomBorderColor(colorCode);
+            }
 
             cCell.setCellStyle(newStyle);
         } catch (Exception e) {
             log.error("Error in setting border: {}", e.getMessage());
         }
         return this;
+    }
+
+    private XSSFColor hexToXSSFColor(String hex) {
+        byte[] rgb = new byte[] {
+                (byte) Integer.parseInt(hex.substring(0, 2), 16),
+                (byte) Integer.parseInt(hex.substring(2, 4), 16),
+                (byte) Integer.parseInt(hex.substring(4, 6), 16)
+        };
+        return new XSSFColor(rgb, null);
+    }
+
+    private short closestIndexedForHex(String hex) {
+        int r = Integer.parseInt(hex.substring(0, 2), 16);
+        int g = Integer.parseInt(hex.substring(2, 4), 16);
+        int b = Integer.parseInt(hex.substring(4, 6), 16);
+        return getClosestIndexedColor(r, g, b);
     }
 
 
