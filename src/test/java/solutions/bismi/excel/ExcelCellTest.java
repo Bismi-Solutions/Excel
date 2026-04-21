@@ -737,4 +737,51 @@ class ExcelCellTest {
         sh.saveWorkBook();
         app.closeAllWorkBooks();
     }
+
+    @Test
+    void rSetFillColorHexOnXLSX() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/cellHexFill.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("H");
+
+        sh.cell(1, 1).setText("header").setFillColor("#2d6cdf");
+        sh.cell(2, 1).setText("zebra").setFillColor("#f3f6f9");
+
+        org.apache.poi.xssf.usermodel.XSSFCell c1 =
+                (org.apache.poi.xssf.usermodel.XSSFCell) wb.getWb().getSheet("H").getRow(0).getCell(0);
+        org.apache.poi.xssf.usermodel.XSSFCell c2 =
+                (org.apache.poi.xssf.usermodel.XSSFCell) wb.getWb().getSheet("H").getRow(1).getCell(0);
+
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND,
+                c1.getCellStyle().getFillPattern());
+        byte[] rgb1 = c1.getCellStyle().getFillForegroundXSSFColor().getRGB();
+        Assertions.assertEquals((byte) 0x2d, rgb1[0]);
+        Assertions.assertEquals((byte) 0x6c, rgb1[1]);
+        Assertions.assertEquals((byte) 0xdf, rgb1[2]);
+
+        byte[] rgb2 = c2.getCellStyle().getFillForegroundXSSFColor().getRGB();
+        Assertions.assertEquals((byte) 0xf3, rgb2[0]);
+        Assertions.assertEquals((byte) 0xf6, rgb2[1]);
+        Assertions.assertEquals((byte) 0xf9, rgb2[2]);
+
+        sh.saveWorkBook();
+        app.closeAllWorkBooks();
+    }
+
+    @Test
+    void sSetFillColorHexOnXLSFallsBackToIndexed() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/cellHexFill.xls");
+        ExcelWorkSheet sh = wb.addSheet("H");
+
+        // Should not throw — picks closest indexed color for HSSF
+        Assertions.assertDoesNotThrow(() -> sh.cell(1, 1).setText("x").setFillColor("#2d6cdf"));
+
+        org.apache.poi.ss.usermodel.Cell raw = wb.getWb().getSheet("H").getRow(0).getCell(0);
+        Assertions.assertEquals(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND,
+                raw.getCellStyle().getFillPattern());
+
+        sh.saveWorkBook();
+        app.closeAllWorkBooks();
+    }
 }

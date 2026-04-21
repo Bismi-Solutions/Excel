@@ -32,8 +32,8 @@
   <!-- From block (grey fill) -->
   <rect x="40"  y="178" width="400" height="62" fill="#ebeef2" stroke="#d0d7de"/>
   <text x="52" y="198" font-size="12" fill="#24292f">Bismi Solutions</text>
-  <text x="52" y="215" font-size="12" fill="#24292f">Tech Park, Level 4</text>
-  <text x="52" y="232" font-size="12" fill="#24292f">Chennai, India 600001</text>
+  <text x="52" y="215" font-size="12" fill="#24292f">Infopark, Phase II</text>
+  <text x="52" y="232" font-size="12" fill="#24292f">Kochi, India 682042</text>
 
   <!-- Bill To block -->
   <rect x="480" y="178" width="300" height="62" fill="#ebeef2" stroke="#d0d7de"/>

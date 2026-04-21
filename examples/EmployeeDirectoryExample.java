@@ -49,7 +49,7 @@ public class EmployeeDirectoryExample {
                 new Employee(102, "Rahul Menon",   "Senior Engineer",  "rahul.menon@example.com",  LocalDate.of(2019, 3, 4), 135000, true),
                 new Employee(103, "Sofia Gomez",   "Product Manager",  "sofia.gomez@example.com",  LocalDate.of(2022, 11, 21),110000, true),
                 new Employee(104, "Dmitri Ivanov", "QA Lead",          "dmitri.ivanov@example.com",LocalDate.of(2018, 1, 9), 120000, false),
-                new Employee(105, "Priya Naidu",   "Designer",         "priya.naidu@example.com",  LocalDate.of(2023, 6, 15),  88000, true));
+                new Employee(105, "John Jones",    "Designer",         "john.jones@example.com",   LocalDate.of(2023, 6, 15),  88000, true));
 
         // No title() — keeps row 1 as the header so readAsBeans works cleanly later.
         ReportBuilder.on(sh)

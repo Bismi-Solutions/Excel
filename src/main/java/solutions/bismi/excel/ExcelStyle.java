@@ -101,10 +101,10 @@ public final class ExcelStyle {
     /*  Ready-made presets                                                 */
     /* ------------------------------------------------------------------ */
 
-    /** Dark header with white bold centered text and black border — typical report header. */
+    /** Blue header with white bold centred text and black border — typical report header. */
     public static ExcelStyle header() {
         return builder()
-                .fillColor("grey_50_percent")
+                .fillColor("#2d6cdf")
                 .fontColor("white")
                 .bold(true)
                 .horizontalAlignment("CENTER")
@@ -112,9 +112,20 @@ public final class ExcelStyle {
                 .build();
     }
 
-    /** Light-grey alternating row fill for zebra-striped tables. */
+    /** Dark-grey variant of {@link #header()} — typical for invoices and formal documents. */
+    public static ExcelStyle greyHeader() {
+        return builder()
+                .fillColor("#636363")
+                .fontColor("white")
+                .bold(true)
+                .horizontalAlignment("CENTER")
+                .fullBorder("black")
+                .build();
+    }
+
+    /** Very light grey alternating row fill for zebra-striped tables. */
     public static ExcelStyle zebraStripe() {
-        return builder().fillColor("grey_25_percent").build();
+        return builder().fillColor("#f3f6f9").build();
     }
 
     /** Currency preset — right-aligned, {@code $#,##0.00}. */

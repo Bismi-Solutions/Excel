@@ -360,8 +360,12 @@ public class ExcelCell {
 
     /**
      * Sets the background fill color for the cell.
+     * <p>
+     * Accepts named colours (see {@link NamedColor}) or hex codes ({@code "#RRGGBB"}).
+     * Hex is rendered exactly on {@code .xlsx} workbooks; on {@code .xls} it falls back
+     * to the closest indexed colour.
      *
-     * @param fillColor The color name to set for the cell background
+     * @param fillColor named color or hex code
      * @return this cell for chaining
      */
     public ExcelCell setFillColor(String fillColor) {
@@ -374,13 +378,50 @@ public class ExcelCell {
             newStyle.cloneStyleFrom(originalStyle);
 
             newStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            newStyle.setFillForegroundColor(Common.getColorCode(fillColor));
+
+            if (fillColor != null && fillColor.startsWith("#") && fillColor.length() >= 7) {
+                String hex = fillColor.substring(1);
+                if (workbook instanceof org.apache.poi.xssf.usermodel.XSSFWorkbook) {
+                    setXSSFHexFillColor(hex, newStyle);
+                } else {
+                    setHSSFHexFillColor(hex, newStyle);
+                }
+            } else {
+                newStyle.setFillForegroundColor(Common.getColorCode(fillColor));
+            }
 
             cCell.setCellStyle(newStyle);
         } catch (Exception e) {
             log.error("Error in setting fill color: {}", e.getMessage());
         }
         return this;
+    }
+
+    private void setXSSFHexFillColor(String hex, CellStyle style) {
+        try {
+            byte[] rgb = new byte[] {
+                (byte) Integer.parseInt(hex.substring(0, 2), 16),
+                (byte) Integer.parseInt(hex.substring(2, 4), 16),
+                (byte) Integer.parseInt(hex.substring(4, 6), 16)
+            };
+            org.apache.poi.xssf.usermodel.XSSFCellStyle xs = (org.apache.poi.xssf.usermodel.XSSFCellStyle) style;
+            xs.setFillForegroundColor(new org.apache.poi.xssf.usermodel.XSSFColor(rgb, null));
+        } catch (Exception e) {
+            log.error("Error parsing hex fill color: {}", e.getMessage());
+            style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        }
+    }
+
+    private void setHSSFHexFillColor(String hex, CellStyle style) {
+        try {
+            int r = Integer.parseInt(hex.substring(0, 2), 16);
+            int g = Integer.parseInt(hex.substring(2, 4), 16);
+            int b = Integer.parseInt(hex.substring(4, 6), 16);
+            style.setFillForegroundColor(getClosestIndexedColor(r, g, b));
+        } catch (Exception e) {
+            log.error("Error parsing hex fill color for HSSF: {}", e.getMessage());
+            style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        }
     }
 
     /**

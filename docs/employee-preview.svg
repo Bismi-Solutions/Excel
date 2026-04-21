@@ -168,9 +168,9 @@
     <rect x="780" y="224" width="110" height="28" fill="#ffffff" stroke="#d0d7de"/>
     <rect x="890" y="224" width="80"  height="28" fill="#ffffff" stroke="#d0d7de"/>
     <text x="70"  y="242" text-anchor="middle">105</text>
-    <text x="112" y="242">Priya Naidu</text>
+    <text x="112" y="242">John Jones</text>
     <text x="272" y="242">Designer</text>
-    <text x="452" y="242" fill="#0969da" text-decoration="underline">priya.naidu@example.com</text>
+    <text x="452" y="242" fill="#0969da" text-decoration="underline">john.jones@example.com</text>
     <text x="720" y="242" text-anchor="middle">15-Jun-2023</text>
     <text x="880" y="242" text-anchor="end">$88,000</text>
     <text x="930" y="242" text-anchor="middle">true</text>

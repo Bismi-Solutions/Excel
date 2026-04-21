@@ -27,8 +27,8 @@ public class InvoiceExample {
         ExcelStyle labelStyle = ExcelStyle.builder()
                 .bold(true).fontColor("#0d4ba1").build();
         ExcelStyle addressStyle = ExcelStyle.builder()
-                .fillColor("grey_25_percent").build();
-        ExcelStyle headerStyle = ExcelStyle.header();
+                .fillColor("#ebeef2").build();
+        ExcelStyle headerStyle = ExcelStyle.greyHeader();
         ExcelStyle money = ExcelStyle.currency();
         ExcelStyle totalRow = ExcelStyle.builder()
                 .bold(true).fillColor("#e6eefc").numberFormat("$#,##0.00")
@@ -46,8 +46,8 @@ public class InvoiceExample {
 
         sh.cell(5, 1).setText("From").applyStyle(labelStyle);
         sh.cell(6, 1).setText("Bismi Solutions").applyStyle(addressStyle);
-        sh.cell(7, 1).setText("Tech Park, Level 4").applyStyle(addressStyle);
-        sh.cell(8, 1).setText("Chennai, India 600001").applyStyle(addressStyle);
+        sh.cell(7, 1).setText("Infopark, Phase II").applyStyle(addressStyle);
+        sh.cell(8, 1).setText("Kochi, India 682042").applyStyle(addressStyle);
 
         sh.cell(5, 4).setText("Bill To").applyStyle(labelStyle);
         sh.cell(6, 4).setText("Acme Corp.").applyStyle(addressStyle);
