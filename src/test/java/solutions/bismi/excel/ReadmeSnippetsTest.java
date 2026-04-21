@@ -181,6 +181,34 @@ class ReadmeSnippetsTest {
         app.closeAllWorkBooks();
     }
 
+    // README — "Rows from arrays — one call writes the whole row"
+    @Test
+    void iRowsFromArrays() {
+        ExcelApplication app = new ExcelApplication();
+        ExcelWorkBook wb = app.createWorkBook("./resources/testdata/readmeRowArrays.xlsx");
+        ExcelWorkSheet sh = wb.addSheet("S");
+
+        // --- snippet begin ---
+        // Header row from a String[]
+        String[] headers = {"Item", "Qty", "Unit", "Aisle"};
+        sh.row(2).setRowValues(headers);
+
+        // Data rows from Object[] — mixed types get routed automatically
+        sh.row(3).setValues(new Object[]{"Apples",  6, "pcs", "Produce"});
+        sh.row(4).setValues(new Object[]{"Milk",    2, "L",   "Dairy"});
+        // --- snippet end ---
+
+        org.apache.poi.ss.usermodel.Sheet raw = wb.getWb().getSheet("S");
+        Assertions.assertEquals("Item",    raw.getRow(1).getCell(0).getStringCellValue());
+        Assertions.assertEquals("Aisle",   raw.getRow(1).getCell(3).getStringCellValue());
+        Assertions.assertEquals("Apples",  raw.getRow(2).getCell(0).getStringCellValue());
+        Assertions.assertEquals(6.0,       raw.getRow(2).getCell(1).getNumericCellValue(), 0.0001);
+        Assertions.assertEquals("Produce", raw.getRow(2).getCell(3).getStringCellValue());
+
+        sh.saveWorkBook();
+        app.closeAllWorkBooks();
+    }
+
     // README — "Style reuse at a glance"
     @Test
     void hStyleReuseAtAGlance() {

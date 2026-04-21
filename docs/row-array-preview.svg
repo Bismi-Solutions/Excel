@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 540" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect x="10" y="10" width="760" height="520" rx="6" fill="#ffffff" stroke="#d0d7de" filter="url(#shadow)"/>
+
+  <!-- Window chrome -->
+  <rect x="10" y="10" width="760" height="32" rx="6" fill="#0d4ba1"/>
+  <rect x="10" y="30" width="760" height="12" fill="#0d4ba1"/>
+  <circle cx="28" cy="26" r="5" fill="#ff5f57"/>
+  <circle cx="44" cy="26" r="5" fill="#febc2e"/>
+  <circle cx="60" cy="26" r="5" fill="#28c840"/>
+  <text x="82" y="30" fill="#ffffff" font-size="13" font-weight="600">rowFromArray.xlsx — Shopping</text>
+
+  <!-- Column letters -->
+  <g font-size="11" fill="#57606a" text-anchor="middle">
+    <rect x="10"  y="54" width="30"  height="20" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="40"  y="54" width="180" height="20" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="220" y="54" width="80"  height="20" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="300" y="54" width="100" height="20" fill="#f6f8fa" stroke="#d0d7de"/>
+    <rect x="400" y="54" width="140" height="20" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25"  y="68">#</text>
+    <text x="130" y="68">A</text>
+    <text x="260" y="68">B</text>
+    <text x="350" y="68">C</text>
+    <text x="470" y="68">D</text>
+  </g>
+
+  <!-- Row 1: Title (merged A1:D1) -->
+  <rect x="10" y="74"  width="30"  height="28" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="92" font-size="11" fill="#57606a" text-anchor="middle">1</text>
+  <rect x="40" y="74"  width="500" height="28" fill="#2d6cdf" stroke="#000"/>
+  <text x="290" y="93" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">Weekly Shopping List</text>
+
+  <!-- Row 2: Header row from String[] - BLUE -->
+  <rect x="10" y="102" width="30"  height="26" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="25" y="119" font-size="11" fill="#57606a" text-anchor="middle">2</text>
+  <g font-size="12" fill="#ffffff" font-weight="700" text-anchor="middle">
+    <rect x="40"  y="102" width="180" height="26" fill="#2d6cdf" stroke="#000"/>
+    <rect x="220" y="102" width="80"  height="26" fill="#2d6cdf" stroke="#000"/>
+    <rect x="300" y="102" width="100" height="26" fill="#2d6cdf" stroke="#000"/>
+    <rect x="400" y="102" width="140" height="26" fill="#2d6cdf" stroke="#000"/>
+    <text x="130" y="120">Item</text>
+    <text x="260" y="120">Qty</text>
+    <text x="350" y="120">Unit</text>
+    <text x="470" y="120">Aisle</text>
+  </g>
+
+  <!-- Arrow calling out the header array -->
+  <path d="M 548 115 L 605 115" stroke="#cf222e" stroke-width="1.4" fill="none" marker-end="url(#arrow)"/>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+      <polygon points="0,0 8,4 0,8" fill="#cf222e"/>
+    </marker>
+  </defs>
+  <rect x="608" y="98" width="155" height="36" rx="4" fill="#fff5f5" stroke="#cf222e"/>
+  <text x="616" y="113" font-size="10.5" fill="#cf222e" font-weight="700">String[] headers</text>
+  <text x="616" y="127" font-size="10" fill="#57606a" font-family="Consolas, monospace">setRowValues(headers)</text>
+
+  <!-- Data rows -->
+  <g font-size="12" fill="#24292f">
+    <rect x="10" y="128" width="30" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25" y="144" font-size="11" fill="#57606a" text-anchor="middle">3</text>
+    <rect x="40"  y="128" width="180" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="220" y="128" width="80"  height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="300" y="128" width="100" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="400" y="128" width="140" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="54" y="144">Apples</text>
+    <text x="290" y="144" text-anchor="end">6</text>
+    <text x="314" y="144">pcs</text>
+    <text x="414" y="144">Produce</text>
+
+    <rect x="10" y="152" width="30" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25" y="168" font-size="11" fill="#57606a" text-anchor="middle">4</text>
+    <rect x="40"  y="152" width="180" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="220" y="152" width="80"  height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="300" y="152" width="100" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="400" y="152" width="140" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="54" y="168">Milk</text>
+    <text x="290" y="168" text-anchor="end">2</text>
+    <text x="314" y="168">L</text>
+    <text x="414" y="168">Dairy</text>
+
+    <rect x="10" y="176" width="30" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25" y="192" font-size="11" fill="#57606a" text-anchor="middle">5</text>
+    <rect x="40"  y="176" width="180" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="220" y="176" width="80"  height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="300" y="176" width="100" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="400" y="176" width="140" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="54" y="192">Bread</text>
+    <text x="290" y="192" text-anchor="end">1</text>
+    <text x="314" y="192">loaf</text>
+    <text x="414" y="192">Bakery</text>
+
+    <rect x="10" y="200" width="30" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25" y="216" font-size="11" fill="#57606a" text-anchor="middle">6</text>
+    <rect x="40"  y="200" width="180" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="220" y="200" width="80"  height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="300" y="200" width="100" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="400" y="200" width="140" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="54" y="216">Coffee</text>
+    <text x="290" y="216" text-anchor="end">1</text>
+    <text x="314" y="216">kg</text>
+    <text x="414" y="216">Grocery</text>
+
+    <rect x="10" y="224" width="30" height="24" fill="#f6f8fa" stroke="#d0d7de"/>
+    <text x="25" y="240" font-size="11" fill="#57606a" text-anchor="middle">7</text>
+    <rect x="40"  y="224" width="180" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="220" y="224" width="80"  height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="300" y="224" width="100" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="400" y="224" width="140" height="24" fill="#ffffff" stroke="#d0d7de"/>
+    <text x="54" y="240">Eggs</text>
+    <text x="290" y="240" text-anchor="end">12</text>
+    <text x="314" y="240">pcs</text>
+    <text x="414" y="240">Dairy</text>
+  </g>
+
+  <!-- Callout for data rows -->
+  <path d="M 548 212 L 605 212" stroke="#1a7f37" stroke-width="1.4" fill="none"/>
+  <polygon points="605,208 605,216 612,212" fill="#1a7f37"/>
+  <rect x="608" y="195" width="155" height="36" rx="4" fill="#eef7f0" stroke="#1a7f37"/>
+  <text x="616" y="210" font-size="10.5" fill="#1a7f37" font-weight="700">Object[] (mixed types)</text>
+  <text x="616" y="224" font-size="10" fill="#57606a" font-family="Consolas, monospace">setValues(new Object[]...)</text>
+
+  <!-- Code callout -->
+  <rect x="40" y="275" width="700" height="245" rx="6" fill="#fff" stroke="#d0d7de"/>
+  <text x="56" y="295" font-size="12" fill="#24292f" font-weight="700">examples/RowFromArrayExample.java — write rows in one call</text>
+
+  <text x="56" y="320" font-size="11" fill="#cf222e" font-family="Consolas, monospace" font-weight="700">// 1. Header row from a String[]</text>
+  <text x="56" y="336" font-size="11" fill="#57606a" font-family="Consolas, monospace">String[] headers = {"Item", "Qty", "Unit", "Aisle"};</text>
+  <text x="56" y="352" font-size="11" fill="#57606a" font-family="Consolas, monospace">sh.row(2).setRowValues(headers);</text>
+  <text x="56" y="368" font-size="11" fill="#57606a" font-family="Consolas, monospace">sh.row(2).applyStyle(ExcelStyle.header());</text>
+
+  <text x="56" y="395" font-size="11" fill="#1a7f37" font-family="Consolas, monospace" font-weight="700">// 2. Data rows from Object[] — mixed types</text>
+  <text x="56" y="411" font-size="11" fill="#57606a" font-family="Consolas, monospace">sh.row(3).setValues(new Object[]{"Apples",  6, "pcs",  "Produce"});</text>
+  <text x="56" y="427" font-size="11" fill="#57606a" font-family="Consolas, monospace">sh.row(4).setValues(new Object[]{"Milk",    2, "L",    "Dairy"});</text>
+  <text x="56" y="443" font-size="11" fill="#57606a" font-family="Consolas, monospace">sh.row(5).setValues(new Object[]{"Bread",   1, "loaf", "Bakery"});</text>
+  <text x="56" y="459" font-size="11" fill="#57606a" font-family="Consolas, monospace">sh.row(6).setValues(new Object[]{"Coffee",  1, "kg",   "Grocery"});</text>
+  <text x="56" y="475" font-size="11" fill="#57606a" font-family="Consolas, monospace">sh.row(7).setValues(new Object[]{"Eggs",   12, "pcs",  "Dairy"});</text>
+
+  <text x="56" y="505" font-size="10.5" fill="#636363" font-style="italic">One call writes the whole row — cells are created, types routed automatically.</text>
+</svg>

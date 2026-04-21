@@ -161,6 +161,31 @@ These two are the simplest possible starting points — a title, a few cells, an
 
 ---
 
+#### 🛒 Rows from arrays — one call writes the whole row
+
+<p align="center">
+  <img src="docs/row-array-preview.svg" alt="Shopping list produced by RowFromArrayExample.java" width="90%"/>
+</p>
+
+> Source: [`examples/RowFromArrayExample.java`](examples/RowFromArrayExample.java) ·
+> Showcases:
+>
+> ```java
+> // Header row from a String[]
+> String[] headers = {"Item", "Qty", "Unit", "Aisle"};
+> sh.row(2).setRowValues(headers);
+>
+> // Data rows from Object[] — mixed types get routed automatically
+> sh.row(3).setValues(new Object[]{"Apples",  6, "pcs", "Produce"});
+> sh.row(4).setValues(new Object[]{"Milk",    2, "L",   "Dairy"});
+> ```
+>
+> No per-cell loop, no column-index bookkeeping. Use `setRowValues(String[])` when
+> every cell is text (headers are the classic case) and `setValues(Object[])` when
+> the row mixes strings, numbers, dates, booleans, etc.
+
+---
+
 ### 🟠 For intermediate + advanced users
 
 The rest use `@ExcelColumn` bean mapping, `ReportBuilder`, formulas, hyperlinks, round-trip reads, etc.
